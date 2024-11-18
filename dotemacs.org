@@ -1,0 +1,1532 @@
+# -*- ispell-dictionary: "en_US"; -*-
+#+TITLE: Emacs Config
+#+STARTUP: show3levels
+#+PROPERTY: header-args :comments link :tangle yes :mkdirp yes :results none :noweb yes
+
+* Early init config
+:PROPERTIES:
+:header-args: :tangle early-init.el
+:END:
+#+begin_src emacs-lisp
+  (setq package-enable-at-startup nil)
+
+  (setq gc-cons-threshold most-positive-fixnum)
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              (setq gc-cons-threshold (* 16 1024 1024))))
+#+end_src
+
+* Package management
+:PROPERTIES:
+:header-args+: :tangle lib/package-manager.el
+:END:
+#+begin_src emacs-lisp
+  ;; (provide 'package-manager)
+
+  ;; (require 'package)
+  ;; (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+  ;; (package-initialize)
+
+  (provide 'package-manager)
+
+  (defvar elpaca-installer-version 0.8)
+
+  (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
+
+  (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
+  (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
+  (defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
+                                :ref nil
+                                :files (:defaults "elpaca-test.el" (:exclude "extensions"))
+                                :build (:not elpaca--activate-package)))
+  (let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
+         (build (expand-file-name "elpaca/" elpaca-builds-directory))
+         (order (cdr elpaca-order))
+         (default-directory repo))
+    (add-to-list 'load-path (if (file-exists-p build) build repo))
+    (unless (file-exists-p repo)
+      (make-directory repo t)
+      (when (< emacs-major-version 28) (require 'subr-x))
+      (condition-case-unless-debug err
+          (if-let* ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
+                   ((zerop (call-process "git" nil buffer t "clone"
+                                         (plist-get order :repo) repo)))
+                   ((zerop (call-process "git" nil buffer t "checkout"
+                                         (or (plist-get order :ref) "--"))))
+                   (emacs (concat invocation-directory invocation-name))
+                   ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
+                                         "--eval" "(byte-recompile-directory \".\" 0 'force)")))
+                   ((require 'elpaca))
+                   ((elpaca-generate-autoloads "elpaca" repo)))
+              (progn (message "%s" (buffer-string)) (kill-buffer buffer))
+            (error "%s" (with-current-buffer buffer (buffer-string))))
+        ((error) (warn "%s" err) (delete-directory repo 'recursive))))
+    (unless (require 'elpaca-autoloads nil t)
+      (require 'elpaca)
+      (elpaca-generate-autoloads "elpaca" repo)
+      (load "./elpaca-autoloads")))
+  (add-hook 'after-init-hook #'elpaca-process-queues)
+  (elpaca `(,@elpaca-order))
+
+  (elpaca elpaca-use-package
+    (elpaca-use-package-mode))
+
+  (elpaca-wait)
+
+  ;; (defun +elpaca-unload-seq (e)
+  ;;   "Unload seq before continuing the elpaca build, then continue to build the recipe E."
+  ;;   (and (featurep 'seq) (unload-feature 'seq t))
+  ;;   (elpaca--continue-build e))
+
+  ;; (elpaca `(seq :build ,(append (butlast (if (file-exists-p (expand-file-name "seq" elpaca-builds-directory))
+  ;;                                           elpaca--pre-built-steps
+  ;;                                         elpaca-build-steps))
+  ;;                              (list '+elpaca-unload-seq 'elpaca--activate-package))))
+
+
+  (unless (equal system-type 'gnu/linux)
+    (elpaca-no-symlink-mode))
+#+end_src
+
+* Init config
+:PROPERTIES:
+:header-args+: :tangle init.el
+:END:
+
+#+begin_src emacs-lisp
+  (mapc (lambda(string)
+          (add-to-list 'load-path (locate-user-emacs-file string)))
+        '("ext" "lib"))
+
+  (require 'package-manager)
+  (require 'rca-macros)
+  (require 'rca-functions)
+  (require 'rca-ui)
+  (require 'rca-emacs)
+  (require 'rca-org)
+  (require 'rca-prog)
+  (require 'rca-completion)
+  (require 'rca-minibuffer)
+  (require 'rca-project)
+  (require 'rca-keyboard)
+  (require 'rca-tex)
+#+end_src
+
+* Macros
+:PROPERTIES:
+:header-args+: :tangle lib/rca-macros.el
+:END:
+
+#+begin_src emacs-lisp
+  (provide 'rca-macros)
+
+  (defmacro toggle-p (var)
+    "Toggles a boolean variable"
+    `(if (booleanp ,var) 
+         (setq ,var (not ,var))))
+#+end_src
+
+* Custom functions
+:PROPERTIES:
+:header-args+: :tangle lib/rca-functions.el
+:END:
+
+#+begin_src emacs-lisp
+  (provide 'rca-functions)
+#+end_src
+
+** File manipulation
+
+#+begin_src emacs-lisp
+  (defun rc/file-find-config ()
+    "Find config file interactively"
+    (interactive)
+    (find-file (locate-user-emacs-file
+                (completing-read "Select config file: " emacs-config-files))))
+
+  (defun rc/file-get-el (dir)
+    "Get all elisp files from a directory"
+    (directory-files dir nil "^[^.].*el$"))
+
+  (defun rc/find-stow-file ()
+    (interactive)
+    (find-file
+     (completing-read "Select config file: "
+                      (directory-files-recursively
+                       stow-files ".*" nil
+                       (lambda (dir)
+                         (not (string-match-p ".*git.*" dir)))))))
+
+  ;; (defun rc/insert-wallpaper-file ()
+  ;;   (interactive)
+  ;;   (insert
+  ;;    (file-name-sans-extension
+  ;;     (file-name-nondirectory
+  ;;      (completing-read "Select wallpaper: "
+  ;;                       (directory-files-recursively
+  ;;                        wallpaper-files ".*"))))))
+
+  (defun rc/locate-or-create-directory (dir)
+    "Search for a directory and create it if doesn't exists"
+    (let ((dir_ (locate-user-emacs-file dir)))
+       (when (not (file-directory-p dir_))
+         (make-directory dir_)) dir_))
+
+  (defun rc/config-insert-footer ()
+    (let ((inhibit-message t))
+      (goto-char (point-max))
+      (insert "\n;; Local Variables:\n;; eval: (add-hook 'after-save-hook (lambda ()(org-babel-detangle)) nil t)\n;; End:")
+      (save-buffer)))
+#+end_src
+
+** List manipulation
+
+#+begin_src emacs-lisp
+  (defun rc/list-append-str (string list &optional position)
+    "Appends a string to each element of a list.
+  If POSITION is nil appends to the beginning of each element."
+    (mapcar (lambda (element)
+              (if position
+                  (concat element string)
+                (concat string element)))
+            list))
+
+  (defun rc/list-merge-sublists (list)
+    "Merge all the sublists in a list"
+    (let (value)
+      (dolist (elt list value)
+        (setq value (append value elt)))))
+
+  (defun rc/list-select-random (items)
+    "Selects a random element from a list"
+    (let* ((size (length items))
+           (index (random size)))
+      (nth index items)))
+#+end_src
+
+** Miscellaneous
+
+#+begin_src emacs-lisp
+  (defun rc/number-between (number bot top)
+    "Determines if a number is within a range"
+    (if (< number top)
+        (if (> number bot)
+            t nil)
+      nil))
+
+  (defun rc/time-is-day ()
+    "Determines if the current time is considered day"
+    (if (rc/number-between
+         (nth 2 (decode-time (current-time)))
+         8 18)
+        t nil))
+
+  (defun rc/truncate-lines-off ()
+    "Command to set truncate-lines to t in mode hooks"
+    (setq truncate-lines t))
+
+  (defun rc/export-code-block-for-message (start end)
+    "Copy current region and format it to a markdown codeblock"
+    (interactive "r")
+    (setq code-block (buffer-substring start end))
+    (setq code-block-formatted (concat "```\n" code-block "```"))
+    (deactivate-mark)
+    (kill-new code-block-formatted))
+
+  (defun line-contains? (string)
+    (s-contains? string
+                 (buffer-substring-no-properties
+                  (line-beginning-position)
+                  (line-end-position))))
+
+  (defun replace-regexp-in-line (regexp replacement)
+    (replace-regexp regexp replacement nil
+                    (line-beginning-position)
+                    (line-end-position)))
+
+  (defun current-line-empty-p ()
+    "Return t if the current line is empty otherwise returns nil"
+    (save-excursion
+      (beginning-of-line)
+      (looking-at-p "[[:blank:]]*$")))
+#+end_src
+
+* Modules
+** Emacs module
+:PROPERTIES:
+:header-args+: :tangle lib/rca-emacs.el
+:END:
+
+#+begin_src emacs-lisp
+  (provide 'rca-emacs)
+
+  (use-package emacs
+    :ensure nil
+
+    :bind (("C-x R" . consult-recent-file)
+           ("C-x C-k C-x C-k" . kill-emacs)
+           ("C-x B" . ibuffer)
+           ("M-z" . zap-up-to-char)
+           ("C-z" . nil)
+           ("C-x C-r" . nil)
+           ("C-x r v" . view-register)
+           ("C-z C-j" . rc/file-find-config)
+           ("C-z j" . rc/find-stow-file)
+           ("C-x C-z" . nil)
+           ("C-c P" . find-file-at-point)
+           ("C-x K" . (lambda () (interactive) (kill-buffer (current-buffer))))
+           ("C-x C-c" . nil)
+           ("C-h h" . nil)
+           ("M-`" . nil)
+           ("<insert>" . nil)
+           ("<menu>" . nil))
+
+    :preface
+    (setq history-excluded-filetypes '(".*gz" ".*pdf" "bookmarks" "recentf"
+      			             "init.el" ".*gitignore" "early-init.el"
+      			             ".*log" ".*png" ".*jpg" ".*mp4" ".*gif"
+      			             ".*agenda.org" ".*ideas.org" ".*mod/.*"
+      			             ".*lib/.*" ".*ext/.*" ".*_db"))
+    (setq temporal-directory
+          (locate-user-emacs-file "temporal/"))
+    (setq snippets-directory
+          (locate-user-emacs-file "snippets/"))
+    (setq backup-directory
+          (rc/locate-or-create-directory  "saves/"))
+    (setq undo-history-directory
+          (rc/locate-or-create-directory  "undohist/"))
+    (setq recentf-file
+          (locate-user-emacs-file  "recentf"))
+    (setq emacs-config-files-dirs
+          '("" "lib/"))
+    (setq stow-files
+          (concat (getenv "HOME") "/dotfiles/"))
+    (put 'eval 'safe-local-variable #'booleanp)
+    :custom
+    ;; (initial-buffer-choice t)
+    (recentf-save-file recentf-file)
+    (initial-scratch-message nil)
+    (inhibit-initial-startup-message t)
+    (ring-bell-function 'ignore)
+    (column-number-mode t)
+    (blink-cursor-mode nil)
+    (use-dialog-box nil)
+    (auto-save-default nil)
+    (auto-save-interval 200)
+    (auto-save-timeout 20)
+    (history-length 25)
+    (auto-save-list-file-prefix nil)
+    (backup-directory-alist `(("." . ,backup-directory)))
+    (recentf-exclude history-excluded-filetypes)
+    (x-select-enable-clipboard t)
+    (read-file-name-completion-ignore-case t)
+    (async-shell-command-buffer 'confirm-kill-process)
+    (server-client-instructions nil)
+    (savehist-additional-variables (list 'register-alist))
+    (register-use-preview t)
+    :config
+    (setq emacs-config-files
+          (rc/list-merge-sublists
+           (mapcar (lambda (dir)
+                     (rc/list-append-str
+                      dir (rc/file-get-el
+                           (concat user-emacs-directory dir))))
+                   emacs-config-files-dirs)))
+    (recentf-mode 1)
+    (savehist-mode 1)
+    (global-auto-revert-mode 1)
+    (defalias 'yes-or-no-p 'y-or-n-p)
+    (add-hook 'prog-mode-hook 'display-line-numbers-mode)
+    (add-hook 'shell-mode-hook 'rc/truncate-lines-off)
+    (setq-default custom-file
+                  (expand-file-name "custom.el" user-emacs-directory))
+    (when (file-exists-p custom-file)
+      (load custom-file))
+    (when (not (file-exists-p temporal-directory))
+      (make-directory temporal-directory))
+    (add-to-list 'default-frame-alist '(height . 37)))
+
+  (use-package calendar
+    :ensure nil
+    :bind (("<f6> c" . calendar))
+    :mode ("diary" . diary-mode)
+    :custom
+    (diary-file "~/Dropbox/diary")
+    (calendar-latitude -12.0)
+    (calendar-longitude -77.1)
+    (calendar-mark-diary-entries-flag t)
+    (calendar-mark-holidays-flag t)
+    (holiday-bahai-holidays nil)
+    (holiday-bahai-holidays nil)
+    (holiday-hebrew-holidays nil)
+    (holiday-islamic-holidays nil))
+
+#+end_src
+
+** User interface
+:PROPERTIES:
+:header-args+: :tangle lib/rca-ui.el
+:END:
+#+begin_src emacs-lisp
+  (provide 'rca-ui)
+#+end_src
+
+*** User interface general options
+#+begin_src emacs-lisp
+  (use-package emacs
+    :ensure nil
+    :init
+    ;; (setq text-font "Lexend")
+    (setq default-font "mononoki Nerd Font")
+    (set-face-attribute 'default nil
+          	      :family default-font
+          	      :height 110)
+    (set-face-attribute 'italic nil
+          	      :family default-font)
+    :custom
+    (frame-resize-pixelwise t)
+    (modus-themes-italic-constructs t)
+
+    :config
+    (scroll-bar-mode -1)
+    (tool-bar-mode -1)
+    (menu-bar-mode -1)
+    (setq-default fill-column 80)
+    (setq-default indent-tabs-mode nil)
+    (setq-default display-line-numbers-width 3)
+    (setq-default display-line-numbers-grow-only t))
+#+end_src
+
+*** Buffer display options
+#+begin_src emacs-lisp
+  (use-package emacs
+    :ensure nil
+    :config
+    (defun org-babel-detangle-no-buffer-pop-up (orig-fun &rest args)
+      (save-excursion
+        (let ((display-buffer-alist
+               '((".*" (display-buffer-no-window) (allow-no-window . t)))))
+          (apply orig-fun args))))
+    (advice-add 'org-babel-detangle :around #'org-babel-detangle-no-buffer-pop-up)
+    (setq display-buffer-alist
+          '(
+            ((derived-mode . shell-mode)
+             (display-buffer-reuse-mode-window
+              display-buffer-below-selected)
+             (window-height . 12)
+             (dedicated . t)
+             (window-parameters . ((no-other-window . t)
+    			         (mode-line-format . none))))
+            ("\\*Help\\*"
+             (display-buffer-in-side-window)
+             (side . right)
+             (window-width . 0.40))
+            ("\\*\\(Output\\|Register Preview\\).*"
+             (display-buffer-reuse-mode-window
+              display-buffer-at-bottom)
+             (window-height . 10)
+             (window-parameters . ((mode-line-format . none))))
+            ("\\*\\(Agenda Commands\\|Org Agenda\\|Org Select\\).*"
+             (display-buffer-reuse-mode-window
+              display-buffer-at-bottom)
+             (window-parameters . ((mode-line-format . none))))
+            ("\\*compilation\\*"
+             (display-buffer-reuse-mode-window
+              display-buffer-below-selected)
+             (window-height . 12)
+             (dedicated . t))
+            ("\\*vterm\\*"
+             (display-buffer-reuse-mode-window
+              display-buffer-below-selected)
+             (window-height . 20)
+             (dedicated . t))
+            ("\\*Python\\*"
+             (display-buffer-reuse-mode-window
+              display-buffer-below-selected)
+             (window-height . 20)
+             (dedicated . t))
+            ("\\*undo-tree\\*"
+             (display-buffer-in-side-window)
+             (side . right)
+             (dedicated . t)
+             (window-width . 0.25)))))
+#+end_src
+
+*** User interface variables
+#+begin_src emacs-lisp
+  (use-package emacs
+    :ensure nil
+    :init
+
+    (defcustom wallpaper-files
+      (concat (getenv "HOME") "./sync/pix/wallpaper/")
+      "Folder where wallpaper files are stored."
+      :type 'directory)
+
+    )
+#+end_src
+
+*** Diminish
+#+begin_src emacs-lisp
+  (use-package diminish
+    :ensure t
+    :config
+    (diminish 'which-key-mode nil)
+    (diminish 'eldoc-mode nil))
+#+end_src
+
+*** Themes
+#+begin_src emacs-lisp
+  (use-package ef-themes
+    :ensure t
+    :init
+    (setq themes
+          '((parsee ef-reverie ef-elea-dark)
+            (yuuma ef-summer ef-rosa)
+            (nazrin2 ef-light ef-owl)
+            (satori ef-trio-light ef-trio-dark)))
+    (setq theme-character 'nazrin2)
+    :config
+    (setq ef-themes-headings
+          '((0 . (1.6))
+            (1 . (1.5))
+            (2 . (1.3))
+            (agenda-date . (1.3))
+            (agenda-structure . (1.8))
+            (t . (1.1)))))
+#+end_src
+
+*** Circadian
+#+begin_src emacs-lisp
+  (use-package circadian
+    :ensure t
+    :after (:all ef-themes emacs calendar)
+    :hook
+    (server-after-make-frame . (lambda () (enable-theme (car custom-enabled-themes))))
+    :config
+    (let* ((theme-colors (cdr (assoc theme-character themes)))
+           (sunrise (car theme-colors))
+           (sunset (cdr theme-colors)))
+      (setq circadian-themes `((:sunrise . ,sunrise)
+                               (:sunset . ,sunset))))
+    (circadian-setup))
+#+end_src
+
+*** Olivetti
+#+begin_src emacs-lisp
+  (use-package olivetti
+    :ensure t
+    :hook (Info-mode . olivetti-mode))
+#+end_src
+
+*** Ace-window
+#+begin_src emacs-lisp
+  (use-package ace-window
+    :ensure t
+    :bind ("M-o" . ace-window)
+    :custom-face
+    (aw-mode-line-face ((t (:inherit bold :underline t :height 1.2))))
+    :hook (server-after-make-frame . (lambda () (ace-window-display-mode 1)))
+    :config
+    ;; (ace-window-display-mode 1)
+    (setq aw-scope 'frame)
+    (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
+#+end_src
+
+*** Dashboard
+
+#+begin_src emacs-lisp
+  (defun my-inhibit-startup-screen-file ()
+    "Startup screen inhibitor for `command-line-functions`.
+  Inhibits startup screen on the first unrecognised option which
+  names an existing file."
+    (ignore
+     (setq inhibit-startup-screen
+  	 (file-exists-p
+  	  (expand-file-name argi command-line-default-directory)))))
+
+  (add-hook 'command-line-functions #'my-inhibit-startup-screen-file)
+
+  (use-package dashboard
+    :ensure t
+    :preface
+    (defun protect-dashboard ()
+      (define-key
+       dashboard-mode-map (kbd "q") 'dashboard-refresh-buffer))
+    :init
+    (setq banner-images
+          (directory-files (locate-user-emacs-file "img") t ".*g$"))
+    (setq banner-image-size (if (equal system-name "acer") 500 550))
+    :hook
+    (elpaca-after-init . dashboard-insert-startupify-lists)
+    (elpaca-after-init . dashboard-initialize)
+    (dashboard-mode . protect-dashboard)
+    (dashboard-after-initialize . dashboard-refresh-buffer)
+    :custom
+    (dashboard-center-content t)
+    (dashboard-items nil)
+    (dashboard-startup-banner `(,(locate-user-emacs-file (concat "img/" (symbol-name theme-character) ".png"))))
+    ;; (dashboard-startup-banner `(,(rc/list-select-random banner-images)))
+    ;; (dashboard-startup-banner banner-images)
+    (dashboard-image-banner-max-height banner-image-size)
+    (dashboard-banner-logo-title nil)
+    (dashboard-set-footer nil)
+    (dashboard-footer-messages (list nil))
+    (tab-bar-new-tab-choice "*dashboard*")
+    :init
+    (dashboard-setup-startup-hook)
+    (setq initial-buffer-choice
+          (lambda () (get-buffer-create "*dashboard*"))))
+#+end_src
+
+*** Rainbow mode
+
+#+begin_src emacs-lisp
+  (use-package rainbow-mode
+    :ensure t
+    :defer t)
+#+end_src
+
+** Org-mode
+:PROPERTIES:
+:header-args+: :tangle lib/rca-org.el
+:END:
+
+#+begin_src emacs-lisp
+  (provide 'rca-org)
+#+end_src
+
+*** Org general options
+#+begin_src emacs-lisp
+  (use-package org
+    :ensure nil
+    :bind ("C-c a" . org-agenda)
+    :hook (org-capture-mode . org-align-tags)
+    :custom
+    ;; (org-todo-keywords '((sequence "IDEA" "TODO" "|" "DONE" "DROP")))
+    (org-agenda-files '("~/.sync/org_files/agenda/" "~/.sync/org_files/notes/"))
+    (org-log-done 'time)
+    (org-confirm-babel-evaluate nil)
+    (org-agenda-time-grid '((daily today require-timed)
+                            (800 1000 1200 1400 1600 1800 2000 2200)
+                            "......"
+                            "-----------------"))
+    :config
+    (setq modus-themes-headings
+          '((1 . (1.5))
+            (2 . (1.3))
+            (agenda-date . (1.3))
+            (agenda-structure . (1.8))
+            (t . (1.1))))
+    (setf (cdr (assoc 'file org-link-frame-setup)) 'find-file)
+    (setq org-safe-remote-resources
+          '("\\`https://fniessen\\.github\\.io/org-html-themes/org/theme-readtheorg\\.setup\\'"))
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((python . t)
+       (octave . t)))
+    (defun browse-steam-page (steam-id)
+      (browse-url (concat "steam://advertise/" steam-id)))
+    
+    (org-link-set-parameters "steam"
+                             :follow 'browse-steam-page)
+
+    (add-hook 'org-agenda-mode-hook 'hl-line-mode)
+    (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
+    (add-hook 'org-babel-after-execute-hook 'org-toggle-inline-images))
+#+end_src
+
+*** Org-capture
+#+begin_src emacs-lisp
+  (use-package org-capture
+    :ensure nil
+    :after org
+    :bind ("C-c c" . org-capture)
+    ("C-c l" . org-store-link)
+    :preface
+    (defvar my/org-academic-agenda "~/.sync/org_files/agenda/academic.org")
+    (defvar my/org-personal-agenda "~/.sync/org_files/agenda/personal.org")
+    (defvar my/org-idea-notebook "~/.sync/org_files/notes/ideas.org")
+    (defvar my/org-dream-diary "~/.sync/org_files/notes/dreams.org")
+    
+    (defvar my/org-created-property
+      "\n:PROPERTIES:\n:CREATED: [%<%Y-%m-%d %a %H:%M>]\n:END:")
+
+    (defvar my/org-file-link
+      "\n\nArchivo: [[%L][%f]]")
+    
+    (defun rc/refile-to (file headline)
+      "Move current headline to specified location"
+      (let ((pos (save-excursion
+  		 (find-file file)
+  		 (org-find-exact-headline-in-buffer headline))))
+        (org-refile nil nil (list headline file nil pos)))
+      (org-save-all-org-buffers)
+      (switch-to-buffer (current-buffer)))
+    
+    (defun rc/idea-to-task (class)
+      "Promotes an idea to a pending task"
+      (interactive
+       (list (completing-read "Tipo de tarea:" '("Universidad" "Personal"))))
+      (org-todo "TODO")
+      (my/refile-to my/org-agenda-file class))
+    
+    :custom
+    (org-capture-templates `(
+                             ("a" "academic task")
+                             ("ae" "exam" entry (file+headline my/org-academic-agenda "Exam"), (concat "* TODO %^{Exam} %^g\nSCHEDULED: %^T" my/org-created-property) :empty-lines 1)
+                             ("ap" "project" entry (file+headline my/org-academic-agenda "Project"), (concat "* TODO %^{Project} %^g\nDEADLINE:%^T" my/org-created-property) :empty-lines 1)
+                             ("ah" "homework" entry (file+headline my/org-academic-agenda "Homework"), (concat "* TODO %^{Homework} %^g\nDEADLINE:%^T" my/org-created-property) :empty-lines 1)
+                             ("p" "personal task")
+                             ("pc" "constructive" entry (file+headline my/org-personal-agenda "Constructive"), (concat "* TODO %^{Task}\nDEADLINE: %^T" my/org-created-property) :empty-lines 1)
+                             ("pm" "mundane" entry (file+headline my/org-personal-agenda "Mundane"), (concat "* TODO %^{Task}\nDEADLINE: %^T" my/org-created-property) :empty-lines 1)
+                             ("n" "note")
+                             ("ni" "idea" entry (file my/org-idea-notebook), (concat "* %^{Idea}" my/org-created-property "\n%?") :empty-lines 1)
+                             ("nd" "dream" entry (file my/org-dream-diary), (concat"* %^{Dream}" my/org-created-property "\n%?") :empty-lines 1)
+                             ))
+    )
+
+#+end_src
+
+*** Org export options
+#+begin_src emacs-lisp
+  (use-package org
+    :ensure nil
+    :config
+    ;; Code extracted from
+    ;; https://pragmaticemacs.wordpress.com/2017/03/13/export-org-mode-headlines-to-separate-files/
+    (defun org-export-headlines-to-pdf ()
+      "Export all subtrees that are *not* tagged with :noexport: to
+  separate files.
+
+  Subtrees that do not have the :EXPORT_FILE_NAME: property set
+  are exported to a filename derived from the headline text."
+      (interactive)
+      (save-buffer)
+      (let ((modifiedp (buffer-modified-p)))
+        (save-excursion
+          (goto-char (point-min))
+          (goto-char (re-search-forward "^*"))
+          (set-mark (line-beginning-position))
+          (goto-char (point-max))
+          (org-map-entries
+           (lambda ()
+             (let ((export-file (org-entry-get (point) "EXPORT_FILE_NAME")))
+               (unless export-file
+                 (org-set-property
+                  "EXPORT_FILE_NAME"
+                  (replace-regexp-in-string " " "_" (nth 4 (org-heading-components)))))
+               (deactivate-mark)
+               (org-latex-export-to-pdf nil t)
+               (unless export-file (org-delete-property "EXPORT_FILE_NAME"))
+               (set-buffer-modified-p modifiedp)))
+           "-noexport" 'region-start-level)))))
+#+end_src
+
+*** Org export packages
+#+begin_src emacs-lisp
+  (use-package htmlize
+    :ensure t)
+
+  (use-package ox-pandoc
+    :ensure t
+    :custom
+    (org-pandoc-options
+     '((lua-filter . "pagebreak.lua")
+       (standalone . t)
+       (highlight-style . "tango"))))
+#+end_src
+
+*** Org latex options
+#+begin_src emacs-lisp
+  (use-package org
+    :ensure nil
+    :custom
+    (org-highlight-latex-and-related '(latex script entities))
+    (org-latex-compiler "lualatex")
+    :config
+    (setq org-latex-listings 'minted
+          org-latex-packages-alist '(("" "minted")))
+    (setq org-latex-pdf-process
+          '("lualatex -shell-escape -interaction nonstopmode %f"
+            "lualatex -shell-escape -interaction nonstopmode %f"))
+    (setq luamagick '(luamagick :programs ("lualatex" "magick")
+                                :description "pdf > png"
+                                :message "you need to install lualatex and imagemagick."
+                                :use-xcolor t
+                                :image-input-type "pdf"
+                                :image-output-type "png"
+                                :image-size-adjust (1.0 . 1.0)
+                                :latex-compiler ("lualatex -interaction nonstopmode -output-directory %o %f")
+                                :image-converter ("magick convert -density %D -trim -antialias %f -quality 100 %O")))
+    (add-to-list 'org-preview-latex-process-alist luamagick)
+    (setq org-preview-latex-default-process 'luamagick))
+#+end_src
+
+** Programming environment
+:PROPERTIES:
+:header-args+: :tangle lib/rca-prog.el
+:END:
+
+#+begin_src emacs-lisp
+  (provide 'rca-prog)
+#+end_src
+
+*** Terminal
+#+begin_src emacs-lisp
+  (use-package vterm
+    :ensure t
+    :defer t)
+#+end_src
+
+*** Fortran
+#+begin_src emacs-lisp
+  (use-package fortran
+    :ensure nil
+    :config
+    (add-hook 'f90-mode-hook
+              (lambda ()
+                (set (make-local-variable 'compile-command)
+                     (format "gfortran %s && ./a.out" (file-name-nondirectory buffer-file-name))))))
+#+end_src
+
+*** Gnuplot
+#+begin_src emacs-lisp
+  (use-package gnuplot
+    :ensure t
+    :defer t)
+#+end_src
+
+*** Lua
+#+begin_src emacs-lisp
+  (use-package lua-mode
+    :ensure t
+    :defer t)
+#+end_src
+
+*** Julia
+#+begin_src emacs-lisp
+  (use-package julia-snail
+    :ensure t
+    :defer t
+    :hook (julia-mode . julia-snail-mode))
+#+end_src
+
+*** Markdown
+#+begin_src emacs-lisp
+  (use-package markdown-mode
+    :ensure t)
+#+end_src
+
+*** Java
+#+begin_src emacs-lisp
+  (use-package eglot-java
+    :ensure t
+    :defer t
+    :config
+    (setq eglot-java-eclipse-jdt-args `("-Xmx1G" "--add-modules=ALL-SYSTEM" "--add-opens"
+                                        "java.base/java.util=ALL-UNNAMED" "--add-opens"
+                                        "java.base/java.lang=ALL-UNNAMED"
+                                        ,(concat "-javaagent:" (expand-file-name user-emacs-directory) "share/eclipse.jdt.ls/plugins/lombok.jar")
+                                        ,(concat "-Xbootclasspath/a:" (expand-file-name user-emacs-directory) "share/eclips.jdtls/plugins/lombok.jar"))))
+
+  (use-package java
+    :ensure nil
+    :defer t
+    :config
+    (defun rc/spring-run ()
+      "Runs current spring boot project in an async shell window"
+      (interactive)
+      (let ((default-directory (project-root (project-current t))))
+        (async-shell-command "mvn spring-boot:run" "\*Spring Boot\*")))
+
+    (defun rc/spring-shell ()
+      "Opens the current spring shell"
+      (interactive)
+      (if (get-buffer "\*Spring Boot\*")
+          (display-buffer "\*Spring Boot\*")
+        (message "No spring boot proccess running. Try spring-run."))))
+#+end_src
+
+*** HTML
+#+begin_src emacs-lisp
+  (use-package mhtml-mode
+    :ensure nil
+    :defer t
+    :preface
+    (defun sgml-delete-tagged-text ()
+      "Delete text between the tags that contain the current point"
+      (interactive)
+      (let ((b (point)))
+        (sgml-skip-tag-backward 1)
+        (when (not (eq b (point)))
+          ;; moved somewhere, should be at front of a tag now
+          (save-excursion 
+            (forward-sexp 1)
+            (setq b (point)))
+          (sgml-skip-tag-forward 1)
+          (backward-sexp 1)
+          (delete-region b (point))
+          (meow-insert))))
+    :config
+    (define-key mhtml-mode-map (kbd "C-c C-i") 'sgml-delete-tagged-text))
+#+end_src
+
+** Completion
+:PROPERTIES:
+:header-args+: :tangle lib/rca-completion.el
+:END:
+
+#+begin_src emacs-lisp
+  (provide 'rca-completion)
+#+end_src
+
+*** Completion general options
+#+begin_src emacs-lisp
+  (use-package emacs
+    :init
+    (setq tab-always-indent 'complete)
+    (setq text-mode-ispell-word-completion nil))
+#+end_src
+
+*** Yasnippet
+#+begin_src emacs-lisp
+  (use-package yasnippet
+    :ensure t
+    :diminish yas-minor-mode
+    :custom
+    (yas-snippet-dirs `(,(locate-user-emacs-file "snippets")))
+    :config
+    (when (not (file-exists-p  snippets-directory))
+      (make-directory snippets-directory))
+    (yas-global-mode 1))
+#+end_src
+
+*** Corfu
+#+begin_src emacs-lisp
+  (use-package corfu
+    :ensure t
+    :bind
+    (("C-<tab>" . completion-at-point)
+     :map corfu-map
+     ("S-SPC" . corfu-insert-separator)
+     :map corfu-popupinfo-map
+     ("M-n" . corfu-popupinfo-scroll-up)
+     ("M-p" . corfu-popupinfo-scroll-down))
+    :init
+    (global-corfu-mode)
+    :custom
+    (corfu-min-width 70)
+    (corfu-max-width 70)
+    (corfu-popupinfo-mode 1)
+    (corfu-popupinfo-delay '(1.0 . 1.2))
+    (corfu-on-exact-match nil)
+    ;; (corfu-auto-prefix 4)
+    (corfu-separator ?\s)
+    (corfu-auto t)
+    (corfu-cycle t)
+    (corfu-quit-no-match 'separator))
+#+end_src
+
+*** Icons
+#+begin_src emacs-lisp
+  (use-package kind-icon
+    :ensure t
+    :after corfu
+    :custom
+    (kind-icon-use-icons nil)
+    ;; (kind-icon-blend-background t)
+    ;; (kind-icon-default-face 'corfu-default) ; only needed with blend-background
+    :config
+    (add-hook 'after-enable-theme-hook  #'kind-icon-reset-cache)
+    (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+#+end_src
+
+*** Cape
+#+begin_src emacs-lisp
+  (use-package cape
+    :ensure t
+    :init
+    ;; Make dabbrev use the correct case
+    (defun my-cape--dabbrev-fix-expansion (expansion)
+      "Return the downcased EXPANSION.
+   Removes trailing non-alphanumeric characters if present."
+      (let ((downcased (downcase expansion)))
+        (substring downcased 0 (string-match-p "[^[:alnum:]]+$" downcased))))
+    
+    (defun my-cape--dabbrev-list (input)
+      "Find all dabbrev expansions for INPUT. "
+      (cape--silent
+        ;; Don't search all buffers. Only those with the same major-mode.
+        (let ((dabbrev-check-other-buffers t)
+              (dabbrev-check-all-buffers nil))
+          (dabbrev--reset-global-variables))
+        (cons
+         (apply-partially #'string-prefix-p input)
+         (cl-loop for w in (mapcar #'my-cape--dabbrev-fix-expansion
+                                   (dabbrev--find-all-expansions input t))
+                  if (>= (length w) cape-dabbrev-min-length) collect
+                  (cape--case-replace t input w)))))
+
+    (advice-add 'cape--dabbrev-list :override #'my-cape--dabbrev-list)
+
+    (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+    (add-to-list 'completion-at-point-functions #'cape-keyword)
+    (add-to-list 'completion-at-point-functions #'cape-file)
+    (add-to-list 'completion-at-point-functions #'cape-elisp-block))
+#+end_src
+
+*** Dabbrev
+#+begin_src emacs-lisp
+  (use-package dabbrev
+    :bind (("C-." . dabbrev-expand)
+           ("C-:" . dabbrev-completion))
+    :config
+    (add-to-list 'dabbrev-ignored-buffer-regexps "\\` ")
+    ;; Since 29.1, use `dabbrev-ignored-buffer-regexps' on older.
+    (add-to-list 'dabbrev-ignored-buffer-modes 'doc-view-mode)
+    (add-to-list 'dabbrev-ignored-buffer-modes 'pdf-view-mode)
+    (add-to-list 'dabbrev-ignored-buffer-modes 'tags-table-mode))
+#+end_src
+
+*** Smartparens
+#+begin_src emacs-lisp
+  (use-package smartparens
+    :ensure t
+    :config
+    (require 'smartparens-config))
+#+end_src
+
+*** Flyspell
+#+begin_src emacs-lisp
+  (use-package flyspell
+    :bind (:map flyspell-mode-map
+                ("C-." . nil))
+    :config
+    (setq ispell-program-name "hunspell"
+  	ispell-personal-dictionary "~/.sync/dict/hunspell_es"
+  	ispell-dictionary "es")
+    :hook (org-mode . flyspell-mode))
+#+end_src
+
+*** Vundo
+#+begin_src emacs-lisp
+  (use-package vundo
+    :ensure t
+    :bind ("C-x u" . vundo))
+#+end_src
+
+*** Eldoc
+#+begin_src emacs-lisp
+  (use-package eldoc-box
+    :ensure t
+    :custom
+    (eldoc-box-max-pixel-width 550)
+    (eldoc-box-max-pixel-height 400)
+    :bind (("M-ñ" . eldoc-box-help-at-point)
+           ("M-n" . eldoc-box-scroll-up)
+           ("M-p" . eldoc-box-scroll-down)))
+#+end_src
+
+** Minibuffer
+:PROPERTIES:
+:header-args+: :tangle lib/rca-minibuffer.el
+:END:
+
+#+begin_src emacs-lisp
+  (provide 'rca-minibuffer)
+#+end_src
+
+*** Vertico
+#+begin_src emacs-lisp
+  (use-package vertico
+    ;; :ensure (vertico :type git
+    ;;       	   :host github
+    ;;       	   :repo "minad/vertico"
+                     ;; :files (:defaults "extensions/*"))
+    :ensure t
+    :init
+    (vertico-mode)
+    :custom
+    (vertico-cicle t)
+    (vertico-count 12))
+
+
+  ;; (use-package vertico-directory
+  ;;   :ensure nil
+  ;;   :after vertico
+  ;;   :bind (:map vertico-map
+  ;; 	      ("RET" . vertico-directory-enter)
+  ;; 	      ("DEL" . vertico-directory-delete-char)
+  ;; 	      ("M-DEL" . vertico-directory-delete-word))
+  ;;   :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
+#+end_src
+
+*** Orderless
+#+begin_src emacs-lisp
+  (use-package orderless
+    :ensure t
+    :custom
+    (completion-styles '(orderless basic))
+    (completion-category-overrides '((file (styles
+                                            basic
+                                            partial-completion)))))
+#+end_src
+
+*** Marginalia
+#+begin_src emacs-lisp
+  (use-package marginalia
+    :ensure t
+    :config
+    (marginalia-mode))
+#+end_src
+
+*** Consult
+#+begin_src emacs-lisp
+  (use-package consult
+    :ensure t
+    :bind (("C-x C-b" . consult-buffer)
+           ("C-x r b" . consult-bookmark))
+    :config
+    (consult-customize consult-recent-file :preview-key nil)
+    (consult-customize consult-bookmark :preview-key nil))
+#+end_src
+
+** Project management
+:PROPERTIES:
+:header-args+: :tangle lib/rca-project.el
+:END:
+
+#+begin_src emacs-lisp
+  (provide 'rca-project)
+#+end_src
+
+*** Transient
+#+begin_src emacs-lisp
+  (use-package transient
+    :ensure t)
+#+end_src
+
+*** Magit
+#+begin_src emacs-lisp
+  (use-package magit
+    :ensure t
+    :requires transient
+    :defer 1)
+#+end_src
+
+*** Skeletor
+#+begin_src emacs-lisp
+  (use-package skeletor
+    :ensure t
+    :custom
+    (skeletor-project-directory "~/Files/workspace/projects/")
+    :config
+    (skeletor-define-template "latex-article"
+      :title "LaTeX Article"
+      :no-license? t)
+    (skeletor-define-template "LaTeX-APA7"
+      :title "LaTeX APA 7th Article"
+      :no-license? t)
+    (skeletor-define-template "latex-beamer"
+      :title "LaTeX Beamer"
+      :no-license? t))
+#+end_src
+
+** Input
+:PROPERTIES:
+:header-args+: :tangle lib/rca-keyboard.el
+:END:
+
+#+begin_src emacs-lisp
+  (provide 'rca-keyboard)
+#+end_src
+
+*** Meow
+**** Initial meow setup
+#+begin_src emacs-lisp 
+  (use-package meow
+    :ensure t
+    :config
+    (defun meow-setup ()
+      (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
+      (meow-motion-overwrite-define-key
+       '("j" . meow-next)
+       '("k" . meow-prev)
+       '("<escape>" . ignore))
+
+      (meow-leader-define-key
+       ;; SPC j/k will run the original command in MOTION state.
+       '("j" . "H-j")
+       '("k" . "H-k")
+       '("d" . "C-x 0")
+       '("t" . "C-x t")
+       '("q" . "C-x C-k")
+       '("r" . "C-x r")
+       '("u" . meow-universal-argument)
+       ;; Use SPC (0-9) for digit arguments.
+       '("1" . meow-digit-argument)
+       '("2" . meow-digit-argument)
+       '("3" . meow-digit-argument)
+       '("4" . meow-digit-argument)
+       '("5" . meow-digit-argument)
+       '("6" . meow-digit-argument)
+       '("7" . meow-digit-argument)
+       '("8" . meow-digit-argument)
+       '("9" . meow-digit-argument)
+       '("0" . meow-digit-argument)
+       '("/" . meow-keypad-describe-key)
+       '("?" . meow-cheatsheet))
+
+      (meow-normal-define-key
+       '("0" . meow-expand-0)
+       '("9" . meow-expand-9)
+       '("8" . meow-expand-8)
+       '("7" . meow-expand-7)
+       '("6" . meow-expand-6)
+       '("5" . meow-expand-5)
+       '("4" . meow-expand-4)
+       '("3" . meow-expand-3)
+       '("2" . meow-expand-2)
+       '("1" . meow-expand-1)
+       '("-" . negative-argument)
+       '(";" . meow-reverse)
+       '("," . meow-inner-of-thing)
+       '("." . meow-bounds-of-thing)
+       '("[" . meow-beginning-of-thing)
+       '("]" . meow-end-of-thing)
+       '("a" . meow-append)
+       '("A" . meow-open-below)
+       '("b" . meow-back-word)
+       '("B" . meow-back-symbol)
+       '("c" . meow-change)
+       '("d" . meow-delete)
+       '("D" . meow-backward-delete)
+       '("e" . meow-next-word)
+       '("E" . meow-next-symbol)
+       '("f" . meow-find)
+       '("g" . meow-cancel-selection)
+       '("G" . meow-grab)
+       '("h" . meow-left)
+       '("H" . meow-left-expand)
+       '("i" . meow-insert)
+       '("I" . meow-open-above)
+       '("j" . meow-next)
+       '("J" . meow-next-expand)
+       '("k" . meow-prev)
+       '("K" . meow-prev-expand)
+       '("l" . meow-right)
+       '("L" . meow-right-expand)
+       '("m" . meow-join)
+       '("n" . meow-search)
+       '("o" . meow-block)
+       '("O" . meow-to-block)
+       '("p" . meow-yank)
+       '("P" . meow-paren-mode)
+       ;; '("q" . meow-quit)
+       '("Q" . meow-indent)
+       '("r" . meow-replace)
+       '("R" . meow-swap-grab)
+       '("s" . meow-kill)
+       '("t" . meow-till)
+       '("u" . meow-undo)
+       '("U" . meow-undo-in-selection)
+       '("v" . meow-visit)
+       '("w" . meow-mark-word)
+       '("W" . meow-mark-symbol)
+       '("x" . meow-line)
+       '("X" . meow-goto-line)
+       '("°" . meow-last-buffer)
+       '("y" . meow-save)
+       '("Y" . meow-sync-grab)
+       '("z" . meow-pop-selection)
+       '("¿" . repeat)
+       '("<escape>" . ignore))
+
+    (meow-motion-overwrite-define-key
+     '("°" . meow-last-buffer)
+     '("j" . meow-next)
+     '("k" . meow-prev)
+     '("<escape>" . ignore))
+
+    (with-eval-after-load 'consult
+      (meow-normal-define-key
+       '("X" . consult-goto-line)))
+
+
+    (add-to-list 'meow-keypad-start-keys '(?z . ?z))
+
+    (meow-thing-register 'angles
+                         '(pair ("<") (">"))
+                         '(pair ("<") (">")))
+    ;; (meow-thing-register 'latex
+    ;;                      latex-thing-regexp
+    ;;                      latex-thing-regexp)
+    (meow-thing-register 'inline-math
+                         '(pair ("\\(") ("\\)"))
+                         '(pair ("\\(") ("\\)")))
+    (meow-thing-register 'display-math
+                         '(pair ("\\[") ("\\]"))
+                         '(pair ("\\[") ("\\]")))
+    (meow-thing-register 'double-quotes
+                         '(regexp "\"" "\"")
+                         '(regexp "\"" "\""))
+    (meow-thing-register 'single-quotes
+                         '(regexp "\'" "\'")
+                         '(regexp "\'" "\'"))
+    ;; (meow-thing-register 'html-tag
+    ;; 		       '(regexp "<.*>" "</?.*>")
+    ;; 		       '(regexp "<.*>" "</?.*>"))
+    ;; (add-to-list 'meow-char-thing-table '(?t . html-tag))
+    (add-to-list 'meow-char-thing-table '(?a . angles))
+    (add-to-list 'meow-char-thing-table '(?\" . double-quotes))
+    (add-to-list 'meow-char-thing-table '(?x . latex))
+    (add-to-list 'meow-char-thing-table '(?\' . single-quotes))
+    (add-to-list 'meow-char-thing-table '(?m . inline-math))
+    (add-to-list 'meow-char-thing-table '(?M . display-math))
+
+    (setq meow-paren-keymap (make-keymap))
+
+    (meow-define-state paren
+      "paren state"
+      :lighter " [P]"
+      :keymap meow-paren-keymap)
+    (setq meow-cursor-type-paren 'hollow)
+
+    (defun wrap-string () (interactive) (sp-wrap-with-pair "\""))
+    (defun back-transpose () (interactive) (sp-transpose-sexp -1))
+
+    (meow-define-keys 'paren
+      '("<escape>" . meow-normal-mode)
+      '("e" . sp-forward-sexp)
+      '("b" . sp-backward-sexp)
+      ;; '("j" . sp-down-sexp)
+      ;; '("k" . sp-up-sexp)
+      '("o s" . sp-wrap-square)
+      '("o r" . sp-wrap-round)
+      '("o c" . sp-wrap-curly)
+      '("o \"" . wrap-string)
+      '("O" . sp-unwrap-sexp)
+      '("z" . meow-pop-selection)
+      '("u" . meow-undo)
+      '("U" . undo-redo))
+
+    (meow-normal-define-key
+     '("P" . meow-paren-mode)))
+
+    (meow-setup)
+    ;; (when (featurep 'corfu)
+    ;;   (add-hook 'meow-insert-exit-hook 'corfu-quit))
+    (meow-global-mode 1))
+#+end_src
+    
+** Tex
+:PROPERTIES:
+:header-args+: :tangle lib/rca-tex.el
+:END:
+
+#+begin_src emacs-lisp
+  (provide 'rca-tex)
+
+  (defvar rc/latex-subdir-plural
+    '("figure" "table" "image" "section")
+    "List of latex filetypes which need a plural form")
+
+  (defun rc/is-main-latex-file ()
+    "Returns t if the current file is the main tex file, nil otherwise"
+    (when (equal (file-name-base buffer-file-name) "main") t))
+
+  (defun rc/latex-file-subdirectory (filetype)
+    "Define the subdirectory in a latex project for the filetype submitted as
+  input"
+    (let* ((file-path-prefix
+            (if (rc/is-main-latex-file) "./" "../"))
+           (file-type-subdir
+            (if (member filetype rc/latex-subdir-plural)
+                (concat filetype "s/")
+              (concat filetype "/")))
+           (file-type-subdir-with-prefix
+            (concat file-path-prefix file-type-subdir))
+           (file-path
+            (read-file-name "File: " file-type-subdir-with-prefix "" t))
+           (file-relative-path
+            (replace-regexp-in-string
+             (concat ".*" file-type-subdir "\\(.*\\)")
+             (concat file-type-subdir-with-prefix "\\1") file-path)))
+      (format "%s" file-relative-path)))
+
+  (defun rc/latex-insert-file (&optional filetype)
+    "Insert the relative path to a latex extra file in a subdirectory"
+    (interactive "P")
+    (if filetype
+        (let ((filepath
+               (rc/latex-file-subdirectory filetype)))
+          (insert filepath))
+      (let* ((filetype
+              (completing-read "File type: "
+                               '("image" "figure" "table" "code" "section") nil t))
+             (filepath
+              (rc/latex-file-subdirectory filetype)))
+        (insert filepath))))
+
+  (defun rc/cdlatex-pos-cursor-insert-file (&optional filetype)
+    "Function to use in cdlatex command completion"
+    (cdlatex-position-cursor)
+    (if filetype
+        (rc/latex-insert-file filetype)
+      (let ((filetype (completing-read
+                       "File type: " '("figure" "table" "section") nil t)))
+        (rc/latex-insert-file filetype))))
+
+  (defun rc/latex-array-separation ()
+    (when (line-contains? "&")
+      (progn
+        (replace-regexp-in-line "&" " & ")
+        (LaTeX-indent-line)
+        (beginning-of-line-text)
+        (left-char 1))))
+
+  (advice-add 'LaTeX-insert-item :after #'rc/latex-array-separation)
+#+end_src
+
+*** Auctex package
+#+begin_src emacs-lisp
+  (use-package tex
+    :ensure auctex
+    :after pdf-tools
+    :preface
+    (defun rc/latex-init ()
+      "Defines what modes are activated by default when entering AuCtex mode"
+      (prettify-symbols-mode)
+      (turn-on-cdlatex)
+      (outline-minor-mode)  
+      ;; (rc/auctex-macros)
+      (TeX-source-correlate-mode t)
+      (tex-fold-mode 1)
+      (TeX-PDF-mode t)
+      (reftex-mode t)
+      (LaTeX-math-mode t))
+    :init
+    ;; Correct way to call hooks for auctex
+    (add-hook 'LaTeX-mode-hook 'rc/latex-init)
+    (setopt
+     TeX-fold-macro-spec-list
+     '(("{1}" ("emph")) ("{1}" ("textbf"))
+       ("{1}" ("textit")) ("[1]:||►" ("item"))
+       ("§ {1}" ("section" "section*"))
+       ("[f]→‖{1}‖" ("footnote" "marginpar"))
+       ("[c]→‖{1}‖" ("cite")) ("[l]→‖{1}‖" ("label"))
+       ("[r]→‖{1}‖" ("ref" "pageref" "eqref" "footref"))
+       ("[i]→‖{1}‖" ("index" "glossary"))
+       ("§§ {1}" ("subsection" "subsection*"))
+       ("§§§ {1}" ("subsubsection" "subsubsection*"))
+       ("¶¶ {1}" ("subparagraph" "subparagraph*"))
+       ("¶ {1}" ("paragraph" "paragraph*"))))
+    :custom
+    (TeX-parse-self t "Enable parse on load")
+    (TeX-auto-save t "Enable parse on save")
+    (TeX-arg-input-file-search 'nil "Find file manually")
+    :config
+    (setq-default preview-scale 1.4
+                  prettify-symbols-unprettify-at-point 'right-edge
+                  preview-scale-function (lambda () (* (/ 10.0 (preview-document-pt)) preview-scale))
+                  TeX-source-correlate-method 'synctex
+                  TeX-source-correlate-start-server t
+                  TeX-master nil
+                  TeX-view-program-selection '((output-pdf "PDF Tools"))))
+#+end_src
+
+*** Cdlatex
+#+begin_src emacs-lisp
+  (use-package cdlatex
+    :ensure t
+    :defer t
+    :init
+    (defvar rc/cdlatex-env-list
+      '(("axiom" "\\begin{axiom}\nLABEL\n?\n\\end{axiom}\n" nil)
+        ("theorem" "\\begin{theorem}\nLABEL\n?\n\\end{theorem}\n" nil))
+      "cdlatex enviroments")
+    (defvar rc/cdlatex-command-list
+      '(
+        ;; ("ref"
+        ;;  "Insert a new reference"
+        ;;  "" consult-reftex-insert-reference nil t nil)
+        ("gph"
+         "Insert an image"
+         "\\includegraphics[width=0.6\\linewidth]{?}"
+         rc/cdlatex-pos-cursor-insert-file ("image") t nil)
+        ("inp"
+         "Input a file"
+         "\\input{?}"
+         rc/cdlatex-pos-cursor-insert-file nil t nil)
+        ("inc"
+         "Include a file"
+         "\\include{?}"
+         rc/cdlatex-pos-cursor-insert-file nil t nil)
+        ("dm"
+         "Insert a math display block"
+         "\\[ ? \\]" cdlatex-position-cursor nil t nil)
+        ("mm"
+         "Insert an inline math block"
+         "\\( ? \\)" cdlatex-position-cursor nil t nil)
+        ("int"
+         "Insert simple integral"
+         "\\int_{?}" cdlatex-position-cursor nil nil t)
+        ("oint"
+         "Insert closed integral"
+         "\\oint_{?}" cdlatex-position-cursor nil nil t)
+        ("dv"
+         "Insert a spaced differential variable"
+         "\\, d?" cdlatex-position-cursor nil nil t)
+        ("t."
+         "Insert therefore symbol"
+         "\\therefore" cdlatex-position-cursor nil nil t)
+        ("intd"
+         "Insert a definite integral limits"
+         "\\biggr\\vert_{?}^{}" cdlatex-position-cursor nil nil t)
+        ("int2"
+         "Insert a definite integral limits"
+         "\\iint" cdlatex-position-cursor nil nil t)
+        ("int3"
+         "Insert a definite integral limits"
+         "\\iiint" cdlatex-position-cursor nil nil t)
+        ("sci"
+         "Insert scientific notation"
+         "\\times 10^{?}" cdlatex-position-cursor nil nil t))
+      "cdlatex custom commands")
+    (setq cdlatex-env-alist rc/cdlatex-env-list
+          cdlatex-command-alist rc/cdlatex-command-list)
+    :custom
+    (cdlatex-paired-parens "$([{")
+    (cdlatex-math-modify-alist '((66 "\\mathbb" nil t nil nil)))
+    :bind ( :map cdlatex-mode-map
+            ("C-<return>" . nil)
+            ("´" . cdlatex-math-symbol)
+            ("<tab>" . cdlatex-tab)))
+#+end_src
+
+*** Pdf-tools
+#+begin_src emacs-lisp
+  (use-package pdf-tools
+    :ensure t
+    ;; :defer t
+    :mode ("\\.pdf\\'" . pdf-view-mode)
+    :hook ((pdf-view-mode . pdf-links-minor-mode)
+           (pdf-view-mode . pdf-view-themed-minor-mode)
+           (pdf-view-mode . pdf-sync-minor-mode))
+    :init
+    (pdf-tools-install)
+    :custom
+    (pdf-view-display-size 'fit-page "Fit to page by default")
+    (pdf-annot-activate-created-annotations t "Activate annotations")
+    :config
+    (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
+    (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
+    (define-key pdf-view-mode-map (kbd "C-r") 'isearch-backward))
+#+end_src
+
+* Local variables
+# Local Variables:
+# eval: (add-hook 'after-save-hook (lambda ()(org-babel-tangle)) nil t)
+# End:
+
