@@ -4,8 +4,7 @@
 (use-package emacs
   :ensure nil
 
-  :bind (("C-x R" . consult-recent-file)
-         ("C-x C-k C-x C-k" . kill-emacs)
+  :bind (("C-x C-k C-x C-k" . kill-emacs)
          ("C-x B" . ibuffer)
          ("M-z" . zap-up-to-char)
          ("C-z" . nil)

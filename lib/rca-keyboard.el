@@ -2,7 +2,7 @@
 (provide 'rca-keyboard)
 ;; Input:1 ends here
 
-;; [[file:../dotemacs.org::*Initial meow setup][Initial meow setup:1]]
+;; [[file:../dotemacs.org::*Meow][Meow:1]]
 (use-package meow
   :ensure t
   :config
@@ -176,4 +176,4 @@
   ;; (when (featurep 'corfu)
   ;;   (add-hook 'meow-insert-exit-hook 'corfu-quit))
   (meow-global-mode 1))
-;; Initial meow setup:1 ends here
+;; Meow:1 ends here

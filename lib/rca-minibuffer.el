@@ -47,6 +47,8 @@
 (use-package consult
   :ensure t
   :bind (("C-x C-b" . consult-buffer)
+         ("C-x R" . consult-recent-file)
+         ("C-x r i" . consult-register)
          ("C-x r b" . consult-bookmark))
   :config
   (consult-customize consult-recent-file :preview-key nil)

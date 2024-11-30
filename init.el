@@ -15,4 +15,5 @@
 (require 'rca-project)
 (require 'rca-keyboard)
 (require 'rca-tex)
+(require 'rca-tools)
 ;; Init config:1 ends here

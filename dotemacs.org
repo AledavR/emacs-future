@@ -110,6 +110,7 @@
   (require 'rca-project)
   (require 'rca-keyboard)
   (require 'rca-tex)
+  (require 'rca-tools)
 #+end_src
 
 * Macros
@@ -251,8 +252,7 @@
       (looking-at-p "[[:blank:]]*$")))
 #+end_src
 
-* Modules
-** Emacs module
+* Emacs module
 :PROPERTIES:
 :header-args+: :tangle lib/rca-emacs.el
 :END:
@@ -263,8 +263,7 @@
   (use-package emacs
     :ensure nil
 
-    :bind (("C-x R" . consult-recent-file)
-           ("C-x C-k C-x C-k" . kill-emacs)
+    :bind (("C-x C-k C-x C-k" . kill-emacs)
            ("C-x B" . ibuffer)
            ("M-z" . zap-up-to-char)
            ("C-z" . nil)
@@ -363,7 +362,7 @@
 
 #+end_src
 
-** User interface
+* User interface
 :PROPERTIES:
 :header-args+: :tangle lib/rca-ui.el
 :END:
@@ -371,7 +370,7 @@
   (provide 'rca-ui)
 #+end_src
 
-*** User interface general options
+** User interface general options
 #+begin_src emacs-lisp
   (use-package emacs
     :ensure nil
@@ -397,7 +396,7 @@
     (setq-default display-line-numbers-grow-only t))
 #+end_src
 
-*** Buffer display options
+** Buffer display options
 #+begin_src emacs-lisp
   (use-package emacs
     :ensure nil
@@ -452,7 +451,7 @@
              (window-width . 0.25)))))
 #+end_src
 
-*** User interface variables
+** User interface variables
 #+begin_src emacs-lisp
   (use-package emacs
     :ensure nil
@@ -466,7 +465,7 @@
     )
 #+end_src
 
-*** Diminish
+** Diminish
 #+begin_src emacs-lisp
   (use-package diminish
     :ensure t
@@ -475,7 +474,7 @@
     (diminish 'eldoc-mode nil))
 #+end_src
 
-*** Themes
+** Themes
 #+begin_src emacs-lisp
   (use-package ef-themes
     :ensure t
@@ -496,7 +495,7 @@
             (t . (1.1)))))
 #+end_src
 
-*** Circadian
+** Circadian
 #+begin_src emacs-lisp
   (use-package circadian
     :ensure t
@@ -512,14 +511,14 @@
     (circadian-setup))
 #+end_src
 
-*** Olivetti
+** Olivetti
 #+begin_src emacs-lisp
   (use-package olivetti
     :ensure t
     :hook (Info-mode . olivetti-mode))
 #+end_src
 
-*** Ace-window
+** Ace-window
 #+begin_src emacs-lisp
   (use-package ace-window
     :ensure t
@@ -533,7 +532,7 @@
     (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
 #+end_src
 
-*** Dashboard
+** Dashboard
 
 #+begin_src emacs-lisp
   (defun my-inhibit-startup-screen-file ()
@@ -579,7 +578,7 @@
           (lambda () (get-buffer-create "*dashboard*"))))
 #+end_src
 
-*** Rainbow mode
+** Rainbow mode
 
 #+begin_src emacs-lisp
   (use-package rainbow-mode
@@ -587,7 +586,7 @@
     :defer t)
 #+end_src
 
-** Org-mode
+* Org-mode
 :PROPERTIES:
 :header-args+: :tangle lib/rca-org.el
 :END:
@@ -596,7 +595,7 @@
   (provide 'rca-org)
 #+end_src
 
-*** Org general options
+** Org general options
 #+begin_src emacs-lisp
   (use-package org
     :ensure nil
@@ -636,7 +635,7 @@
     (add-hook 'org-babel-after-execute-hook 'org-toggle-inline-images))
 #+end_src
 
-*** Org-capture
+** Org-capture
 #+begin_src emacs-lisp
   (use-package org-capture
     :ensure nil
@@ -688,7 +687,7 @@
 
 #+end_src
 
-*** Org export options
+** Org export options
 #+begin_src emacs-lisp
   (use-package org
     :ensure nil
@@ -723,7 +722,7 @@
            "-noexport" 'region-start-level)))))
 #+end_src
 
-*** Org export packages
+** Org export packages
 #+begin_src emacs-lisp
   (use-package htmlize
     :ensure t)
@@ -737,7 +736,7 @@
        (highlight-style . "tango"))))
 #+end_src
 
-*** Org latex options
+** Org latex options
 #+begin_src emacs-lisp
   (use-package org
     :ensure nil
@@ -763,7 +762,7 @@
     (setq org-preview-latex-default-process 'luamagick))
 #+end_src
 
-** Programming environment
+* Programming environment
 :PROPERTIES:
 :header-args+: :tangle lib/rca-prog.el
 :END:
@@ -772,14 +771,14 @@
   (provide 'rca-prog)
 #+end_src
 
-*** Terminal
+** Terminal
 #+begin_src emacs-lisp
   (use-package vterm
     :ensure t
     :defer t)
 #+end_src
 
-*** Fortran
+** Fortran
 #+begin_src emacs-lisp
   (use-package fortran
     :ensure nil
@@ -790,21 +789,21 @@
                      (format "gfortran %s && ./a.out" (file-name-nondirectory buffer-file-name))))))
 #+end_src
 
-*** Gnuplot
+** Gnuplot
 #+begin_src emacs-lisp
   (use-package gnuplot
     :ensure t
     :defer t)
 #+end_src
 
-*** Lua
+** Lua
 #+begin_src emacs-lisp
   (use-package lua-mode
     :ensure t
     :defer t)
 #+end_src
 
-*** Julia
+** Julia
 #+begin_src emacs-lisp
   (use-package julia-mode
     :ensure t
@@ -836,13 +835,13 @@
     :hook (julia-mode . julia-snail-mode))
 #+end_src
 
-*** Markdown
+** Markdown
 #+begin_src emacs-lisp
   (use-package markdown-mode
     :ensure t)
 #+end_src
 
-*** Java
+** Java
 #+begin_src emacs-lisp
   (use-package eglot-java
     :ensure t
@@ -872,7 +871,7 @@
         (message "No spring boot proccess running. Try spring-run."))))
 #+end_src
 
-*** HTML
+** HTML
 #+begin_src emacs-lisp
   (use-package mhtml-mode
     :ensure nil
@@ -896,7 +895,7 @@
     (define-key mhtml-mode-map (kbd "C-c C-i") 'sgml-delete-tagged-text))
 #+end_src
 
-** Completion
+* Completion
 :PROPERTIES:
 :header-args+: :tangle lib/rca-completion.el
 :END:
@@ -905,7 +904,7 @@
   (provide 'rca-completion)
 #+end_src
 
-*** Completion general options
+** Completion general options
 #+begin_src emacs-lisp
   (use-package emacs
     :init
@@ -913,7 +912,7 @@
     (setq text-mode-ispell-word-completion nil))
 #+end_src
 
-*** Yasnippet
+** Yasnippet
 #+begin_src emacs-lisp
   (use-package yasnippet
     :ensure t
@@ -926,7 +925,7 @@
     (yas-global-mode 1))
 #+end_src
 
-*** Corfu
+** Corfu
 #+begin_src emacs-lisp
   (use-package corfu
     :ensure t
@@ -952,7 +951,7 @@
     (corfu-quit-no-match 'separator))
 #+end_src
 
-*** Icons
+** Icons
 #+begin_src emacs-lisp
   (use-package kind-icon
     :ensure t
@@ -966,7 +965,7 @@
     (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 #+end_src
 
-*** Cape
+** Cape
 #+begin_src emacs-lisp
   (use-package cape
     :ensure t
@@ -1000,7 +999,7 @@
     (add-to-list 'completion-at-point-functions #'cape-elisp-block))
 #+end_src
 
-*** Dabbrev
+** Dabbrev
 #+begin_src emacs-lisp
   (use-package dabbrev
     :bind (("C-." . dabbrev-expand)
@@ -1013,7 +1012,7 @@
     (add-to-list 'dabbrev-ignored-buffer-modes 'tags-table-mode))
 #+end_src
 
-*** Smartparens
+** Smartparens
 #+begin_src emacs-lisp
   (use-package smartparens
     :ensure t
@@ -1021,7 +1020,7 @@
     (require 'smartparens-config))
 #+end_src
 
-*** Flyspell
+** Flyspell
 #+begin_src emacs-lisp
   (use-package flyspell
     :bind (:map flyspell-mode-map
@@ -1033,14 +1032,14 @@
     :hook (org-mode . flyspell-mode))
 #+end_src
 
-*** Vundo
+** Vundo
 #+begin_src emacs-lisp
   (use-package vundo
     :ensure t
     :bind ("C-x u" . vundo))
 #+end_src
 
-*** Eldoc
+** Eldoc
 #+begin_src emacs-lisp
   (use-package eldoc-box
     :ensure t
@@ -1052,7 +1051,7 @@
            ("M-p" . eldoc-box-scroll-down)))
 #+end_src
 
-** Minibuffer
+* Minibuffer
 :PROPERTIES:
 :header-args+: :tangle lib/rca-minibuffer.el
 :END:
@@ -1061,7 +1060,7 @@
   (provide 'rca-minibuffer)
 #+end_src
 
-*** Vertico
+** Vertico
 #+begin_src emacs-lisp
   (use-package vertico
     ;; :ensure (vertico :type git
@@ -1086,7 +1085,7 @@
   ;;   :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
 #+end_src
 
-*** Orderless
+** Orderless
 #+begin_src emacs-lisp
   (use-package orderless
     :ensure t
@@ -1097,7 +1096,7 @@
                                             partial-completion)))))
 #+end_src
 
-*** Marginalia
+** Marginalia
 #+begin_src emacs-lisp
   (use-package marginalia
     :ensure t
@@ -1105,18 +1104,20 @@
     (marginalia-mode))
 #+end_src
 
-*** Consult
+** Consult
 #+begin_src emacs-lisp
   (use-package consult
     :ensure t
     :bind (("C-x C-b" . consult-buffer)
+           ("C-x R" . consult-recent-file)
+           ("C-x r i" . consult-register)
            ("C-x r b" . consult-bookmark))
     :config
     (consult-customize consult-recent-file :preview-key nil)
     (consult-customize consult-bookmark :preview-key nil))
 #+end_src
 
-** Project management
+* Project management
 :PROPERTIES:
 :header-args+: :tangle lib/rca-project.el
 :END:
@@ -1125,13 +1126,13 @@
   (provide 'rca-project)
 #+end_src
 
-*** Transient
+** Transient
 #+begin_src emacs-lisp
   (use-package transient
     :ensure t)
 #+end_src
 
-*** Magit
+** Magit
 #+begin_src emacs-lisp
   (use-package magit
     :ensure t
@@ -1139,7 +1140,7 @@
     :defer 1)
 #+end_src
 
-*** Skeletor
+** Skeletor
 #+begin_src emacs-lisp
   (use-package skeletor
     :ensure t
@@ -1157,7 +1158,7 @@
       :no-license? t))
 #+end_src
 
-** Input
+* Input
 :PROPERTIES:
 :header-args+: :tangle lib/rca-keyboard.el
 :END:
@@ -1166,8 +1167,8 @@
   (provide 'rca-keyboard)
 #+end_src
 
-*** Meow
-**** Initial meow setup
+** Meow
+
 #+begin_src emacs-lisp 
   (use-package meow
     :ensure t
@@ -1344,7 +1345,7 @@
     (meow-global-mode 1))
 #+end_src
     
-** Tex
+* Tex
 :PROPERTIES:
 :header-args+: :tangle lib/rca-tex.el
 :END:
@@ -1413,7 +1414,7 @@
   (advice-add 'LaTeX-insert-item :after #'rc/latex-array-separation)
 #+end_src
 
-*** Auctex package
+** Auctex package
 #+begin_src emacs-lisp
   (use-package tex
     :ensure auctex
@@ -1460,7 +1461,7 @@
                   TeX-view-program-selection '((output-pdf "PDF Tools"))))
 #+end_src
 
-*** Cdlatex
+** Cdlatex
 #+begin_src emacs-lisp
   (use-package cdlatex
     :ensure t
@@ -1529,7 +1530,7 @@
             ("<tab>" . cdlatex-tab)))
 #+end_src
 
-*** Pdf-tools
+** Pdf-tools
 #+begin_src emacs-lisp
   (use-package pdf-tools
     :ensure t
@@ -1547,6 +1548,28 @@
     (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
     (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
     (define-key pdf-view-mode-map (kbd "C-r") 'isearch-backward))
+#+end_src
+
+* Tools
+:PROPERTIES:
+:header-args+: :tangle lib/rca-tools.el
+:END:
+
+#+begin_src emacs-lisp
+  (provide 'rca-tools)
+#+end_src
+
+** Ebuku
+#+begin_src emacs-lisp
+  (use-package ebuku
+    :ensure t
+    :defer t
+    :bind ("C-z b" . ebuku)
+    :custom-face
+    (ebuku-tags-face ((t (:inherit font-lock-keyword-face))))
+    (ebuku-title-face ((t (:inherit font-lock-constant-face))))
+    :custom
+    (ebuku-results-limit 25))
 #+end_src
 
 * Local variables
