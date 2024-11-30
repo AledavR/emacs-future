@@ -40,6 +40,10 @@
                 marginalia markdown-mode meow olivetti orderless ox-pandoc
                 pdf-tools rainbow-mode smartparens use-package vertico vterm
                 vundo yasnippet))
+ '(reftex-section-levels
+   '(("part" . 0) ("chapter" . 1) ("section" . 2) ("subsection" . 3)
+     ("subsubsection" . 4) ("paragraph" . 5) ("subparagraph" . 6)
+     ("addchap" . -1) ("addsec" . -2) ("frametitle" . -2)))
  '(safe-local-variable-values
    '((eval add-hook 'org-babel-post-tangle-hook 'rc/config-insert-footer)
      (eval add-hook 'after-save-hook (lambda nil (org-babel-tangle)) nil t)

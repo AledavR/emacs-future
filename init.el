@@ -16,4 +16,3 @@
 (require 'rca-keyboard)
 (require 'rca-tex)
 ;; Init config:1 ends here
-(put 'dired-find-alternate-file 'disabled nil)

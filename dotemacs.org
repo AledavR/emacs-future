@@ -806,6 +806,30 @@
 
 *** Julia
 #+begin_src emacs-lisp
+  (use-package julia-mode
+    :ensure t
+    :defer t
+    :bind (:map julia-mode-map ("`" . julia-insert-unicode-symbol))
+    :init  
+    (defvar julia-unicode-symbols-alist
+      '((?a . "α") (?b . "β")
+        (?\C-a . "ₐ")
+        (?0 . "₀")
+        (?1 . "₁")
+        (?2 . "₂")
+        (?3 . "₃")
+        (?4 . "₄"))
+      "List of unicode symbols to be inserted in julia-mode")
+
+    (defun julia-insert-unicode-symbol ()
+      (interactive)
+      (let* ((char (read-char "Insert symbol: "))
+             (entry (assoc char julia-unicode-symbols-alist))
+             (symbol (cdr entry)))
+        (if (equal nil entry)
+            (error "The symbol is not mapped")
+          (insert symbol)))))
+
   (use-package julia-snail
     :ensure t
     :defer t
