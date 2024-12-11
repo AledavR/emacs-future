@@ -606,6 +606,7 @@
     (org-agenda-files '("~/.sync/org_files/agenda/" "~/.sync/org_files/notes/"))
     (org-log-done 'time)
     (org-confirm-babel-evaluate nil)
+    (org-cite-global-bibliography '("~/Documents/bibliography.bib"))
     (org-agenda-time-grid '((daily today require-timed)
                             (800 1000 1200 1400 1600 1800 2000 2200)
                             "......"
@@ -1560,6 +1561,7 @@
 #+end_src
 
 ** Ebuku
+
 #+begin_src emacs-lisp
   (use-package ebuku
     :ensure t
@@ -1570,6 +1572,30 @@
     (ebuku-title-face ((t (:inherit font-lock-constant-face))))
     :custom
     (ebuku-results-limit 25))
+#+end_src
+
+** Denote
+
+#+begin_src emacs-lisp
+  (use-package denote
+    :ensure t)
+#+end_src
+
+** Citar
+
+#+begin_src emacs-lisp
+  (use-package citar
+    :ensure t
+    :custom
+    (org-cite-insert-processor 'citar)
+    (org-cite-follow-processor 'citar)
+    (org-cite-activate-processor 'citar)
+    :config
+    (setq citar-file-note-extensions '("org")
+          citar-notes-paths '("~/Documents/articles/notes/")
+          citar-library-paths '("~/Documents/articles/")
+          citar-library-file-extensions '("pdf")
+          citar-bibliography '("~/Documents/bibliography.bib")))
 #+end_src
 
 * Local variables

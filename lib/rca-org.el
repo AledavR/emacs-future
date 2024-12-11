@@ -12,6 +12,7 @@
   (org-agenda-files '("~/.sync/org_files/agenda/" "~/.sync/org_files/notes/"))
   (org-log-done 'time)
   (org-confirm-babel-evaluate nil)
+  (org-cite-global-bibliography '("~/Documents/bibliography.bib"))
   (org-agenda-time-grid '((daily today require-timed)
                           (800 1000 1200 1400 1600 1800 2000 2200)
                           "......"
