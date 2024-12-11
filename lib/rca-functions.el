@@ -22,6 +22,12 @@
                      (lambda (dir)
                        (not (string-match-p ".*git.*" dir)))))))
 
+(defun find-file-at-point-other-window ()
+  (interactive)
+  (let ((ffap-file-finder #'find-file-other-window))
+    (find-file-at-point)))
+
+
 ;; (defun rc/insert-wallpaper-file ()
 ;;   (interactive)
 ;;   (insert

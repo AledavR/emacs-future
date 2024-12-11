@@ -7,6 +7,7 @@
 :PROPERTIES:
 :header-args: :tangle early-init.el
 :END:
+
 #+begin_src emacs-lisp
   (setq package-enable-at-startup nil)
 
@@ -20,6 +21,7 @@
 :PROPERTIES:
 :header-args+: :tangle lib/package-manager.el
 :END:
+
 #+begin_src emacs-lisp
   ;; (provide 'package-manager)
 
@@ -49,15 +51,15 @@
       (when (< emacs-major-version 28) (require 'subr-x))
       (condition-case-unless-debug err
           (if-let* ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
-                   ((zerop (call-process "git" nil buffer t "clone"
-                                         (plist-get order :repo) repo)))
-                   ((zerop (call-process "git" nil buffer t "checkout"
-                                         (or (plist-get order :ref) "--"))))
-                   (emacs (concat invocation-directory invocation-name))
-                   ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
-                                         "--eval" "(byte-recompile-directory \".\" 0 'force)")))
-                   ((require 'elpaca))
-                   ((elpaca-generate-autoloads "elpaca" repo)))
+                    ((zerop (call-process "git" nil buffer t "clone"
+                                          (plist-get order :repo) repo)))
+                    ((zerop (call-process "git" nil buffer t "checkout"
+                                          (or (plist-get order :ref) "--"))))
+                    (emacs (concat invocation-directory invocation-name))
+                    ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
+                                          "--eval" "(byte-recompile-directory \".\" 0 'force)")))
+                    ((require 'elpaca))
+                    ((elpaca-generate-autoloads "elpaca" repo)))
               (progn (message "%s" (buffer-string)) (kill-buffer buffer))
             (error "%s" (with-current-buffer buffer (buffer-string))))
         ((error) (warn "%s" err) (delete-directory repo 'recursive))))
@@ -70,6 +72,35 @@
 
   (elpaca elpaca-use-package
     (elpaca-use-package-mode))
+
+  (use-package org
+    :defer
+    :ensure `(org
+              :remotes ("tecosaur"
+                        :repo "https://code.tecosaur.net/tec/org-mode.git"
+                        :branch "dev")
+              :files (:defaults ("etc/styles/" "etc/styles/*" "doc/*.texi"))
+              :build t
+              :pre-build
+              (progn
+                (with-temp-file "org-version.el"
+                  (require 'lisp-mnt)
+                  (let ((version
+                         (with-temp-buffer
+                           (insert-file-contents "lisp/org.el")
+                           (lm-header "version")))
+                        (git-version
+                         (string-trim
+                          (with-temp-buffer
+                            (call-process "git" nil t nil "rev-parse" "--short" "HEAD")
+                            (buffer-string)))))
+                    (insert
+                     (format "(defun org-release () \"The release version of Org.\" %S)\n" version)
+                     (format "(defun org-git-version () \"The truncate git commit hash of Org mode.\" %S)\n" git-version)
+                     "(provide 'org-version)\n")))
+                (require 'elpaca-menu-org)
+                (elpaca-menu-org--build))
+              :pin nil))
 
   (elpaca-wait)
 
@@ -98,7 +129,10 @@
           (add-to-list 'load-path (locate-user-emacs-file string)))
         '("ext" "lib"))
 
+
   (require 'package-manager)
+
+
   (require 'rca-macros)
   (require 'rca-functions)
   (require 'rca-ui)
@@ -157,6 +191,12 @@
                        stow-files ".*" nil
                        (lambda (dir)
                          (not (string-match-p ".*git.*" dir)))))))
+
+  (defun find-file-at-point-other-window()
+    (interactive)
+    (let ((ffap-file-finder #'find-file-other-window))
+      (find-file-at-point)))
+
 
   ;; (defun rc/insert-wallpaper-file ()
   ;;   (interactive)
@@ -272,6 +312,7 @@
            ("C-z C-j" . rc/file-find-config)
            ("C-z j" . rc/find-stow-file)
            ("C-x C-z" . nil)
+           ("M-o" . other-window)
            ("C-c P" . find-file-at-point)
            ("C-x K" . (lambda () (interactive) (kill-buffer (current-buffer))))
            ("C-x C-c" . nil)
@@ -307,6 +348,7 @@
     (initial-scratch-message nil)
     (inhibit-initial-startup-message t)
     (ring-bell-function 'ignore)
+    (dired-listing-switches "-alh")
     (column-number-mode t)
     (blink-cursor-mode nil)
     (use-dialog-box nil)
@@ -366,11 +408,13 @@
 :PROPERTIES:
 :header-args+: :tangle lib/rca-ui.el
 :END:
+
 #+begin_src emacs-lisp
   (provide 'rca-ui)
 #+end_src
 
 ** User interface general options
+
 #+begin_src emacs-lisp
   (use-package emacs
     :ensure nil
@@ -397,6 +441,7 @@
 #+end_src
 
 ** Buffer display options
+
 #+begin_src emacs-lisp
   (use-package emacs
     :ensure nil
@@ -452,6 +497,7 @@
 #+end_src
 
 ** User interface variables
+
 #+begin_src emacs-lisp
   (use-package emacs
     :ensure nil
@@ -466,6 +512,7 @@
 #+end_src
 
 ** Diminish
+
 #+begin_src emacs-lisp
   (use-package diminish
     :ensure t
@@ -475,16 +522,17 @@
 #+end_src
 
 ** Themes
+
 #+begin_src emacs-lisp
   (use-package ef-themes
     :ensure t
     :init
     (setq themes
           '((parsee ef-reverie ef-elea-dark)
-            (yuuma ef-summer ef-rosa)
+            (yuuma ef-tritanopia-light ef-rosa)
             (nazrin2 ef-light ef-owl)
             (satori ef-trio-light ef-trio-dark)))
-    (setq theme-character 'nazrin2)
+    (setq theme-character 'yuuma)
     :config
     (setq ef-themes-headings
           '((0 . (1.6))
@@ -496,6 +544,7 @@
 #+end_src
 
 ** Circadian
+
 #+begin_src emacs-lisp
   (use-package circadian
     :ensure t
@@ -512,14 +561,56 @@
 #+end_src
 
 ** Olivetti
+
 #+begin_src emacs-lisp
   (use-package olivetti
     :ensure t
     :hook (Info-mode . olivetti-mode))
 #+end_src
 
-** Ace-window
+** Spacious-Padding
+
 #+begin_src emacs-lisp
+  (use-package spacious-padding
+    :ensure t
+    :config
+    (setq-default header-line-format
+                  '("%e" mode-line-front-space
+                    (:propertize
+                     display (min-width (6.0)))
+                    "%b" mode-line-end-spaces))
+
+    (setq-default mode-line-format
+                  '("%e" mode-line-front-space
+                    (:propertize
+                     ("" mode-line-mule-info mode-line-client mode-line-modified mode-line-remote
+                      mode-line-window-dedicated)
+                     display (min-width (6.0)))
+                    mode-line-frame-identification "   "
+                    mode-line-position (project-mode-line project-mode-line-format)
+                    (vc-mode vc-mode) "  " mode-line-modes mode-line-misc-info mode-line-end-spaces))
+
+    (setq spacious-padding-widths
+          '( :internal-border-width 10
+             :header-line-width 4
+             :mode-line-width 4
+             :tab-width 4
+             :right-divider-width 25
+             :scroll-bar-width 8
+             :fringe-width 8))
+    (setq spacious-padding-subtle-mode-line
+          `( :mode-line-active 'default
+             :mode-line-inactive vertical-border))
+
+    (spacious-padding-mode 1)
+
+    ;; Set a key binding if you need to toggle spacious padding.
+    (define-key global-map (kbd "<f8>") #'spacious-padding-mode))
+#+end_src
+
+** Ace-window
+
+#+begin_src emacs-lisp :tangle no
   (use-package ace-window
     :ensure t
     :bind ("M-o" . ace-window)
@@ -603,15 +694,18 @@
     :hook (org-capture-mode . org-align-tags)
     :custom
     ;; (org-todo-keywords '((sequence "IDEA" "TODO" "|" "DONE" "DROP")))
+    (org-highlight-latex-and-related '(latex script entities))
     (org-agenda-files '("~/.sync/org_files/agenda/" "~/.sync/org_files/notes/"))
     (org-log-done 'time)
     (org-confirm-babel-evaluate nil)
     (org-cite-global-bibliography '("~/Documents/bibliography.bib"))
+    (org-image-actual-width nil)
     (org-agenda-time-grid '((daily today require-timed)
                             (800 1000 1200 1400 1600 1800 2000 2200)
                             "......"
                             "-----------------"))
     :config
+    (setq org-hide-emphasis-markers t)
     (setq modus-themes-headings
           '((1 . (1.5))
             (2 . (1.3))
@@ -624,13 +718,17 @@
     (org-babel-do-load-languages
      'org-babel-load-languages
      '((python . t)
+       (julia . t)
+       (shell . t)
+       (calc . t)
        (octave . t)))
     (defun browse-steam-page (steam-id)
       (browse-url (concat "steam://advertise/" steam-id)))
     
     (org-link-set-parameters "steam"
                              :follow 'browse-steam-page)
-
+    (add-hook 'org-mode-hook 'variable-pitch-mode)
+    (add-hook 'org-mode-hook 'visual-line-mode)
     (add-hook 'org-agenda-mode-hook 'hl-line-mode)
     (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
     (add-hook 'org-babel-after-execute-hook 'org-toggle-inline-images))
@@ -687,7 +785,7 @@
     )
 
 #+end_src
-
+  
 ** Org export options
 #+begin_src emacs-lisp
   (use-package org
@@ -738,12 +836,13 @@
 #+end_src
 
 ** Org latex options
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   (use-package org
     :ensure nil
     :custom
     (org-highlight-latex-and-related '(latex script entities))
     (org-latex-compiler "lualatex")
+    (org-pretty-entities-include-sub-superscripts nil)
     :config
     (setq org-latex-listings 'minted
           org-latex-packages-alist '(("" "minted")))
@@ -760,7 +859,74 @@
                                 :latex-compiler ("lualatex -interaction nonstopmode -output-directory %o %f")
                                 :image-converter ("magick convert -density %D -trim -antialias %f -quality 100 %O")))
     (add-to-list 'org-preview-latex-process-alist luamagick)
-    (setq org-preview-latex-default-process 'luamagick))
+    (setq org-preview-latex-default-process 'luamagick)
+    (setq org-preview-latex-default-process 'imagemagick)
+    )
+#+end_src
+
+** Org latex preview
+#+begin_src emacs-lisp
+  (use-package org-latex-preview
+    :config
+    ;; Increase preview width
+    (plist-put org-latex-preview-appearance-options
+               :page-width 0.8)
+
+    ;; Use dvisvgm to generate previews
+    ;; You don't need this, it's the default:
+    (setq org-latex-preview-process-default 'dvisvgm)
+    
+    ;; Turn on auto-mode, it's built into Org and much faster/more featured than
+    ;; org-fragtog. (Remember to turn off/uninstall org-fragtog.)
+    (add-hook 'org-mode-hook 'org-latex-preview-auto-mode)
+
+    ;; Block C-n, C-p etc from opening up previews when using auto-mode
+    (setq org-latex-preview-auto-ignored-commands
+          '(next-line previous-line mwheel-scroll
+                      scroll-up-command scroll-down-command))
+
+    ;; Enable consistent equation numbering
+    (setq org-latex-preview-numbered t)
+
+    ;; Bonus: Turn on live previews.  This shows you a live preview of a LaTeX
+    ;; fragment and updates the preview in real-time as you edit it.
+    ;; To preview only environments, set it to '(block edit-special) instead
+    (setq org-latex-preview-live t)
+
+    ;; More immediate live-previews -- the default delay is 1 second
+    (setq org-latex-preview-live-debounce 0.25)
+    (defun my/org-latex-preview-uncenter (ov)
+      (overlay-put ov 'before-string nil))
+    (defun my/org-latex-preview-recenter (ov)
+      (overlay-put ov 'before-string (overlay-get ov 'justify)))
+    (defun my/org-latex-preview-center (ov)
+      (save-excursion
+        (goto-char (overlay-start ov))
+        (when-let* ((elem (org-element-context))
+                    ((or (eq (org-element-type elem) 'latex-environment)
+                         (string-match-p "^\\\\\\[" (org-element-property :value elem))))
+                    (img (overlay-get ov 'display))
+                    (prop `(space :align-to (- center (0.55 . ,img))))
+                    (justify (propertize " " 'display prop 'face 'default)))
+          (overlay-put ov 'justify justify)
+          (overlay-put ov 'before-string (overlay-get ov 'justify)))))
+    (define-minor-mode org-latex-preview-center-mode
+      "Center equations previewed with `org-latex-preview'."
+      :global nil
+      (if org-latex-preview-center-mode
+          (progn
+            (add-hook 'org-latex-preview-overlay-open-functions
+                      #'my/org-latex-preview-uncenter nil :local)
+            (add-hook 'org-latex-preview-overlay-close-functions
+                      #'my/org-latex-preview-recenter nil :local)
+            (add-hook 'org-latex-preview-overlay-update-functions
+                      #'my/org-latex-preview-center nil :local))
+        (remove-hook 'org-latex-preview-overlay-close-functions
+                     #'my/org-latex-preview-recenter)
+        (remove-hook 'org-latex-preview-overlay-update-functions
+                     #'my/org-latex-preview-center)
+        (remove-hook 'org-latex-preview-overlay-open-functions
+                     #'my/org-latex-preview-uncenter))))
 #+end_src
 
 * Programming environment
@@ -773,6 +939,7 @@
 #+end_src
 
 ** Terminal
+
 #+begin_src emacs-lisp
   (use-package vterm
     :ensure t
@@ -780,6 +947,8 @@
 #+end_src
 
 ** Fortran
+
+
 #+begin_src emacs-lisp
   (use-package fortran
     :ensure nil
@@ -791,6 +960,7 @@
 #+end_src
 
 ** Gnuplot
+
 #+begin_src emacs-lisp
   (use-package gnuplot
     :ensure t
@@ -798,6 +968,7 @@
 #+end_src
 
 ** Lua
+
 #+begin_src emacs-lisp
   (use-package lua-mode
     :ensure t
@@ -805,6 +976,7 @@
 #+end_src
 
 ** Julia
+
 #+begin_src emacs-lisp
   (use-package julia-mode
     :ensure t
@@ -837,12 +1009,14 @@
 #+end_src
 
 ** Markdown
+
 #+begin_src emacs-lisp
   (use-package markdown-mode
     :ensure t)
 #+end_src
 
 ** Java
+
 #+begin_src emacs-lisp
   (use-package eglot-java
     :ensure t
@@ -873,6 +1047,7 @@
 #+end_src
 
 ** HTML
+
 #+begin_src emacs-lisp
   (use-package mhtml-mode
     :ensure nil
@@ -906,6 +1081,7 @@
 #+end_src
 
 ** Completion general options
+
 #+begin_src emacs-lisp
   (use-package emacs
     :init
@@ -914,6 +1090,7 @@
 #+end_src
 
 ** Yasnippet
+
 #+begin_src emacs-lisp
   (use-package yasnippet
     :ensure t
@@ -927,6 +1104,7 @@
 #+end_src
 
 ** Corfu
+
 #+begin_src emacs-lisp
   (use-package corfu
     :ensure t
@@ -953,6 +1131,7 @@
 #+end_src
 
 ** Icons
+
 #+begin_src emacs-lisp
   (use-package kind-icon
     :ensure t
@@ -967,6 +1146,7 @@
 #+end_src
 
 ** Cape
+
 #+begin_src emacs-lisp
   (use-package cape
     :ensure t
@@ -1001,6 +1181,7 @@
 #+end_src
 
 ** Dabbrev
+
 #+begin_src emacs-lisp
   (use-package dabbrev
     :bind (("C-." . dabbrev-expand)
@@ -1014,6 +1195,7 @@
 #+end_src
 
 ** Smartparens
+
 #+begin_src emacs-lisp
   (use-package smartparens
     :ensure t
@@ -1022,6 +1204,7 @@
 #+end_src
 
 ** Flyspell
+
 #+begin_src emacs-lisp
   (use-package flyspell
     :bind (:map flyspell-mode-map
@@ -1034,6 +1217,7 @@
 #+end_src
 
 ** Vundo
+
 #+begin_src emacs-lisp
   (use-package vundo
     :ensure t
@@ -1041,6 +1225,7 @@
 #+end_src
 
 ** Eldoc
+
 #+begin_src emacs-lisp
   (use-package eldoc-box
     :ensure t
@@ -1062,6 +1247,7 @@
 #+end_src
 
 ** Vertico
+
 #+begin_src emacs-lisp
   (use-package vertico
     ;; :ensure (vertico :type git
@@ -1086,7 +1272,22 @@
   ;;   :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
 #+end_src
 
+** Vertico Posframe
+
+#+begin_src emacs-lisp
+  (use-package vertico-posframe
+    :ensure t
+    :config
+    (setq vertico-posframe-poshandler 'posframe-poshandler-frame-bottom-center)
+    (setq vertico-posframe-parameters
+          '((left-fringe . 8)
+            (right-fringe . 8)))
+    (setq vertico-posframe-width 300)
+    (vertico-posframe-mode 1))
+#+end_src
+
 ** Orderless
+
 #+begin_src emacs-lisp
   (use-package orderless
     :ensure t
@@ -1098,6 +1299,7 @@
 #+end_src
 
 ** Marginalia
+
 #+begin_src emacs-lisp
   (use-package marginalia
     :ensure t
@@ -1106,6 +1308,7 @@
 #+end_src
 
 ** Consult
+
 #+begin_src emacs-lisp
   (use-package consult
     :ensure t
@@ -1134,6 +1337,7 @@
 #+end_src
 
 ** Magit
+
 #+begin_src emacs-lisp
   (use-package magit
     :ensure t
@@ -1142,6 +1346,7 @@
 #+end_src
 
 ** Skeletor
+
 #+begin_src emacs-lisp
   (use-package skeletor
     :ensure t
@@ -1416,6 +1621,7 @@
 #+end_src
 
 ** Auctex package
+
 #+begin_src emacs-lisp
   (use-package tex
     :ensure auctex
@@ -1463,6 +1669,7 @@
 #+end_src
 
 ** Cdlatex
+
 #+begin_src emacs-lisp
   (use-package cdlatex
     :ensure t
@@ -1532,6 +1739,7 @@
 #+end_src
 
 ** Pdf-tools
+
 #+begin_src emacs-lisp
   (use-package pdf-tools
     :ensure t
@@ -1546,6 +1754,21 @@
     (pdf-view-display-size 'fit-page "Fit to page by default")
     (pdf-annot-activate-created-annotations t "Activate annotations")
     :config
+    (defvar mode-line-format--old nil
+      "Variable to store last mode line format to restore it
+  when deactivating presentation-mode")
+
+    (define-minor-mode presentation-mode
+      "Remove visual elements for presentation"
+      :global nil
+      (if presentation-mode
+          (progn
+            (setq mode-line-format--old mode-line-format)
+            (setq mode-line-format nil)
+            (tab-bar-mode -1))
+        (setq mode-line-format mode-line-format--old)
+        (tab-bar-mode)))
+    (define-key pdf-view-mode-map (kbd "<f5>") 'presentation-mode)
     (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
     (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
     (define-key pdf-view-mode-map (kbd "C-r") 'isearch-backward))

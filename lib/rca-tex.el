@@ -190,6 +190,21 @@ input"
   (pdf-view-display-size 'fit-page "Fit to page by default")
   (pdf-annot-activate-created-annotations t "Activate annotations")
   :config
+  (defvar mode-line-format--old nil
+    "Variable to store last mode line format to restore it
+when deactivating presentation-mode")
+
+  (define-minor-mode presentation-mode
+    "Remove visual elements for presentation"
+    :global nil
+    (if presentation-mode
+        (progn
+          (setq mode-line-format--old mode-line-format)
+          (setq mode-line-format nil)
+          (tab-bar-mode -1))
+      (setq mode-line-format mode-line-format--old)
+      (tab-bar-mode)))
+  (define-key pdf-view-mode-map (kbd "<f5>") 'presentation-mode)
   (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
   (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
   (define-key pdf-view-mode-map (kbd "C-r") 'isearch-backward))

@@ -27,15 +27,15 @@
     (when (< emacs-major-version 28) (require 'subr-x))
     (condition-case-unless-debug err
         (if-let* ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
-                 ((zerop (call-process "git" nil buffer t "clone"
-                                       (plist-get order :repo) repo)))
-                 ((zerop (call-process "git" nil buffer t "checkout"
-                                       (or (plist-get order :ref) "--"))))
-                 (emacs (concat invocation-directory invocation-name))
-                 ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
-                                       "--eval" "(byte-recompile-directory \".\" 0 'force)")))
-                 ((require 'elpaca))
-                 ((elpaca-generate-autoloads "elpaca" repo)))
+                  ((zerop (call-process "git" nil buffer t "clone"
+                                        (plist-get order :repo) repo)))
+                  ((zerop (call-process "git" nil buffer t "checkout"
+                                        (or (plist-get order :ref) "--"))))
+                  (emacs (concat invocation-directory invocation-name))
+                  ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
+                                        "--eval" "(byte-recompile-directory \".\" 0 'force)")))
+                  ((require 'elpaca))
+                  ((elpaca-generate-autoloads "elpaca" repo)))
             (progn (message "%s" (buffer-string)) (kill-buffer buffer))
           (error "%s" (with-current-buffer buffer (buffer-string))))
       ((error) (warn "%s" err) (delete-directory repo 'recursive))))
@@ -48,6 +48,35 @@
 
 (elpaca elpaca-use-package
   (elpaca-use-package-mode))
+
+(use-package org
+  :defer
+  :ensure `(org
+            :remotes ("tecosaur"
+                      :repo "https://code.tecosaur.net/tec/org-mode.git"
+                      :branch "dev")
+            :files (:defaults ("etc/styles/" "etc/styles/*" "doc/*.texi"))
+            :build t
+            :pre-build
+            (progn
+              (with-temp-file "org-version.el"
+                (require 'lisp-mnt)
+                (let ((version
+                       (with-temp-buffer
+                         (insert-file-contents "lisp/org.el")
+                         (lm-header "version")))
+                      (git-version
+                       (string-trim
+                        (with-temp-buffer
+                          (call-process "git" nil t nil "rev-parse" "--short" "HEAD")
+                          (buffer-string)))))
+                  (insert
+                   (format "(defun org-release () \"The release version of Org.\" %S)\n" version)
+                   (format "(defun org-git-version () \"The truncate git commit hash of Org mode.\" %S)\n" git-version)
+                   "(provide 'org-version)\n")))
+              (require 'elpaca-menu-org)
+              (elpaca-menu-org--build))
+            :pin nil))
 
 (elpaca-wait)
 

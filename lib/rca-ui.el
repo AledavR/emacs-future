@@ -108,10 +108,10 @@
   :init
   (setq themes
         '((parsee ef-reverie ef-elea-dark)
-          (yuuma ef-summer ef-rosa)
+          (yuuma ef-tritanopia-light ef-rosa)
           (nazrin2 ef-light ef-owl)
           (satori ef-trio-light ef-trio-dark)))
-  (setq theme-character 'nazrin2)
+  (setq theme-character 'yuuma)
   :config
   (setq ef-themes-headings
         '((0 . (1.6))
@@ -143,18 +143,43 @@
   :hook (Info-mode . olivetti-mode))
 ;; Olivetti:1 ends here
 
-;; [[file:../dotemacs.org::*Ace-window][Ace-window:1]]
-(use-package ace-window
+;; [[file:../dotemacs.org::*Spacious-Padding][Spacious-Padding:1]]
+(use-package spacious-padding
   :ensure t
-  :bind ("M-o" . ace-window)
-  :custom-face
-  (aw-mode-line-face ((t (:inherit bold :underline t :height 1.2))))
-  :hook (server-after-make-frame . (lambda () (ace-window-display-mode 1)))
   :config
-  ;; (ace-window-display-mode 1)
-  (setq aw-scope 'frame)
-  (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
-;; Ace-window:1 ends here
+  (setq-default header-line-format
+                '("%e" mode-line-front-space
+                  (:propertize
+                   display (min-width (6.0)))
+                  "%b" mode-line-end-spaces))
+
+  (setq-default mode-line-format
+                '("%e" mode-line-front-space
+                  (:propertize
+                   ("" mode-line-mule-info mode-line-client mode-line-modified mode-line-remote
+                    mode-line-window-dedicated)
+                   display (min-width (6.0)))
+                  mode-line-frame-identification "   "
+                  mode-line-position (project-mode-line project-mode-line-format)
+                  (vc-mode vc-mode) "  " mode-line-modes mode-line-misc-info mode-line-end-spaces))
+
+  (setq spacious-padding-widths
+        '( :internal-border-width 10
+           :header-line-width 4
+           :mode-line-width 4
+           :tab-width 4
+           :right-divider-width 25
+           :scroll-bar-width 8
+           :fringe-width 8))
+  (setq spacious-padding-subtle-mode-line
+        `( :mode-line-active 'default
+           :mode-line-inactive vertical-border))
+
+  (spacious-padding-mode 1)
+
+  ;; Set a key binding if you need to toggle spacious padding.
+  (define-key global-map (kbd "<f8>") #'spacious-padding-mode))
+;; Spacious-Padding:1 ends here
 
 ;; [[file:../dotemacs.org::*Dashboard][Dashboard:1]]
 (defun my-inhibit-startup-screen-file ()
