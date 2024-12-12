@@ -24,7 +24,13 @@
   (setq-default fill-column 80)
   (setq-default indent-tabs-mode nil)
   (setq-default display-line-numbers-width 3)
-  (setq-default display-line-numbers-grow-only t))
+  (setq-default display-line-numbers-grow-only t)
+  (setq tab-bar-format '(tab-bar-format-history
+                         tab-bar-format-tabs-groups
+                         tab-bar-separator
+                         tab-bar-format-add-tab
+                         tab-bar-format-align-right
+                         tab-bar-format-global)))
 ;; User interface general options:1 ends here
 
 ;; [[file:../dotemacs.org::*Buffer display options][Buffer display options:1]]

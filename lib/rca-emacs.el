@@ -13,6 +13,7 @@
          ("C-z C-j" . rc/file-find-config)
          ("C-z j" . rc/find-stow-file)
          ("C-x C-z" . nil)
+         ("C-x t h" . tab-bar-mode)
          ("M-o" . other-window)
          ("C-c P" . find-file-at-point)
          ("C-x K" . (lambda () (interactive) (kill-buffer (current-buffer))))
@@ -93,7 +94,7 @@
   :bind (("<f6> c" . calendar))
   :mode ("diary" . diary-mode)
   :custom
-  (diary-file "~/Dropbox/diary")
+  (diary-file "~/.sync/org_files/agenda/diary")
   (calendar-latitude -12.0)
   (calendar-longitude -77.1)
   (calendar-mark-diary-entries-flag t)
