@@ -1,0 +1,11 @@
+org-mode
+
+(ttl "#+title: " q)
+(ath "#+author: " q)
+(inc "#+include: " p p q)
+
+org-mode :when (not (texmathp))
+
+(mm "\\( " q " \\)")
+(dm "\\[ " q " \\]")
+

@@ -6,17 +6,12 @@
 (use-package emacs
   :ensure nil
   :init
-  ;; (setq text-font "Lexend")
-  (setq default-font "mononoki Nerd Font")
-  (set-face-attribute 'default nil
-        	      :family default-font
-        	      :height 110)
-  (set-face-attribute 'italic nil
-        	      :family default-font)
+  (set-face-attribute 'default nil :family "Iosevka Comfy" :height 140)
+  (set-face-attribute 'fixed-pitch nil :family "Iosevka Comfy")
+  (set-face-attribute 'variable-pitch nil :family "Iosevka Comfy Motion")
   :custom
   (frame-resize-pixelwise t)
   (modus-themes-italic-constructs t)
-
   :config
   (scroll-bar-mode -1)
   (tool-bar-mode -1)
@@ -117,8 +112,9 @@
           (yuuma ef-tritanopia-light ef-rosa)
           (nazrin2 ef-light ef-owl)
           (satori ef-trio-light ef-trio-dark)))
-  (setq theme-character 'yuuma)
+  (setq theme-character 'parsee)
   :config
+  (setq ef-themes-mixed-fonts t)
   (setq ef-themes-headings
         '((0 . (1.6))
           (1 . (1.5))
@@ -177,9 +173,9 @@
            :right-divider-width 25
            :scroll-bar-width 8
            :fringe-width 8))
-  (setq spacious-padding-subtle-mode-line
-        `( :mode-line-active 'default
-           :mode-line-inactive vertical-border))
+  ;; (setq spacious-padding-subtle-mode-line
+  ;;       `( :mode-line-active 'default
+  ;;          :mode-line-inactive vertical-border))
 
   (spacious-padding-mode 1)
 

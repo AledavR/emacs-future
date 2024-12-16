@@ -22,9 +22,6 @@
                           "......"
                           "-----------------"))
   :config
-  (let ((documents-path (xdg-user-dir "DOCUMENTS")))
-    (setq org-cite-global-bibliography `(,(concat documents-path "/bibliography.bib"))))
-  (setq org-hide-emphasis-markers t)
   (setq modus-themes-headings
         '((1 . (1.5))
           (2 . (1.3))
@@ -43,7 +40,7 @@
      (octave . t)))
   (defun browse-steam-page (steam-id)
     (browse-url (concat "steam://advertise/" steam-id)))
-  
+  (set-face-attribute 'org-latex-and-related nil :family "Iosevka Comfy")
   (org-link-set-parameters "steam"
                            :follow 'browse-steam-page)
   (add-hook 'org-mode-hook 'variable-pitch-mode)

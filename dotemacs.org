@@ -420,17 +420,12 @@
   (use-package emacs
     :ensure nil
     :init
-    ;; (setq text-font "Lexend")
-    (setq default-font "mononoki Nerd Font")
-    (set-face-attribute 'default nil
-          	      :family default-font
-          	      :height 110)
-    (set-face-attribute 'italic nil
-          	      :family default-font)
+    (set-face-attribute 'default nil :family "Iosevka Comfy" :height 140)
+    (set-face-attribute 'fixed-pitch nil :family "Iosevka Comfy")
+    (set-face-attribute 'variable-pitch nil :family "Iosevka Comfy Motion")
     :custom
     (frame-resize-pixelwise t)
     (modus-themes-italic-constructs t)
-
     :config
     (scroll-bar-mode -1)
     (tool-bar-mode -1)
@@ -539,8 +534,9 @@
             (yuuma ef-tritanopia-light ef-rosa)
             (nazrin2 ef-light ef-owl)
             (satori ef-trio-light ef-trio-dark)))
-    (setq theme-character 'yuuma)
+    (setq theme-character 'parsee)
     :config
+    (setq ef-themes-mixed-fonts t)
     (setq ef-themes-headings
           '((0 . (1.6))
             (1 . (1.5))
@@ -605,9 +601,9 @@
              :right-divider-width 25
              :scroll-bar-width 8
              :fringe-width 8))
-    (setq spacious-padding-subtle-mode-line
-          `( :mode-line-active 'default
-             :mode-line-inactive vertical-border))
+    ;; (setq spacious-padding-subtle-mode-line
+    ;;       `( :mode-line-active 'default
+    ;;          :mode-line-inactive vertical-border))
 
     (spacious-padding-mode 1)
 
@@ -714,9 +710,6 @@
                             "......"
                             "-----------------"))
     :config
-    (let ((documents-path (xdg-user-dir "DOCUMENTS")))
-      (setq org-cite-global-bibliography `(,(concat documents-path "/bibliography.bib"))))
-    (setq org-hide-emphasis-markers t)
     (setq modus-themes-headings
           '((1 . (1.5))
             (2 . (1.3))
@@ -735,7 +728,7 @@
        (octave . t)))
     (defun browse-steam-page (steam-id)
       (browse-url (concat "steam://advertise/" steam-id)))
-    
+    (set-face-attribute 'org-latex-and-related nil :family "Iosevka Comfy")
     (org-link-set-parameters "steam"
                              :follow 'browse-steam-page)
     (add-hook 'org-mode-hook 'variable-pitch-mode)
@@ -1102,7 +1095,7 @@
 
 ** Yasnippet
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   (use-package yasnippet
     :ensure t
     :diminish yas-minor-mode
@@ -1112,6 +1105,50 @@
     (when (not (file-exists-p  snippets-directory))
       (make-directory snippets-directory))
     (yas-global-mode 1))
+#+end_src
+
+** Tempel
+
+#+begin_src emacs-lisp
+  ;; Configure Tempel
+  (use-package tempel
+    :ensure t
+    ;; Require trigger prefix before template name when completing.
+    ;; :custom
+    ;; (tempel-trigger-prefix "<")
+
+    :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
+           ("M-*" . tempel-insert))
+
+    :init
+
+    ;; Setup completion at point
+    (defun tempel-setup-capf ()
+      ;; Add the Tempel Capf to `completion-at-point-functions'.
+      ;; `tempel-expand' only triggers on exact matches. Alternatively use
+      ;; `tempel-complete' if you want to see all matches, but then you
+      ;; should also configure `tempel-trigger-prefix', such that Tempel
+      ;; does not trigger too often when you don't expect it. NOTE: We add
+      ;; `tempel-expand' *before* the main programming mode Capf, such
+      ;; that it will be tried first.
+      (setq-local completion-at-point-functions
+                  (cons #'tempel-expand
+                        completion-at-point-functions)))
+
+    (add-hook 'conf-mode-hook 'tempel-setup-capf)
+    (add-hook 'prog-mode-hook 'tempel-setup-capf)
+    (add-hook 'text-mode-hook 'tempel-setup-capf)
+
+    ;; Optionally make the Tempel templates available to Abbrev,
+    ;; either locally or globally. `expand-abbrev' is bound to C-x '.
+    ;; (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
+    ;; (global-tempel-abbrev-mode)
+  )
+
+  ;; Optional: Add tempel-collection.
+  ;; The package is young and doesn't have comprehensive coverage.
+  (use-package tempel-collection
+    :ensure t)
 #+end_src
 
 ** Corfu
@@ -1814,7 +1851,26 @@
   (use-package denote
     :ensure t
     :config
-    (setq denote-directory (concat (xdg-user-dir "DOCUMENTS") "/notes")))
+    (setq denote-directory "~/.sync/archive/notes"))
+#+end_src
+
+** Embark
+
+#+begin_src emacs-lisp
+  (use-package embark
+    :ensure t
+    :bind (("C-c o" . embark-act)
+           :map embark-general-map
+           ("G" . embark-google-search))
+    :preface
+    (defun embark-google-search (term)
+      (interactive "sSearch Term: ")
+      (browse-url (format "https://google.com/search?q=%s" term)))
+    :config
+    (add-to-list 'display-buffer-alist '("\\*Embark Actions\\*" (display-buffer-pop-up-window))))
+
+  (use-package embark-consult
+    :ensure t)
 #+end_src
 
 ** Citar
@@ -1827,18 +1883,30 @@
     (org-cite-follow-processor 'citar)
     (org-cite-activate-processor 'citar)
     :config
-    (let ((documents-path (xdg-user-dir "DOCUMENTS")))
+    (let ((documents-path (xdg-user-dir "DOCUMENTS"))
+          (archive-path "~/.sync/archive/"))
+      (setq org-cite-global-bibliography
+            (mapcar (lambda (entry) (concat archive-path entry)) '("articles.bib" "books.bib")))
+      (setq citar-library-paths
+            (mapcar (lambda (entry) (concat documents-path entry)) '("/library/articles/" "/library/books/"))
+            citar-notes-paths
+            (mapcar (lambda (entry) (concat documents-path entry)) '("/library/notes/")))
       (setq citar-file-note-extensions '("org")
-            citar-notes-paths `( ,(concat documents-path "/articles/notes/"))
-            citar-library-paths `( ,(concat documents-path "/articles/"))
             citar-library-file-extensions '("pdf")
-            citar-bibliography `(,(concat documents-path "/bibliography.bib")))))
+            citar-bibliography org-cite-global-bibliography)))
 
-    ;; (setq citar-file-note-extensions '("org")
-    ;;       citar-notes-paths '("~/Documents/articles/notes/")
-    ;;       citar-library-paths '("~/Documents/articles/")
-    ;;       citar-library-file-extensions '("pdf")
-    ;;       citar-bibliography '("~/Documents/bibliography.bib")))
+  (use-package citar-embark
+    :ensure t
+    :diminish
+    :after citar embark
+    :config
+    (defun open-pdf-file-externally (citekey)
+      (let ((file (car (car (hash-table-values (citar-get-files citekey))))))
+        (if file (start-process "sioyek" nil "sioyek" file)
+          (message "No pdf file found with this citekey"))))
+    (define-key citar-embark-citation-map (kbd "F") #'open-pdf-file-externally)
+    (define-key citar-embark-map (kbd "F") #'open-pdf-file-externally)
+    (citar-embark-mode))
 #+end_src
 
 * Local variables

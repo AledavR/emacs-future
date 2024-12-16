@@ -22,7 +22,6 @@
          SGI SR2 SRF SUN SVG SVGZ TGA TIFF TIFF64 TILE TIM TTF UYVY VDA VICAR
          VID VIFF VST WBMP WPG X3F XBM XC XCF XPM XV XWD YCbCr YCbCrA YUV))
  '(imagemagick-render-type 1)
- '(org-fold-catch-invisible-edits 'show)
  '(org-latex-preview-appearance-options
    '(:foreground auto :background "Transparent" :scale 1.4 :zoom 1.0 :page-width
                  0.8 :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
@@ -31,7 +30,7 @@
  '(org-latex-preview-live-display-type 'buffer)
  '(org-latex-preview-preamble
    "\\documentclass{minimal}\12[DEFAULT-PACKAGES]\12[PACKAGES]\12\\usepackage{amsmath}\12\\usepackage{amssymb}\12\\usepackage{xcolor}")
- '(org-pretty-entities-include-sub-superscripts t)
+ '(org-pretty-entities-include-sub-superscripts nil)
  '(org-safe-remote-resources
    '("\\`https://fniessen\\.github\\.io/org-html-themes/org/theme-bigblow\\.setup\\'"
      "\\`https://fniessen\\.github\\.io/org-html-themes/org/theme-readtheorg\\.setup\\'"))
@@ -63,26 +62,5 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(corfu-default ((t (:inherit ef-themes-fixed-pitch :height 1.0))))
- '(ef-themes-fixed-pitch ((t (:height 0.8 :family "mononoki Nerd Font"))) t)
- '(fringe ((t :background "unspecified-bg")))
- '(header-line ((t :box (:line-width 4 :color "unspecified-bg" :style nil))))
- '(header-line-highlight ((t :box (:color "unspecified-fg"))))
  '(keycast-key ((t)))
- '(line-number ((t :background "unspecified-bg")))
- '(mode-line ((t :background "unspecified-bg" :overline "unspecified-fg" :box (:line-width 4 :color "unspecified-bg" :style nil))))
- '(mode-line-active ((t :background "unspecified-bg" :overline nil :box (:line-width 4 :color "unspecified-bg" :style nil))))
- '(mode-line-highlight ((t :box (:color "unspecified-fg"))))
- '(mode-line-inactive ((t :background "unspecified-bg" :overline nil :box (:line-width 4 :color "unspecified-bg" :style nil))))
- '(org-tag ((t nil)))
- '(tab-bar-tab ((t :box (:line-width 4 :color "grey" :style nil))))
- '(tab-bar-tab-inactive ((t :box (:line-width 4 :color "grey" :style nil))))
- '(tab-line-tab ((t)))
- '(tab-line-tab-active ((t)))
- '(tab-line-tab-current ((t)))
- '(tab-line-tab-inactive ((t)))
- '(variable-pitch ((t (:height 1.25 :family "ETBembo"))))
- '(vertical-border ((t :background "unspecified-bg" :foreground "unspecified-bg")))
- '(window-divider ((t (:background "unspecified-bg" :foreground "unspecified-bg"))))
- '(window-divider-first-pixel ((t (:background "unspecified-bg" :foreground "unspecified-bg"))))
- '(window-divider-last-pixel ((t (:background "unspecified-bg" :foreground "unspecified-bg")))))
+ '(org-latex-and-related ((t (:foreground "#6fcfd2" :family "mononoki Nerd Font")))))
