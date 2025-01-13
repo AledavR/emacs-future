@@ -137,6 +137,7 @@
 ;; [[file:../dotemacs.org::*Smartparens][Smartparens:1]]
 (use-package smartparens
   :ensure t
+  :hook (prog-mode org-mode)
   :config
   (require 'smartparens-config))
 ;; Smartparens:1 ends here

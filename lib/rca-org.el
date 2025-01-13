@@ -5,7 +5,7 @@
 ;; [[file:../dotemacs.org::*Org general options][Org general options:1]]
 (use-package org
   :ensure nil
-  :bind ("C-c a" . org-agenda)
+  :bind ("C-z C-a" . org-agenda)
   :hook (org-capture-mode . org-align-tags)
   :custom
   ;; (org-todo-keywords '((sequence "IDEA" "TODO" "|" "DONE" "DROP")))
@@ -54,8 +54,8 @@
 (use-package org-capture
   :ensure nil
   :after org
-  :bind ("C-c c" . org-capture)
-  ("C-c l" . org-store-link)
+  :bind (("C-z C-c" . org-capture)
+         ("C-z C-l" . org-store-link))
   :preface
   (defvar my/org-academic-agenda "~/.sync/org_files/agenda/academic.org")
   (defvar my/org-personal-agenda "~/.sync/org_files/agenda/personal.org")

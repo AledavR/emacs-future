@@ -4,6 +4,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(bibtex-files
+   '("/home/rcaled/.sync/archive/articles.bib"
+     "/home/rcaled/.sync/archive/books.bib"))
  '(citar-templates
    '((main . "${author editor:30%sn}     ${date year issued:4}     ${title:48}")
      (suffix
@@ -45,6 +48,8 @@
      (highlight (color . "yellow")) (underline (color . "blue"))
      (squiggly (color . "orange")) (strike-out (color . "red"))))
  '(pdf-annot-minor-mode-map-prefix [3 1])
+ '(reftex-default-bibliography '("/home/rcaled/.sync/archive/articles.bib"))
+ '(reftex-plug-into-AUCTeX t)
  '(reftex-section-levels
    '(("part" . 0) ("chapter" . 1) ("section" . 2) ("subsection" . 3)
      ("subsubsection" . 4) ("paragraph" . 5) ("subparagraph" . 6)

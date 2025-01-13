@@ -117,3 +117,9 @@
   :config
   (define-key mhtml-mode-map (kbd "C-c C-i") 'sgml-delete-tagged-text))
 ;; HTML:1 ends here
+
+;; [[file:../dotemacs.org::*Tree-sitter][Tree-sitter:1]]
+(use-package toml-ts-mode
+  :ensure nil
+  :mode "\\.toml\\'")
+;; Tree-sitter:1 ends here
