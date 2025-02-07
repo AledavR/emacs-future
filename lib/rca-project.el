@@ -14,6 +14,11 @@
   :defer 1)
 ;; Magit:1 ends here
 
+;; [[file:../dotemacs.org::*Llama][Llama:1]]
+(use-package llama
+  :ensure t)
+;; Llama:1 ends here
+
 ;; [[file:../dotemacs.org::*Skeletor][Skeletor:1]]
 (use-package skeletor
   :ensure t

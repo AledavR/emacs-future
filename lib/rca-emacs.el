@@ -53,6 +53,7 @@
   (dired-listing-switches "-alh")
   (column-number-mode t)
   (blink-cursor-mode nil)
+  (help-window-select t)
   (use-dialog-box nil)
   (auto-save-default nil)
   (auto-save-interval 200)
