@@ -7,7 +7,6 @@
 :PROPERTIES:
 :header-args: :tangle early-init.el
 :END:
-
 #+begin_src emacs-lisp
   (setq package-enable-at-startup nil)
 
@@ -1263,15 +1262,27 @@
 
 ** Flyspell
 
+#+begin_src emacs-lisp :tangle no
+    (use-package flyspell
+      :bind (:map flyspell-mode-map
+                  ("C-." . nil))
+      :config
+      (setq ispell-program-name "aspell"
+    	ispell-personal-dictionary "~/.sync/dict/aspell_es"
+    	ispell-dictionary "es")
+      :hook (org-mode . flyspell-mode))
+#+end_src
+
+** Jinx
+
 #+begin_src emacs-lisp
-  (use-package flyspell
-    :bind (:map flyspell-mode-map
-                ("C-." . nil))
+  (use-package jinx
+    :ensure t
+    :hook (text-mode . global-jinx-mode)
+    :bind (("M-$" . jinx-correct)
+           ("C-M-$" . jinx-languages))
     :config
-    (setq ispell-program-name "hunspell"
-  	ispell-personal-dictionary "~/.sync/dict/hunspell_es"
-  	ispell-dictionary "es")
-    :hook (org-mode . flyspell-mode))
+    (setq jinx-languages "es en_US"))
 #+end_src
 
 ** Vundo
@@ -1332,14 +1343,14 @@
 
 ** Vertico Posframe
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   (use-package vertico-posframe
     :ensure t
     :config
     (setq vertico-posframe-poshandler 'posframe-poshandler-frame-bottom-center)
-    (setq vertico-posframe-parameters
-          '((left-fringe . 8)
-            (right-fringe . 8)))
+    ;; (setq vertico-posframe-parameters
+    ;;       '((left-fringe . 8)
+    ;;         (right-fringe . 8)))
     (setq vertico-posframe-width 300)
     (vertico-posframe-mode 1))
 #+end_src

@@ -142,16 +142,15 @@
   (require 'smartparens-config))
 ;; Smartparens:1 ends here
 
-;; [[file:../dotemacs.org::*Flyspell][Flyspell:1]]
-(use-package flyspell
-  :bind (:map flyspell-mode-map
-              ("C-." . nil))
+;; [[file:../dotemacs.org::*Jinx][Jinx:1]]
+(use-package jinx
+  :ensure t
+  :hook (text-mode . global-jinx-mode)
+  :bind (("M-$" . jinx-correct)
+         ("C-M-$" . jinx-languages))
   :config
-  (setq ispell-program-name "hunspell"
-	ispell-personal-dictionary "~/.sync/dict/hunspell_es"
-	ispell-dictionary "es")
-  :hook (org-mode . flyspell-mode))
-;; Flyspell:1 ends here
+  (setq jinx-languages "es en_US"))
+;; Jinx:1 ends here
 
 ;; [[file:../dotemacs.org::*Vundo][Vundo:1]]
 (use-package vundo
