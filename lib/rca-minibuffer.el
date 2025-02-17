@@ -49,7 +49,11 @@
   :bind (("C-x C-b" . consult-buffer)
          ("C-x R" . consult-recent-file)
          ("C-x r i" . consult-register)
-         ("C-x r b" . consult-bookmark))
+         ("C-x r b" . consult-bookmark)
+         ("M-s f" . consult-recent-file)
+         ("M-s b" . consult-bookmark)
+         :map org-mode-map
+         ("M-s s" . consult-org-heading))
   :config
   (consult-customize consult-recent-file :preview-key nil)
   (consult-customize consult-bookmark :preview-key nil))

@@ -145,7 +145,7 @@
 ;; [[file:../dotemacs.org::*Jinx][Jinx:1]]
 (use-package jinx
   :ensure t
-  :hook (text-mode . global-jinx-mode)
+  :hook (org-mode . jinx-mode)
   :bind (("M-$" . jinx-correct)
          ("C-M-$" . jinx-languages))
   :config

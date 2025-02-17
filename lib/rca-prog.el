@@ -28,6 +28,11 @@
 (use-package lua-mode
   :ensure t
   :defer t)
+
+(use-package lua-ts-mode
+  :ensure nil
+  :defer t
+  :bind (:map lua-ts-mode-map ("C-c C-c" . lua-send-buffer)))
 ;; Lua:1 ends here
 
 ;; [[file:../dotemacs.org::*Julia][Julia:1]]
@@ -60,6 +65,14 @@
   :defer t
   :hook (julia-mode . julia-snail-mode))
 ;; Julia:1 ends here
+
+;; [[file:../dotemacs.org::*Python][Python:1]]
+(use-package python-mode
+  :ensure nil
+  :defer t
+  :config
+  (setq-default python-eldoc-get-doc nil))
+;; Python:1 ends here
 
 ;; [[file:../dotemacs.org::*Markdown][Markdown:1]]
 (use-package markdown-mode
@@ -123,3 +136,20 @@
   :ensure nil
   :mode "\\.toml\\'")
 ;; Tree-sitter:1 ends here
+
+;; [[file:../dotemacs.org::*Eglot][Eglot:1]]
+(use-package eglot
+  :ensure nil
+  :defer t
+  :custom
+  (eldoc-echo-area-use-multiline-p nil)
+  ;; (eglot-ignored-server-capabilities '(:hoverProvider))
+  :config
+  (defun eglot-open-link ()
+    "Open markdown link at point in the `eldoc-doc-buffer'."
+    (interactive)
+    (let ((url (get-text-property (point) 'help-echo)))
+      (if url
+          (browse-url-xdg-open url)
+        (message "No URL found at point")))))
+;; Eglot:1 ends here

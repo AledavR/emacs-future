@@ -28,14 +28,14 @@
     (find-file-at-point)))
 
 
-;; (defun rc/insert-wallpaper-file ()
-;;   (interactive)
-;;   (insert
-;;    (file-name-sans-extension
-;;     (file-name-nondirectory
-;;      (completing-read "Select wallpaper: "
-;;                       (directory-files-recursively
-;;                        wallpaper-files ".*"))))))
+(defun rc/insert-wallpaper-file ()
+  (interactive)
+  (insert
+   (file-name-sans-extension
+    (file-name-nondirectory
+     (completing-read "Select wallpaper: "
+                      (directory-files-recursively
+                       wallpaper-files ".*"))))))
 
 (defun rc/locate-or-create-directory (dir)
   "Search for a directory and create it if doesn't exists"

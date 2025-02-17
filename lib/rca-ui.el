@@ -86,13 +86,10 @@
 (use-package emacs
   :ensure nil
   :init
-
   (defcustom wallpaper-files
-    (concat (getenv "HOME") "./sync/pix/wallpaper/")
+    (concat (getenv "HOME") "/.sync/pix/wallpaper/")
     "Folder where wallpaper files are stored."
-    :type 'directory)
-
-  )
+    :type 'directory))
 ;; User interface variables:1 ends here
 
 ;; [[file:../dotemacs.org::*Diminish][Diminish:1]]

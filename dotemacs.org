@@ -197,14 +197,14 @@
       (find-file-at-point)))
 
 
-  ;; (defun rc/insert-wallpaper-file ()
-  ;;   (interactive)
-  ;;   (insert
-  ;;    (file-name-sans-extension
-  ;;     (file-name-nondirectory
-  ;;      (completing-read "Select wallpaper: "
-  ;;                       (directory-files-recursively
-  ;;                        wallpaper-files ".*"))))))
+  (defun rc/insert-wallpaper-file ()
+    (interactive)
+    (insert
+     (file-name-sans-extension
+      (file-name-nondirectory
+       (completing-read "Select wallpaper: "
+                        (directory-files-recursively
+                         wallpaper-files ".*"))))))
 
   (defun rc/locate-or-create-directory (dir)
     "Search for a directory and create it if doesn't exists"
@@ -504,13 +504,10 @@
   (use-package emacs
     :ensure nil
     :init
-
     (defcustom wallpaper-files
-      (concat (getenv "HOME") "./sync/pix/wallpaper/")
+      (concat (getenv "HOME") "/.sync/pix/wallpaper/")
       "Folder where wallpaper files are stored."
-      :type 'directory)
-
-    )
+      :type 'directory))
 #+end_src
 
 ** Diminish
@@ -609,21 +606,6 @@
 
     ;; Set a key binding if you need to toggle spacious padding.
     (define-key global-map (kbd "<f8>") #'spacious-padding-mode))
-#+end_src
-
-** Ace-window
-
-#+begin_src emacs-lisp :tangle no
-  (use-package ace-window
-    :ensure t
-    :bind ("M-o" . ace-window)
-    :custom-face
-    (aw-mode-line-face ((t (:inherit bold :underline t :height 1.2))))
-    :hook (server-after-make-frame . (lambda () (ace-window-display-mode 1)))
-    :config
-    ;; (ace-window-display-mode 1)
-    (setq aw-scope 'frame)
-    (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
 #+end_src
 
 ** Dashboard
@@ -977,6 +959,11 @@
   (use-package lua-mode
     :ensure t
     :defer t)
+
+  (use-package lua-ts-mode
+    :ensure nil
+    :defer t
+    :bind (:map lua-ts-mode-map ("C-c C-c" . lua-send-buffer)))
 #+end_src
 
 ** Julia
@@ -1010,6 +997,16 @@
     :ensure t
     :defer t
     :hook (julia-mode . julia-snail-mode))
+#+end_src
+
+** Python
+
+#+begin_src emacs-lisp
+  (use-package python-mode
+    :ensure nil
+    :defer t
+    :config
+    (setq-default python-eldoc-get-doc nil))
 #+end_src
 
 ** Markdown
@@ -1081,6 +1078,24 @@
   (use-package toml-ts-mode
     :ensure nil
     :mode "\\.toml\\'")
+#+end_src
+
+** Eglot
+#+begin_src emacs-lisp
+  (use-package eglot
+    :ensure nil
+    :defer t
+    :custom
+    (eldoc-echo-area-use-multiline-p nil)
+    ;; (eglot-ignored-server-capabilities '(:hoverProvider))
+    :config
+    (defun eglot-open-link ()
+      "Open markdown link at point in the `eldoc-doc-buffer'."
+      (interactive)
+      (let ((url (get-text-property (point) 'help-echo)))
+        (if url
+            (browse-url-xdg-open url)
+          (message "No URL found at point")))))
 #+end_src
 
 * Completion
@@ -1278,7 +1293,7 @@
 #+begin_src emacs-lisp
   (use-package jinx
     :ensure t
-    :hook (text-mode . global-jinx-mode)
+    :hook (org-mode . jinx-mode)
     :bind (("M-$" . jinx-correct)
            ("C-M-$" . jinx-languages))
     :config
@@ -1384,7 +1399,11 @@
     :bind (("C-x C-b" . consult-buffer)
            ("C-x R" . consult-recent-file)
            ("C-x r i" . consult-register)
-           ("C-x r b" . consult-bookmark))
+           ("C-x r b" . consult-bookmark)
+           ("M-s f" . consult-recent-file)
+           ("M-s b" . consult-bookmark)
+           :map org-mode-map
+           ("M-s s" . consult-org-heading))
     :config
     (consult-customize consult-recent-file :preview-key nil)
     (consult-customize consult-bookmark :preview-key nil))
