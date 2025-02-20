@@ -4,6 +4,11 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(+citar-library-local-path "Files/Documents/library")
+ '(+citar-library-port "2222")
+ '(+citar-library-server "ubuntu@rcaled.mooo.com")
+ '(+citar-local-library-path "/home/rcaled/Files/Documents/library-test")
+ '(+citar-remote-library-path "Files/Documents/library")
  '(bibtex-files
    '("/home/rcaled/.sync/archive/articles.bib"
      "/home/rcaled/.sync/archive/books.bib"))
@@ -26,7 +31,7 @@
          VID VIFF VST WBMP WPG X3F XBM XC XCF XPM XV XWD YCbCr YCbCrA YUV))
  '(imagemagick-render-type 1)
  '(org-latex-preview-appearance-options
-   '(:foreground auto :background "Transparent" :scale 1.4 :zoom 1.0 :page-width
+   '(:foreground auto :background "Transparent" :scale 1.0 :zoom 1.2 :page-width
                  0.8 :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
  '(org-latex-preview-live '(inline block edit-special))
  '(org-latex-preview-live-debounce 0.5)
@@ -55,7 +60,8 @@
      ("subsubsection" . 4) ("paragraph" . 5) ("subparagraph" . 6)
      ("addchap" . -1) ("addsec" . -2) ("frametitle" . -2)))
  '(safe-local-variable-values
-   '((eval add-hook 'after-save-hook (lambda nil (org-babel-tangle)) nil t)
+   '((TeX-command-extra-options . "-shell-escape")
+     (eval add-hook 'after-save-hook (lambda nil (org-babel-tangle)) nil t)
      (eval add-hook 'after-save-hook (lambda nil (org-babel-detangle)) nil t)
      (ispell-dictionary . "en_US")))
  '(sentence-end "[a-z0-9)}][.:?][ ]")
@@ -67,5 +73,4 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(keycast-key ((t)))
  '(org-latex-and-related ((t (:foreground "#6fcfd2" :family "mononoki Nerd Font")))))

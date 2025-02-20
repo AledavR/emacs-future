@@ -31,7 +31,8 @@
 
 (use-package lua-ts-mode
   :ensure nil
-  :defer t
+  ;; :defer t
+  :mode "\\.lua\\'"
   :bind (:map lua-ts-mode-map ("C-c C-c" . lua-send-buffer)))
 ;; Lua:1 ends here
 

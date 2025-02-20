@@ -6,9 +6,14 @@
 (use-package emacs
   :ensure nil
   :init
-  (set-face-attribute 'default nil :family "Iosevka Comfy" :height 130)
-  (set-face-attribute 'fixed-pitch nil :family "Iosevka Comfy")
-  (set-face-attribute 'variable-pitch nil :family "Iosevka Comfy Motion")
+  ;; (set-face-attribute 'default nil :family "Iosevka Comfy" :height 130)
+  ;; (set-face-attribute 'fixed-pitch nil :family "Iosevka Comfy")
+  ;; (set-face-attribute 'variable-pitch nil :family "Iosevka Comfy Motion")
+  (set-face-attribute 'default nil :family "Aporetic Sans Mono" :height 130)
+  (set-face-attribute 'fixed-pitch nil :family "Aporetic Sans Mono")
+  (set-face-attribute 'variable-pitch nil :family "Aporetic Serif Mono")
+  (set-fontset-font t 'emoji (font-spec :family "Apple Color Emoji") nil 'prepend)
+  (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend)
   :custom
   (frame-resize-pixelwise t)
   (modus-themes-italic-constructs t)
@@ -109,7 +114,7 @@
           (yuuma ef-tritanopia-light ef-rosa)
           (nazrin2 ef-light ef-owl)
           (satori ef-trio-light ef-trio-dark)))
-  (setq theme-character 'parsee)
+  (setq theme-character 'satori)
   :config
   (setq ef-themes-mixed-fonts t)
   (setq ef-themes-headings

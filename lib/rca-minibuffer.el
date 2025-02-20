@@ -52,6 +52,7 @@
          ("C-x r b" . consult-bookmark)
          ("M-s f" . consult-recent-file)
          ("M-s b" . consult-bookmark)
+         ("M-s l" . consult-line)
          :map org-mode-map
          ("M-s s" . consult-org-heading))
   :config
