@@ -597,6 +597,8 @@ This file recreates the emacs configuration
                     mode-line-position (project-mode-line project-mode-line-format)
                     (vc-mode vc-mode) "  " mode-line-modes mode-line-misc-info mode-line-end-spaces))
 
+    (set-face-attribute 'header-line-active nil :inherit 'mode-line-active)
+    
     (setq spacious-padding-widths
           '( :internal-border-width 10
              :header-line-width 4
@@ -717,7 +719,7 @@ This file recreates the emacs configuration
        (octave . t)))
     (defun browse-steam-page (steam-id)
       (browse-url (concat "steam://advertise/" steam-id)))
-    (set-face-attribute 'org-latex-and-related nil :family "Iosevka Comfy")
+    (set-face-attribute 'org-latex-and-related nil :family "Aporetic Sans Mono")
     (org-link-set-parameters "steam"
                              :follow 'browse-steam-page)
     (add-hook 'org-mode-hook 'variable-pitch-mode)
@@ -1013,6 +1015,12 @@ This file recreates the emacs configuration
   (use-package python-mode
     :ensure nil
     :defer t
+    :bind ("C-c v" . python-set-venv)
+    :init
+    (defun python-set-venv (interpreter)
+      (interactive "fPython interpreter:")
+      (setq python-interpreter interpreter
+            python-shell-interpreter interpreter))
     :config
     (setq-default python-eldoc-get-doc nil))
 #+end_src

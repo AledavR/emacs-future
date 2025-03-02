@@ -40,7 +40,7 @@
      (octave . t)))
   (defun browse-steam-page (steam-id)
     (browse-url (concat "steam://advertise/" steam-id)))
-  (set-face-attribute 'org-latex-and-related nil :family "Iosevka Comfy")
+  (set-face-attribute 'org-latex-and-related nil :family "Aporetic Sans Mono")
   (org-link-set-parameters "steam"
                            :follow 'browse-steam-page)
   (add-hook 'org-mode-hook 'variable-pitch-mode)

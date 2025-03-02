@@ -167,6 +167,8 @@
                   mode-line-position (project-mode-line project-mode-line-format)
                   (vc-mode vc-mode) "  " mode-line-modes mode-line-misc-info mode-line-end-spaces))
 
+  (set-face-attribute 'header-line-active nil :inherit 'mode-line-active)
+  
   (setq spacious-padding-widths
         '( :internal-border-width 10
            :header-line-width 4

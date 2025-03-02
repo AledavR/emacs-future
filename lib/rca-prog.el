@@ -71,6 +71,12 @@
 (use-package python-mode
   :ensure nil
   :defer t
+  :bind ("C-c v" . python-set-venv)
+  :init
+  (defun python-set-venv (interpreter)
+    (interactive "fPython interpreter:")
+    (setq python-interpreter interpreter
+          python-shell-interpreter interpreter))
   :config
   (setq-default python-eldoc-get-doc nil))
 ;; Python:1 ends here
