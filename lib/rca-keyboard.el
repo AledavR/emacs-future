@@ -15,8 +15,8 @@
 
     (meow-leader-define-key
      ;; SPC j/k will run the original command in MOTION state.
-     '("j" . "H-j")
-     '("k" . "H-k")
+     ;; '("j" . "H-j") ; Not needed anymore
+     ;; '("k" . "H-k")
      '("d" . "C-x 0")
      '("t" . "C-x t")
      '("q" . "C-x C-k")

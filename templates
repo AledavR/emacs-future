@@ -9,3 +9,6 @@ org-mode :when (not (texmathp))
 (mm "\\( " q " \\)")
 (dm "\\[ " q " \\]")
 
+lua-mode
+
+(req "local " (s mod) " = require(\""(s mod) "\")" q)
