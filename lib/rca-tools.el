@@ -103,6 +103,28 @@
   (citar-embark-mode))
 ;; Citar:1 ends here
 
+;; [[file:../dotemacs.org::*Ebib][Ebib:1]]
+(use-package ebib
+  :ensure t
+  :after citar
+  :defer t
+  :config
+  (setq ebib-preload-bib-files '("~/.sync/archive/articles.bib" "~/.sync/archive/books.bib"))
+  (setq ebib-file-search-dirs '("~/Files/Documents/library/articles" "~/Files/Documents/library/books"))
+  (setq ebib-file-associations '(("ps" . "gv")))
+  (define-key ebib-index-mode-map (kbd "O") '+ebib-open-file-externally)
+  (define-key ebib-index-mode-map (kbd "L") '+ebib-scholar-search)
+  (defun +ebib-open-file-externally () ; Maybe I can define args?
+    (interactive)
+    (let ((file (ebib--expand-file-name (ebib--select-file nil 1 (ebib--get-key-at-point)))))
+      (if file (start-process "open pdf" nil "xdg-open" file)
+        (message "No PDF file found with this citekey"))))
+  (defun +ebib-scholar-search ()
+    (interactive)
+    (browse-url (format "https://scholar.google.com/scholar?q=%s"
+                        (ebib-get-field-value "title" (ebib--get-key-at-point) ebib--cur-db nil t))))
+;; Ebib:1 ends here
+
 ;; [[file:../dotemacs.org::*Alert][Alert:1]]
 (use-package alert
   :ensure t
