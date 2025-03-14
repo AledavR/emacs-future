@@ -56,6 +56,11 @@
            (display-buffer-in-side-window)
            (side . right)
            (window-width . 0.40))
+          ("\\*Man"
+           (display-buffer-in-side-window)
+           (side . right)
+           (slot . 0)
+           (window-width . 80))
           ("\\*\\(Output\\|Register Preview\\).*"
            (display-buffer-reuse-mode-window
             display-buffer-at-bottom)

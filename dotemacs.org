@@ -452,57 +452,62 @@ This file recreates the emacs configuration
 ** Buffer display options
 
 #+begin_src emacs-lisp
-  (use-package emacs
-    :ensure nil
-    :config
-    (defun org-babel-detangle-no-buffer-pop-up (orig-fun &rest args)
-      (save-excursion
-        (let ((display-buffer-alist
-               '((".*" (display-buffer-no-window) (allow-no-window . t)))))
-          (apply orig-fun args))))
-    (advice-add 'org-babel-detangle :around #'org-babel-detangle-no-buffer-pop-up)
-    (setq display-buffer-alist
-          '(
-            ((derived-mode . shell-mode)
-             (display-buffer-reuse-mode-window
-              display-buffer-below-selected)
-             (window-height . 12)
-             (dedicated . t)
-             (window-parameters . ((no-other-window . t)
-    			         (mode-line-format . none))))
-            ("\\*Help\\*"
-             (display-buffer-in-side-window)
-             (side . right)
-             (window-width . 0.40))
-            ("\\*\\(Output\\|Register Preview\\).*"
-             (display-buffer-reuse-mode-window
-              display-buffer-at-bottom)
-             (window-height . 10)
-             (window-parameters . ((mode-line-format . none))))
-            ("\\*\\(Agenda Commands\\|Org Agenda\\|Org Select\\).*"
-             (display-buffer-reuse-mode-window
-              display-buffer-at-bottom)
-             (window-parameters . ((mode-line-format . none))))
-            ("\\*compilation\\*"
-             (display-buffer-reuse-mode-window
-              display-buffer-below-selected)
-             (window-height . 12)
-             (dedicated . t))
-            ("\\*vterm\\*"
-             (display-buffer-reuse-mode-window
-              display-buffer-below-selected)
-             (window-height . 20)
-             (dedicated . t))
-            ("\\*Python\\*"
-             (display-buffer-reuse-mode-window
-              display-buffer-below-selected)
-             (window-height . 20)
-             (dedicated . t))
-            ("\\*undo-tree\\*"
-             (display-buffer-in-side-window)
-             (side . right)
-             (dedicated . t)
-             (window-width . 0.25)))))
+   (use-package emacs
+     :ensure nil
+     :config
+     (defun org-babel-detangle-no-buffer-pop-up (orig-fun &rest args)
+       (save-excursion
+         (let ((display-buffer-alist
+                '((".*" (display-buffer-no-window) (allow-no-window . t)))))
+           (apply orig-fun args))))
+     (advice-add 'org-babel-detangle :around #'org-babel-detangle-no-buffer-pop-up)
+     (setq display-buffer-alist
+           '(
+             ((derived-mode . shell-mode)
+              (display-buffer-reuse-mode-window
+               display-buffer-below-selected)
+              (window-height . 12)
+              (dedicated . t)
+              (window-parameters . ((no-other-window . t)
+     			         (mode-line-format . none))))
+             ("\\*Help\\*"
+              (display-buffer-in-side-window)
+              (side . right)
+              (window-width . 0.40))
+             ("\\*Man"
+              (display-buffer-in-side-window)
+              (side . right)
+              (slot . 0)
+              (window-width . 80))
+             ("\\*\\(Output\\|Register Preview\\).*"
+              (display-buffer-reuse-mode-window
+               display-buffer-at-bottom)
+              (window-height . 10)
+              (window-parameters . ((mode-line-format . none))))
+             ("\\*\\(Agenda Commands\\|Org Agenda\\|Org Select\\).*"
+              (display-buffer-reuse-mode-window
+               display-buffer-at-bottom)
+              (window-parameters . ((mode-line-format . none))))
+             ("\\*compilation\\*"
+              (display-buffer-reuse-mode-window
+               display-buffer-below-selected)
+              (window-height . 12)
+              (dedicated . t))
+             ("\\*vterm\\*"
+              (display-buffer-reuse-mode-window
+               display-buffer-below-selected)
+              (window-height . 20)
+              (dedicated . t))
+             ("\\*Python\\*"
+              (display-buffer-reuse-mode-window
+               display-buffer-below-selected)
+              (window-height . 20)
+              (dedicated . t))
+             ("\\*undo-tree\\*"
+              (display-buffer-in-side-window)
+              (side . right)
+              (dedicated . t)
+              (window-width . 0.25)))))
 #+end_src
 
 ** User interface variables
@@ -717,11 +722,30 @@ This file recreates the emacs configuration
        (shell . t)
        (calc . t)
        (octave . t)))
+
+    (defun +org-link-mpv-complete-file ()
+      (let ((file (read-file-name "File: "))
+  	  (pwd (file-name-as-directory (expand-file-name ".")))
+  	  (pwd1 (file-name-as-directory (abbreviate-file-name
+  				         (expand-file-name ".")))))
+        (cond ((string-match
+                (concat "^" (regexp-quote pwd1) "\\(.+\\)") file)
+               (concat "mpv:" (match-string 1 file)))
+  	    ((string-match
+                (concat "^" (regexp-quote pwd) "\\(.+\\)")
+                (expand-file-name file))
+               (concat "mpv:" (match-string 1 (expand-file-name file))))
+  	    (t (concat "mpv:" file)))))
+
+    (defun +org-link-open-in-mpv (file)
+      "Opens linked file in an new mpv process"
+      (start-process "open file" nil "mpv" "--title=mpv_emacs" (expand-file-name file)))
+
     (defun browse-steam-page (steam-id)
       (browse-url (concat "steam://advertise/" steam-id)))
     (set-face-attribute 'org-latex-and-related nil :family "Aporetic Sans Mono")
-    (org-link-set-parameters "steam"
-                             :follow 'browse-steam-page)
+    (org-link-set-parameters "steam" :follow 'browse-steam-page)
+    (org-link-set-parameters "mpv" :complete '+org-link-mpv-complete-file :follow '+org-link-open-in-mpv)
     (add-hook 'org-mode-hook 'variable-pitch-mode)
     (add-hook 'org-mode-hook 'visual-line-mode)
     (add-hook 'org-agenda-mode-hook 'hl-line-mode)
@@ -1917,6 +1941,7 @@ This file recreates the emacs configuration
     :ensure t
     :custom
     (denote-known-keywords '("material" "examen" "ajeno" "practica" "apuntes"))
+    (denote-journal-extras-title-format 'day-date-month-year)
     :config
     (setq denote-directory "~/.sync/archive/notes"))
 #+end_src

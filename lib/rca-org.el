@@ -38,11 +38,30 @@
      (shell . t)
      (calc . t)
      (octave . t)))
+
+  (defun +org-link-mpv-complete-file ()
+    (let ((file (read-file-name "File: "))
+	  (pwd (file-name-as-directory (expand-file-name ".")))
+	  (pwd1 (file-name-as-directory (abbreviate-file-name
+				         (expand-file-name ".")))))
+      (cond ((string-match
+              (concat "^" (regexp-quote pwd1) "\\(.+\\)") file)
+             (concat "mpv:" (match-string 1 file)))
+	    ((string-match
+              (concat "^" (regexp-quote pwd) "\\(.+\\)")
+              (expand-file-name file))
+             (concat "mpv:" (match-string 1 (expand-file-name file))))
+	    (t (concat "mpv:" file)))))
+
+  (defun +org-link-open-in-mpv (file)
+    "Opens linked file in an new mpv process"
+    (start-process "open file" nil "mpv" "--title=mpv_emacs" (expand-file-name file)))
+
   (defun browse-steam-page (steam-id)
     (browse-url (concat "steam://advertise/" steam-id)))
   (set-face-attribute 'org-latex-and-related nil :family "Aporetic Sans Mono")
-  (org-link-set-parameters "steam"
-                           :follow 'browse-steam-page)
+  (org-link-set-parameters "steam" :follow 'browse-steam-page)
+  (org-link-set-parameters "mpv" :complete '+org-link-mpv-complete-file :follow '+org-link-open-in-mpv)
   (add-hook 'org-mode-hook 'variable-pitch-mode)
   (add-hook 'org-mode-hook 'visual-line-mode)
   (add-hook 'org-agenda-mode-hook 'hl-line-mode)

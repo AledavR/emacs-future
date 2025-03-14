@@ -19,6 +19,7 @@
   :ensure t
   :custom
   (denote-known-keywords '("material" "examen" "ajeno" "practica" "apuntes"))
+  (denote-journal-extras-title-format 'day-date-month-year)
   :config
   (setq denote-directory "~/.sync/archive/notes"))
 ;; Denote:1 ends here
