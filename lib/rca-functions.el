@@ -116,4 +116,35 @@ If POSITION is nil appends to the beginning of each element."
   (save-excursion
     (beginning-of-line)
     (looking-at-p "[[:blank:]]*$")))
+
+(defun rc/wrap-in-question-marks ()
+  (interactive)
+  (let ((inicio (region-beginning))
+        (fin (region-end)))
+    (save-excursion
+      (goto-char inicio)
+      (insert "¿")
+      (goto-char (+ fin 1))
+      (when (eq (char-before) ?.) 
+        (delete-char -1))
+      (insert "?"))))
+
+(defun rc/org-update-idea ()
+  "Adds a timestamp at the end of the current subtree."
+  (interactive)
+  (org-mark-subtree)
+  (exchange-point-and-mark)
+  (deactivate-mark)
+  (previous-line)
+  (open-line 1)
+  (newline)
+  (insert "UPDATE ")
+  (org-insert-timestamp (current-time) t t)
+  (insert ": "))
+
+(defun +diary-schedule-class (start-month start-day end-month end-day year days-of-week)
+  (and (diary-block start-month start-day year
+                    end-month end-day year)
+       (or (cl-some (lambda (p) (= p (calendar-day-of-week date)))
+                    days-of-week))))
 ;; Miscellaneous:1 ends here

@@ -5,15 +5,22 @@
 ;; [[file:../dotemacs.org::*Org general options][Org general options:1]]
 (use-package org
   :ensure nil
-  :bind ("C-z C-a" . org-agenda)
-  :hook (org-capture-mode . org-align-tags)
+  :bind (("C-z C-a" . org-agenda)
+         :map org-mode-map
+         ("C-c C-x 1" . rc/org-update-idea))
+  :hook ((org-capture-mode . org-align-tags)
+         (org-mode . variable-pitch-mode)
+         (org-mode . visual-line-mode)
+         (org-agenda-mode . hl-line-mode)
+         (org-babel-after-execute . org-redisplay-inline-images)
+         (org-babel-after-execute . org-toggle-inline-images))
   :custom
-  ;; (org-todo-keywords '((sequence "IDEA" "TODO" "|" "DONE" "DROP")))
   (org-highlight-latex-and-related '(latex script entities))
-  (org-agenda-files '("~/.sync/org_files/agenda/" "~/.sync/org_files/notes/"))
+  (org-agenda-files '("~/.sync/org_files/agenda/"))
   (org-log-done 'time)
   (org-confirm-babel-evaluate nil)
-  ;; (org-cite-global-bibliography '("~/Documents/bibliography.bib"))
+  (org-agenda-skip-deadline-if-done t)
+  (org-agenda-skip-scheduled-if-done t)
   (org-image-actual-width nil)
   (org-fold-catch-invisible-edits 'show-and-error)
   (org-list-demote-modify-bullet '(("+" . "-") ("-" . "+")))
@@ -21,16 +28,14 @@
                           (800 1000 1200 1400 1600 1800 2000 2200)
                           "......"
                           "-----------------"))
+  (modus-themes-headings '((1 . (1.5)) (2 . (1.3))
+                           (agenda-date . (1.3))
+                           (agenda-structure . (1.8))
+                           (t . (1.1))))
+  (org-safe-remote-resources
+   '("\\`https://fniessen\\.github\\.io/org-html-themes/org/theme-readtheorg\\.setup\\'"))
   :config
-  (setq modus-themes-headings
-        '((1 . (1.5))
-          (2 . (1.3))
-          (agenda-date . (1.3))
-          (agenda-structure . (1.8))
-          (t . (1.1))))
   (setf (cdr (assoc 'file org-link-frame-setup)) 'find-file)
-  (setq org-safe-remote-resources
-        '("\\`https://fniessen\\.github\\.io/org-html-themes/org/theme-readtheorg\\.setup\\'"))
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((python . t)
@@ -38,7 +43,6 @@
      (shell . t)
      (calc . t)
      (octave . t)))
-
   (defun +org-link-mpv-complete-file ()
     (let ((file (read-file-name "File: "))
 	  (pwd (file-name-as-directory (expand-file-name ".")))
@@ -56,17 +60,18 @@
   (defun +org-link-open-in-mpv (file)
     "Opens linked file in an new mpv process"
     (start-process "open file" nil "mpv" "--title=mpv_emacs" (expand-file-name file)))
+  
+  (defun +org-link-remote-open-in-mpv (url)
+    "Opens linked file in an new mpv process"
+    (start-process "open url" nil "mpv" "--title=mpv_emacs" url))
 
   (defun browse-steam-page (steam-id)
     (browse-url (concat "steam://advertise/" steam-id)))
   (set-face-attribute 'org-latex-and-related nil :family "Aporetic Sans Mono")
   (org-link-set-parameters "steam" :follow 'browse-steam-page)
   (org-link-set-parameters "mpv" :complete '+org-link-mpv-complete-file :follow '+org-link-open-in-mpv)
-  (add-hook 'org-mode-hook 'variable-pitch-mode)
-  (add-hook 'org-mode-hook 'visual-line-mode)
-  (add-hook 'org-agenda-mode-hook 'hl-line-mode)
-  (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
-  (add-hook 'org-babel-after-execute-hook 'org-toggle-inline-images))
+  (org-link-set-parameters "mpv-url" :follow '+org-link-remote-open-in-mpv)
+  )
 ;; Org general options:1 ends here
 
 ;; [[file:../dotemacs.org::*Org-capture][Org-capture:1]]
@@ -101,7 +106,7 @@
     (interactive
      (list (completing-read "Tipo de tarea:" '("Universidad" "Personal"))))
     (org-todo "TODO")
-    (my/refile-to my/org-agenda-file class))
+    (rc/refile-to my/org-personal-agenda class))
   
   :custom
   (org-capture-templates `(
@@ -115,6 +120,9 @@
                            ("n" "note")
                            ("ni" "idea" entry (file my/org-idea-notebook), (concat "* %^{Idea}" my/org-created-property "\n%?") :empty-lines 1)
                            ("nd" "dream" entry (file my/org-dream-diary), (concat"* %^{Dream}" my/org-created-property "\n%?") :empty-lines 1)
+                           ("i" "ideas management")
+                           ("ic" "make constructive task from idea" entry (file+headline my/org-personal-agenda "Constructive"), (concat "* TODO %a \nDEADLINE %^T" my/org-created-property "\n%?") :empty-lines 1)
+                           ("im" "make mundane task from idea" entry (file+headline my/org-personal-agenda "Mundane"), (concat "* TODO %a \nDEADLINE %^T" my/org-created-property "\n%?") :empty-lines 1)
                            ))
   )
 ;; Org-capture:1 ends here

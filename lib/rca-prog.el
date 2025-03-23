@@ -134,8 +134,9 @@
         (backward-sexp 1)
         (delete-region b (point))
         (meow-insert))))
-  :config
-  (define-key mhtml-mode-map (kbd "C-c C-i") 'sgml-delete-tagged-text))
+  :bind (("C-c C-i" . sgml-delete-tagged-text)))
+  ;; :config
+  ;; (define-key mhtml-mode-map (kbd "C-c C-i") 'sgml-delete-tagged-text))
 ;; HTML:1 ends here
 
 ;; [[file:../dotemacs.org::*Tree-sitter][Tree-sitter:1]]

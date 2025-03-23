@@ -3,7 +3,6 @@
 
 (use-package emacs
   :ensure nil
-
   :bind (("C-x C-k C-x C-k" . kill-emacs)
          ("C-x B" . ibuffer)
          ("M-z" . zap-up-to-char)
@@ -27,8 +26,7 @@
   (setq history-excluded-filetypes '(".*gz" ".*pdf" "bookmarks" "recentf"
     			             "init.el" ".*gitignore" "early-init.el"
     			             ".*log" ".*png" ".*jpg" ".*mp4" ".*gif"
-    			             ".*agenda.org" ".*ideas.org" ".*mod/.*"
-    			             ".*lib/.*" ".*ext/.*" ".*_db"))
+    			             ".*agenda/.*" ".*mod/.*" ".*lib/.*" ".*ext/.*" ".*_db"))
   (setq temporal-directory
         (locate-user-emacs-file "temporal/"))
   (setq snippets-directory
@@ -88,7 +86,18 @@
     (load custom-file))
   (when (not (file-exists-p temporal-directory))
     (make-directory temporal-directory))
-  (add-to-list 'default-frame-alist '(height . 37)))
+
+  ;; Greentext mode
+  (setq greentext-font-lock
+        '(("^>.*" . 'success)))
+
+  (define-derived-mode greentext-mode text-mode "🍀"
+    "Major mode for display faces in greentext stories. Derived from `text-mode'."
+    (setq font-lock-defaults '(greentext-font-lock))
+    (olivetti-mode))
+
+  ;; (add-to-list 'default-frame-alist '(height . 37))
+  )
 
 (use-package calendar
   :ensure nil

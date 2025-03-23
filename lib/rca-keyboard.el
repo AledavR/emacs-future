@@ -21,6 +21,7 @@
      '("t" . "C-x t")
      '("q" . "C-x C-k")
      '("r" . "C-x r")
+     '("@" . "C-c @")
      '("u" . meow-universal-argument)
      ;; Use SPC (0-9) for digit arguments.
      '("1" . meow-digit-argument)
@@ -113,6 +114,7 @@
 
 
   (add-to-list 'meow-keypad-start-keys '(?z . ?z))
+  ;; (add-to-list 'meow-keypad-start-keys '(?, . ?,)) ;; TODO Maybe use this for mode hotkeys
 
   (meow-thing-register 'angles
                        '(pair ("<") (">"))

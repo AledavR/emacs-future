@@ -19,9 +19,20 @@
   :ensure t
   :custom
   (denote-known-keywords '("material" "examen" "ajeno" "practica" "apuntes"))
-  (denote-journal-extras-title-format 'day-date-month-year)
+  (denote-directory "~/.sync/archive/notes")
+  (denote-dired-directories '("~/.sync/archive/notes" "~/.sync/archive/journal" "/home/rcaled/Files/Downloads/universidad"))
   :config
-  (setq denote-directory "~/.sync/archive/notes"))
+  (add-hook 'dired-mode-hook 'denote-dired-mode-in-directories))
+
+(use-package denote-journal
+  :ensure t
+  :custom
+  (denote-journal-title-format 'day-date-month-year)
+  (denote-journal-directory "~/.sync/archive/journal"))
+
+(use-package denote-search
+  :ensure t
+  :defer t)
 ;; Denote:1 ends here
 
 ;; [[file:../dotemacs.org::*Embark][Embark:1]]

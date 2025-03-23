@@ -52,15 +52,11 @@
            (dedicated . t)
            (window-parameters . ((no-other-window . t)
   			         (mode-line-format . none))))
-          ("\\*Help\\*"
-           (display-buffer-in-side-window)
-           (side . right)
-           (window-width . 0.40))
-          ("\\*Man"
+          ("^\\*\\(Help\\|Info\\|Man\\)"
            (display-buffer-in-side-window)
            (side . right)
            (slot . 0)
-           (window-width . 80))
+           (window-width . 0.40))
           ("\\*\\(Output\\|Register Preview\\).*"
            (display-buffer-reuse-mode-window
             display-buffer-at-bottom)
@@ -75,12 +71,7 @@
             display-buffer-below-selected)
            (window-height . 12)
            (dedicated . t))
-          ("\\*vterm\\*"
-           (display-buffer-reuse-mode-window
-            display-buffer-below-selected)
-           (window-height . 20)
-           (dedicated . t))
-          ("\\*Python\\*"
+          ("\\*\\(Python\\|vterm\\)\\*"
            (display-buffer-reuse-mode-window
             display-buffer-below-selected)
            (window-height . 20)
@@ -118,8 +109,9 @@
         '((parsee ef-reverie ef-elea-dark)
           (yuuma ef-tritanopia-light ef-rosa)
           (nazrin2 ef-light ef-owl)
+          (youmu ef-elea-light ef-elea-dark)
           (satori ef-trio-light ef-trio-dark)))
-  (setq theme-character 'satori)
+  (setq theme-character 'youmu)
   :config
   (setq ef-themes-mixed-fonts t)
   (setq ef-themes-headings
@@ -175,13 +167,13 @@
   (set-face-attribute 'header-line-active nil :inherit 'mode-line-active)
   
   (setq spacious-padding-widths
-        '( :internal-border-width 10
-           :header-line-width 4
-           :mode-line-width 4
-           :tab-width 4
-           :right-divider-width 25
-           :scroll-bar-width 8
-           :fringe-width 8))
+        '( :internal-border-width 6
+           :header-line-width 3
+           :mode-line-width 3
+           :tab-width 3
+           :right-divider-width 20
+           :scroll-bar-width 4
+           :fringe-width 4))
   ;; (setq spacious-padding-subtle-mode-line
   ;;       `( :mode-line-active 'default
   ;;          :mode-line-inactive vertical-border))
@@ -202,7 +194,8 @@ names an existing file."
 	 (file-exists-p
 	  (expand-file-name argi command-line-default-directory)))))
 
-(add-hook 'command-line-functions #'my-inhibit-startup-screen-file)
+;; (add-hook 'command-line-functions #'my-inhibit-startup-screen-file)
+(setq command-line-functions #'my-inhibit-startup-screen-file)
 
 (use-package dashboard
   :ensure t
@@ -210,6 +203,11 @@ names an existing file."
   (defun protect-dashboard ()
     (define-key
      dashboard-mode-map (kbd "q") 'dashboard-refresh-buffer))
+  (defun rc/refresh-buffer-maybe ()
+    (when (equal "*dashboard*" (buffer-name))
+      (revert-buffer)))
+  ;; Files don't open from command line if this is in init
+  ;; TODO Check if there is any other problem in this section
   :init
   (setq banner-images
         (directory-files (locate-user-emacs-file "img") t ".*g$"))
@@ -219,21 +217,37 @@ names an existing file."
   (elpaca-after-init . dashboard-initialize)
   (dashboard-mode . protect-dashboard)
   (dashboard-after-initialize . dashboard-refresh-buffer)
+  (server-after-make-frame . rc/refresh-buffer-maybe)
+  ;; (server-after-make-frame . (lambda () (set-frame-font "Aporetic Sans Mono 13")))
   :custom
   (dashboard-center-content t)
-  (dashboard-items nil)
   (dashboard-startup-banner `(,(locate-user-emacs-file (concat "img/" (symbol-name theme-character) ".png"))))
   ;; (dashboard-startup-banner `(,(rc/list-select-random banner-images)))
   ;; (dashboard-startup-banner banner-images)
+  (dashboard-set-navigator t)
+  (dashboard-navigator-buttons `(((nil "Open agenda" "Open detailed agenda buffer" (lambda (&rest _) (org-agenda nil "a"))))))
   (dashboard-image-banner-max-height banner-image-size)
+  (dashboard-startupify-list '(dashboard-insert-banner
+                               dashboard-insert-newline
+                               dashboard-insert-banner-title
+                               dashboard-insert-newline
+                               dashboard-insert-navigator
+                               dashboard-insert-init-info
+                               dashboard-insert-items
+                               dashboard-insert-newline
+                               dashboard-insert-footer))
   (dashboard-banner-logo-title nil)
   (dashboard-set-footer nil)
   (dashboard-footer-messages (list nil))
   (tab-bar-new-tab-choice "*dashboard*")
+  (dashboard-items '((agenda . 10)))
+  ;; (dashboard-agenda-tags-format 'ignore)
   :init
   (dashboard-setup-startup-hook)
   (setq initial-buffer-choice
         (lambda () (get-buffer-create "*dashboard*"))))
+  ;; :config
+  ;; (add-hook server-after-make-frame-hook 'revert-buffer))
 ;; Dashboard:1 ends here
 
 ;; [[file:../dotemacs.org::*Rainbow mode][Rainbow mode:1]]

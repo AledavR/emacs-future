@@ -4,27 +4,25 @@
 
 ;; [[file:../dotemacs.org::*Vertico][Vertico:1]]
 (use-package vertico
-  ;; :ensure (vertico :type git
-  ;;       	   :host github
-  ;;       	   :repo "minad/vertico"
-                   ;; :files (:defaults "extensions/*"))
   :ensure t
   :init
   (vertico-mode)
   :custom
   (vertico-cicle t)
   (vertico-count 12))
-
-
-;; (use-package vertico-directory
-;;   :ensure nil
-;;   :after vertico
-;;   :bind (:map vertico-map
-;; 	      ("RET" . vertico-directory-enter)
-;; 	      ("DEL" . vertico-directory-delete-char)
-;; 	      ("M-DEL" . vertico-directory-delete-word))
-;;   :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
 ;; Vertico:1 ends here
+
+;; [[file:../dotemacs.org::*Vertico Posframe][Vertico Posframe:1]]
+(use-package vertico-posframe
+  :ensure t
+  :config
+  (setq vertico-posframe-poshandler 'posframe-poshandler-frame-bottom-center)
+  ;; (setq vertico-posframe-parameters
+  ;;       '((left-fringe . 8)
+  ;;         (right-fringe . 8)))
+  (setq vertico-posframe-width 300)
+  (vertico-posframe-mode 1))
+;; Vertico Posframe:1 ends here
 
 ;; [[file:../dotemacs.org::*Orderless][Orderless:1]]
 (use-package orderless
