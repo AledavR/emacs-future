@@ -2,7 +2,7 @@
 (provide 'rca-tools)
 ;; Tools:1 ends here
 
-;; [[file:../dotemacs.org::*Ebuku][Ebuku:1]]
+;; [[file:../dotemacs.org::*~ebuku~][~ebuku~:1]]
 (use-package ebuku
   :ensure t
   :defer t
@@ -12,9 +12,9 @@
   (ebuku-title-face ((t (:inherit font-lock-constant-face))))
   :custom
   (ebuku-results-limit 25))
-;; Ebuku:1 ends here
+;; ~ebuku~:1 ends here
 
-;; [[file:../dotemacs.org::*Denote][Denote:1]]
+;; [[file:../dotemacs.org::*~denote~][~denote~:1]]
 (use-package denote
   :ensure t
   :custom
@@ -33,9 +33,9 @@
 (use-package denote-search
   :ensure t
   :defer t)
-;; Denote:1 ends here
+;; ~denote~:1 ends here
 
-;; [[file:../dotemacs.org::*Embark][Embark:1]]
+;; [[file:../dotemacs.org::*~embark~][~embark~:1]]
 (use-package embark
   :ensure t
   :bind (("C-c o" . embark-act)
@@ -50,9 +50,9 @@
 
 (use-package embark-consult
   :ensure t)
-;; Embark:1 ends here
+;; ~embark~:1 ends here
 
-;; [[file:../dotemacs.org::*Citar][Citar:1]]
+;; [[file:../dotemacs.org::*~citar~][~citar~:1]]
 (use-package citar
   :ensure t
   :bind (("C-z c o" . citar-open)
@@ -113,9 +113,9 @@
               ("F" . +citar-open-file-externally))
   :config
   (citar-embark-mode))
-;; Citar:1 ends here
+;; ~citar~:1 ends here
 
-;; [[file:../dotemacs.org::*Ebib][Ebib:1]]
+;; [[file:../dotemacs.org::*~ebib~][~ebib~:1]]
 (use-package ebib
   :ensure t
   :defer t
@@ -135,9 +135,9 @@
     (interactive)
     (browse-url (format "https://scholar.google.com/scholar?q=%s"
                         (ebib-get-field-value "title" (ebib--get-key-at-point) ebib--cur-db nil t)))))
-;; Ebib:1 ends here
+;; ~ebib~:1 ends here
 
-;; [[file:../dotemacs.org::*Alert][Alert:1]]
+;; [[file:../dotemacs.org::*~alert~][~alert~:1]]
 (use-package alert
   :ensure t
   :config
@@ -174,4 +174,4 @@
   (setq org-wild-notifier-alert-time '(4320 2880 1440 720 360 180 120 60 15 5 1))
   ;; (setq org-wild-notifier-keyword-whitelist nil)
   (org-wild-notifier-mode))
-;; Alert:1 ends here
+;; ~alert~:1 ends here

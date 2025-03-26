@@ -62,7 +62,7 @@ input"
 (advice-add 'LaTeX-insert-item :after #'rc/latex-array-separation)
 ;; Tex:1 ends here
 
-;; [[file:../dotemacs.org::*Auctex package][Auctex package:1]]
+;; [[file:../dotemacs.org::*~auctex~][~auctex~:1]]
 (use-package tex
   :ensure auctex
   :after pdf-tools
@@ -106,9 +106,9 @@ input"
                 TeX-source-correlate-start-server t
                 TeX-master nil
                 TeX-view-program-selection '((output-pdf "PDF Tools"))))
-;; Auctex package:1 ends here
+;; ~auctex~:1 ends here
 
-;; [[file:../dotemacs.org::*Cdlatex][Cdlatex:1]]
+;; [[file:../dotemacs.org::*~cdlatex~][~cdlatex~:1]]
 (use-package cdlatex
   :ensure t
   :defer t
@@ -174,9 +174,9 @@ input"
           ("C-<return>" . nil)
           ("´" . cdlatex-math-symbol)
           ("<tab>" . cdlatex-tab)))
-;; Cdlatex:1 ends here
+;; ~cdlatex~:1 ends here
 
-;; [[file:../dotemacs.org::*Pdf-tools][Pdf-tools:1]]
+;; [[file:../dotemacs.org::*~pdf-tools~][~pdf-tools~:1]]
 (use-package pdf-tools
   :ensure t
   ;; :defer t
@@ -208,4 +208,4 @@ when deactivating presentation-mode")
   (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
   (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
   (define-key pdf-view-mode-map (kbd "C-r") 'isearch-backward))
-;; Pdf-tools:1 ends here
+;; ~pdf-tools~:1 ends here

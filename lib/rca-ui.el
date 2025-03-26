@@ -237,6 +237,7 @@ names an existing file."
                                dashboard-insert-newline
                                dashboard-insert-footer))
   (dashboard-banner-logo-title nil)
+  (dashboard-match-agenda-entry "-class")
   (dashboard-set-footer nil)
   (dashboard-footer-messages (list nil))
   (tab-bar-new-tab-choice "*dashboard*")

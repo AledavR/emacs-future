@@ -2,24 +2,24 @@
 (provide 'rca-project)
 ;; Project management:1 ends here
 
-;; [[file:../dotemacs.org::*Transient][Transient:1]]
+;; [[file:../dotemacs.org::*~transient~][~transient~:1]]
 (use-package transient
   :ensure t)
-;; Transient:1 ends here
+;; ~transient~:1 ends here
 
-;; [[file:../dotemacs.org::*Llama][Llama:1]]
+;; [[file:../dotemacs.org::*~llama~][~llama~:1]]
 (use-package llama
   :ensure t)
-;; Llama:1 ends here
+;; ~llama~:1 ends here
 
-;; [[file:../dotemacs.org::*Magit][Magit:1]]
+;; [[file:../dotemacs.org::*~magit~][~magit~:1]]
 (use-package magit
   :ensure t
   :requires transient
   :defer 1)
-;; Magit:1 ends here
+;; ~magit~:1 ends here
 
-;; [[file:../dotemacs.org::*Skeletor][Skeletor:1]]
+;; [[file:../dotemacs.org::*~skeletor~][~skeletor~:1]]
 (use-package skeletor
   :ensure t
   :custom
@@ -34,4 +34,4 @@
   (skeletor-define-template "latex-beamer"
     :title "LaTeX Beamer"
     :no-license? t))
-;; Skeletor:1 ends here
+;; ~skeletor~:1 ends here

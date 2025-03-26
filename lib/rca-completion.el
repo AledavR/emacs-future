@@ -9,7 +9,7 @@
   (setq text-mode-ispell-word-completion nil))
 ;; Completion general options:1 ends here
 
-;; [[file:../dotemacs.org::*Tempel][Tempel:1]]
+;; [[file:../dotemacs.org::*~tempel~][~tempel~:1]]
 ;; Configure Tempel
 (use-package tempel
   :ensure t
@@ -49,9 +49,9 @@
 ;; The package is young and doesn't have comprehensive coverage.
 (use-package tempel-collection
   :ensure t)
-;; Tempel:1 ends here
+;; ~tempel~:1 ends here
 
-;; [[file:../dotemacs.org::*Corfu][Corfu:1]]
+;; [[file:../dotemacs.org::*~corfu~][~corfu~:1]]
 (use-package corfu
   :ensure t
   :bind
@@ -74,7 +74,7 @@
   (corfu-auto t)
   (corfu-cycle t)
   (corfu-quit-no-match 'separator))
-;; Corfu:1 ends here
+;; ~corfu~:1 ends here
 
 ;; [[file:../dotemacs.org::*Icons][Icons:1]]
 (use-package kind-icon
@@ -89,7 +89,7 @@
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 ;; Icons:1 ends here
 
-;; [[file:../dotemacs.org::*Cape][Cape:1]]
+;; [[file:../dotemacs.org::*~cape~][~cape~:1]]
 (use-package cape
   :ensure t
   :init
@@ -120,9 +120,9 @@
   (add-to-list 'completion-at-point-functions #'cape-keyword)
   (add-to-list 'completion-at-point-functions #'cape-file)
   (add-to-list 'completion-at-point-functions #'cape-elisp-block))
-;; Cape:1 ends here
+;; ~cape~:1 ends here
 
-;; [[file:../dotemacs.org::*Dabbrev][Dabbrev:1]]
+;; [[file:../dotemacs.org::*~dabbrev~][~dabbrev~:1]]
 (use-package dabbrev
   :bind (("C-." . dabbrev-expand)
          ("C-:" . dabbrev-completion))
@@ -132,17 +132,17 @@
   (add-to-list 'dabbrev-ignored-buffer-modes 'doc-view-mode)
   (add-to-list 'dabbrev-ignored-buffer-modes 'pdf-view-mode)
   (add-to-list 'dabbrev-ignored-buffer-modes 'tags-table-mode))
-;; Dabbrev:1 ends here
+;; ~dabbrev~:1 ends here
 
-;; [[file:../dotemacs.org::*Smartparens][Smartparens:1]]
+;; [[file:../dotemacs.org::*~smartparens~][~smartparens~:1]]
 (use-package smartparens
   :ensure t
   :hook (prog-mode org-mode)
   :config
   (require 'smartparens-config))
-;; Smartparens:1 ends here
+;; ~smartparens~:1 ends here
 
-;; [[file:../dotemacs.org::*Jinx][Jinx:1]]
+;; [[file:../dotemacs.org::*~jinx~][~jinx~:1]]
 (use-package jinx
   :ensure t
   :hook (org-mode . jinx-mode)
@@ -150,15 +150,15 @@
          ("C-M-$" . jinx-languages))
   :config
   (setq jinx-languages "es en_US"))
-;; Jinx:1 ends here
+;; ~jinx~:1 ends here
 
-;; [[file:../dotemacs.org::*Vundo][Vundo:1]]
+;; [[file:../dotemacs.org::*~vundo~][~vundo~:1]]
 (use-package vundo
   :ensure t
   :bind ("C-x u" . vundo))
-;; Vundo:1 ends here
+;; ~vundo~:1 ends here
 
-;; [[file:../dotemacs.org::*Eldoc][Eldoc:1]]
+;; [[file:../dotemacs.org::*~eldoc~][~eldoc~:1]]
 (use-package eldoc-box
   :ensure t
   :custom
@@ -167,4 +167,4 @@
   :bind (("M-ñ" . eldoc-box-help-at-point)
          ("M-n" . eldoc-box-scroll-up)
          ("M-p" . eldoc-box-scroll-down)))
-;; Eldoc:1 ends here
+;; ~eldoc~:1 ends here

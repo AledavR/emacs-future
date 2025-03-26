@@ -5,7 +5,7 @@
 
 This file recreates the emacs configuration
 
-* Early init config
+* ~early-init.el~
 :PROPERTIES:
 :header-args: :tangle early-init.el
 :END:
@@ -120,7 +120,7 @@ This file recreates the emacs configuration
     (elpaca-no-symlink-mode))
 #+end_src
 
-* Init config
+* ~init.el~
 :PROPERTIES:
 :header-args+: :tangle init.el
 :END:
@@ -709,6 +709,7 @@ This file recreates the emacs configuration
                                  dashboard-insert-newline
                                  dashboard-insert-footer))
     (dashboard-banner-logo-title nil)
+    (dashboard-match-agenda-entry "-class")
     (dashboard-set-footer nil)
     (dashboard-footer-messages (list nil))
     (tab-bar-new-tab-choice "*dashboard*")
@@ -759,6 +760,7 @@ This file recreates the emacs configuration
     (org-confirm-babel-evaluate nil)
     (org-agenda-skip-deadline-if-done t)
     (org-agenda-skip-scheduled-if-done t)
+    (org-agenda-skip-scheduled-repeats-after-deadline t)
     (org-image-actual-width nil)
     (org-fold-catch-invisible-edits 'show-and-error)
     (org-list-demote-modify-bullet '(("+" . "-") ("-" . "+")))
@@ -1027,7 +1029,7 @@ This file recreates the emacs configuration
     :defer t)
 #+end_src
 
-** Fortran
+** FORTRAN
 
 
 #+begin_src emacs-lisp
@@ -1040,7 +1042,7 @@ This file recreates the emacs configuration
                      (format "gfortran %s && ./a.out" (file-name-nondirectory buffer-file-name))))))
 #+end_src
 
-** Gnuplot
+** Gnu plot
 
 #+begin_src emacs-lisp
   (use-package gnuplot
@@ -1048,7 +1050,7 @@ This file recreates the emacs configuration
     :defer t)
 #+end_src
 
-** Lua
+** LUA
 
 #+begin_src emacs-lisp
   (use-package lua-mode
@@ -1101,7 +1103,8 @@ This file recreates the emacs configuration
   (use-package python-mode
     :ensure nil
     :defer t
-    :bind ("C-c v" . python-set-venv)
+    :bind (:map python-mode-map
+                ("C-c v" . python-set-venv))
     :init
     (defun python-set-venv (interpreter)
       (interactive "fPython interpreter:")
@@ -1183,7 +1186,7 @@ This file recreates the emacs configuration
     :mode "\\.toml\\'")
 #+end_src
 
-** Eglot
+** ~eglot~
 #+begin_src emacs-lisp
   (use-package eglot
     :ensure nil
@@ -1219,7 +1222,7 @@ This file recreates the emacs configuration
     (setq text-mode-ispell-word-completion nil))
 #+end_src
 
-** Yasnippet
+** ~yasnippet~
 
 #+begin_src emacs-lisp :tangle no
   (use-package yasnippet
@@ -1233,7 +1236,7 @@ This file recreates the emacs configuration
     (yas-global-mode 1))
 #+end_src
 
-** Tempel
+** ~tempel~
 
 #+begin_src emacs-lisp
   ;; Configure Tempel
@@ -1277,7 +1280,7 @@ This file recreates the emacs configuration
     :ensure t)
 #+end_src
 
-** Corfu
+** ~corfu~
 
 #+begin_src emacs-lisp
   (use-package corfu
@@ -1319,7 +1322,7 @@ This file recreates the emacs configuration
     (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 #+end_src
 
-** Cape
+** ~cape~
 
 #+begin_src emacs-lisp
   (use-package cape
@@ -1354,7 +1357,7 @@ This file recreates the emacs configuration
     (add-to-list 'completion-at-point-functions #'cape-elisp-block))
 #+end_src
 
-** Dabbrev
+** ~dabbrev~
 
 #+begin_src emacs-lisp
   (use-package dabbrev
@@ -1368,7 +1371,7 @@ This file recreates the emacs configuration
     (add-to-list 'dabbrev-ignored-buffer-modes 'tags-table-mode))
 #+end_src
 
-** Smartparens
+** ~smartparens~
 
 #+begin_src emacs-lisp
   (use-package smartparens
@@ -1378,7 +1381,7 @@ This file recreates the emacs configuration
     (require 'smartparens-config))
 #+end_src
 
-** Flyspell
+** ~flyspell~
 
 #+begin_src emacs-lisp :tangle no
     (use-package flyspell
@@ -1391,7 +1394,7 @@ This file recreates the emacs configuration
       :hook (org-mode . flyspell-mode))
 #+end_src
 
-** Jinx
+** ~jinx~
 
 #+begin_src emacs-lisp
   (use-package jinx
@@ -1403,7 +1406,7 @@ This file recreates the emacs configuration
     (setq jinx-languages "es en_US"))
 #+end_src
 
-** Vundo
+** ~vundo~
 
 #+begin_src emacs-lisp
   (use-package vundo
@@ -1411,7 +1414,7 @@ This file recreates the emacs configuration
     :bind ("C-x u" . vundo))
 #+end_src
 
-** Eldoc
+** ~eldoc~
 
 #+begin_src emacs-lisp
   (use-package eldoc-box
@@ -1433,7 +1436,7 @@ This file recreates the emacs configuration
   (provide 'rca-minibuffer)
 #+end_src
 
-** Vertico
+** ~vertico~
 
 #+begin_src emacs-lisp
   (use-package vertico
@@ -1445,7 +1448,7 @@ This file recreates the emacs configuration
     (vertico-count 12))
 #+end_src
 
-** Vertico Posframe
+** ~vertico-posframe~
 
 #+begin_src emacs-lisp
   (use-package vertico-posframe
@@ -1459,7 +1462,7 @@ This file recreates the emacs configuration
     (vertico-posframe-mode 1))
 #+end_src
 
-** Orderless
+** ~orderless~
 
 #+begin_src emacs-lisp
   (use-package orderless
@@ -1471,7 +1474,7 @@ This file recreates the emacs configuration
                                             partial-completion)))))
 #+end_src
 
-** Marginalia
+** ~marginalia~
 
 #+begin_src emacs-lisp
   (use-package marginalia
@@ -1480,7 +1483,7 @@ This file recreates the emacs configuration
     (marginalia-mode))
 #+end_src
 
-** Consult
+** ~consult~
 
 #+begin_src emacs-lisp
   (use-package consult
@@ -1508,21 +1511,21 @@ This file recreates the emacs configuration
   (provide 'rca-project)
 #+end_src
 
-** Transient
+** ~transient~
 
 #+begin_src emacs-lisp
   (use-package transient
     :ensure t)
 #+end_src
 
-** Llama
+** ~llama~
 
 #+begin_src emacs-lisp
   (use-package llama
     :ensure t)
 #+end_src
 
-** Magit
+** ~magit~
 
 #+begin_src emacs-lisp
   (use-package magit
@@ -1531,7 +1534,7 @@ This file recreates the emacs configuration
     :defer 1)
 #+end_src
 
-** Skeletor
+** ~skeletor~
 
 #+begin_src emacs-lisp
   (use-package skeletor
@@ -1559,7 +1562,7 @@ This file recreates the emacs configuration
   (provide 'rca-keyboard)
 #+end_src
 
-** Meow
+** ~meow~
 
 #+begin_src emacs-lisp 
   (use-package meow
@@ -1808,7 +1811,7 @@ This file recreates the emacs configuration
   (advice-add 'LaTeX-insert-item :after #'rc/latex-array-separation)
 #+end_src
 
-** Auctex package
+** ~auctex~
 
 #+begin_src emacs-lisp
   (use-package tex
@@ -1856,7 +1859,7 @@ This file recreates the emacs configuration
                   TeX-view-program-selection '((output-pdf "PDF Tools"))))
 #+end_src
 
-** Cdlatex
+** ~cdlatex~
 
 #+begin_src emacs-lisp
   (use-package cdlatex
@@ -1926,7 +1929,7 @@ This file recreates the emacs configuration
             ("<tab>" . cdlatex-tab)))
 #+end_src
 
-** Pdf-tools
+** ~pdf-tools~
 
 #+begin_src emacs-lisp
   (use-package pdf-tools
@@ -1971,7 +1974,7 @@ This file recreates the emacs configuration
   (provide 'rca-tools)
 #+end_src
 
-** Ebuku
+** ~ebuku~
 
 #+begin_src emacs-lisp
   (use-package ebuku
@@ -1985,7 +1988,7 @@ This file recreates the emacs configuration
     (ebuku-results-limit 25))
 #+end_src
 
-** Denote
+** ~denote~
 
 #+begin_src emacs-lisp
   (use-package denote
@@ -2008,7 +2011,7 @@ This file recreates the emacs configuration
     :defer t)
 #+end_src
 
-** Embark
+** ~embark~
 
 #+begin_src emacs-lisp
   (use-package embark
@@ -2027,7 +2030,7 @@ This file recreates the emacs configuration
     :ensure t)
 #+end_src
 
-** Citar
+** ~citar~
 
 #+begin_src emacs-lisp
   (use-package citar
@@ -2092,7 +2095,7 @@ This file recreates the emacs configuration
     (citar-embark-mode))
 #+end_src
 
-** Ebib
+** ~ebib~
 
 #+begin_src emacs-lisp
   (use-package ebib
@@ -2116,7 +2119,7 @@ This file recreates the emacs configuration
                           (ebib-get-field-value "title" (ebib--get-key-at-point) ebib--cur-db nil t)))))
 #+end_src
 
-** Alert
+** ~alert~
 
 #+begin_src emacs-lisp
   (use-package alert

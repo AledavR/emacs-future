@@ -1,4 +1,4 @@
-;; [[file:dotemacs.org::*Init config][Init config:1]]
+;; [[file:dotemacs.org::*~init.el~][~init.el~:1]]
 (mapc (lambda(string)
         (add-to-list 'load-path (locate-user-emacs-file string)))
       '("ext" "lib"))
@@ -19,4 +19,4 @@
 (require 'rca-keyboard)
 (require 'rca-tex)
 (require 'rca-tools)
-;; Init config:1 ends here
+;; ~init.el~:1 ends here

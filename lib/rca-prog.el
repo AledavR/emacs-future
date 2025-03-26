@@ -8,7 +8,7 @@
   :defer t)
 ;; Terminal:1 ends here
 
-;; [[file:../dotemacs.org::*Fortran][Fortran:1]]
+;; [[file:../dotemacs.org::*FORTRAN][FORTRAN:1]]
 (use-package fortran
   :ensure nil
   :config
@@ -16,15 +16,15 @@
             (lambda ()
               (set (make-local-variable 'compile-command)
                    (format "gfortran %s && ./a.out" (file-name-nondirectory buffer-file-name))))))
-;; Fortran:1 ends here
+;; FORTRAN:1 ends here
 
-;; [[file:../dotemacs.org::*Gnuplot][Gnuplot:1]]
+;; [[file:../dotemacs.org::*Gnu plot][Gnu plot:1]]
 (use-package gnuplot
   :ensure t
   :defer t)
-;; Gnuplot:1 ends here
+;; Gnu plot:1 ends here
 
-;; [[file:../dotemacs.org::*Lua][Lua:1]]
+;; [[file:../dotemacs.org::*LUA][LUA:1]]
 (use-package lua-mode
   :ensure t
   :defer t)
@@ -34,7 +34,7 @@
   ;; :defer t
   :mode "\\.lua\\'"
   :bind (:map lua-ts-mode-map ("C-c C-c" . lua-send-buffer)))
-;; Lua:1 ends here
+;; LUA:1 ends here
 
 ;; [[file:../dotemacs.org::*Julia][Julia:1]]
 (use-package julia-mode
@@ -71,7 +71,8 @@
 (use-package python-mode
   :ensure nil
   :defer t
-  :bind ("C-c v" . python-set-venv)
+  :bind (:map python-mode-map
+              ("C-c v" . python-set-venv))
   :init
   (defun python-set-venv (interpreter)
     (interactive "fPython interpreter:")
@@ -145,7 +146,7 @@
   :mode "\\.toml\\'")
 ;; Tree-sitter:1 ends here
 
-;; [[file:../dotemacs.org::*Eglot][Eglot:1]]
+;; [[file:../dotemacs.org::*~eglot~][~eglot~:1]]
 (use-package eglot
   :ensure nil
   :defer t
@@ -160,4 +161,4 @@
       (if url
           (browse-url-xdg-open url)
         (message "No URL found at point")))))
-;; Eglot:1 ends here
+;; ~eglot~:1 ends here

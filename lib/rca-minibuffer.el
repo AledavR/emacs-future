@@ -2,7 +2,7 @@
 (provide 'rca-minibuffer)
 ;; Minibuffer:1 ends here
 
-;; [[file:../dotemacs.org::*Vertico][Vertico:1]]
+;; [[file:../dotemacs.org::*~vertico~][~vertico~:1]]
 (use-package vertico
   :ensure t
   :init
@@ -10,9 +10,9 @@
   :custom
   (vertico-cicle t)
   (vertico-count 12))
-;; Vertico:1 ends here
+;; ~vertico~:1 ends here
 
-;; [[file:../dotemacs.org::*Vertico Posframe][Vertico Posframe:1]]
+;; [[file:../dotemacs.org::*~vertico-posframe~][~vertico-posframe~:1]]
 (use-package vertico-posframe
   :ensure t
   :config
@@ -22,9 +22,9 @@
   ;;         (right-fringe . 8)))
   (setq vertico-posframe-width 300)
   (vertico-posframe-mode 1))
-;; Vertico Posframe:1 ends here
+;; ~vertico-posframe~:1 ends here
 
-;; [[file:../dotemacs.org::*Orderless][Orderless:1]]
+;; [[file:../dotemacs.org::*~orderless~][~orderless~:1]]
 (use-package orderless
   :ensure t
   :custom
@@ -32,16 +32,16 @@
   (completion-category-overrides '((file (styles
                                           basic
                                           partial-completion)))))
-;; Orderless:1 ends here
+;; ~orderless~:1 ends here
 
-;; [[file:../dotemacs.org::*Marginalia][Marginalia:1]]
+;; [[file:../dotemacs.org::*~marginalia~][~marginalia~:1]]
 (use-package marginalia
   :ensure t
   :config
   (marginalia-mode))
-;; Marginalia:1 ends here
+;; ~marginalia~:1 ends here
 
-;; [[file:../dotemacs.org::*Consult][Consult:1]]
+;; [[file:../dotemacs.org::*~consult~][~consult~:1]]
 (use-package consult
   :ensure t
   :bind (("C-x C-b" . consult-buffer)
@@ -56,4 +56,4 @@
   :config
   (consult-customize consult-recent-file :preview-key nil)
   (consult-customize consult-bookmark :preview-key nil))
-;; Consult:1 ends here
+;; ~consult~:1 ends here

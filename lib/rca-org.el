@@ -21,6 +21,7 @@
   (org-confirm-babel-evaluate nil)
   (org-agenda-skip-deadline-if-done t)
   (org-agenda-skip-scheduled-if-done t)
+  (org-agenda-skip-scheduled-repeats-after-deadline t)
   (org-image-actual-width nil)
   (org-fold-catch-invisible-edits 'show-and-error)
   (org-list-demote-modify-bullet '(("+" . "-") ("-" . "+")))
