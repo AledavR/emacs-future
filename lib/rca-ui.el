@@ -141,7 +141,9 @@
 ;; [[file:../dotemacs.org::*Olivetti][Olivetti:1]]
 (use-package olivetti
   :ensure t
-  :hook (Info-mode . olivetti-mode))
+  :hook (Info-mode . olivetti-mode)
+  :config
+  (setq-default olivetti-body-width 110))
 ;; Olivetti:1 ends here
 
 ;; [[file:../dotemacs.org::*Spacious-Padding][Spacious-Padding:1]]

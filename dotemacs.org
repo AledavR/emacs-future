@@ -609,7 +609,9 @@ This file recreates the emacs configuration
 #+begin_src emacs-lisp
   (use-package olivetti
     :ensure t
-    :hook (Info-mode . olivetti-mode))
+    :hook (Info-mode . olivetti-mode)
+    :config
+    (setq-default olivetti-body-width 110))
 #+end_src
 
 ** Spacious-Padding

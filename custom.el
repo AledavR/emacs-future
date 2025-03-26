@@ -30,6 +30,7 @@
          SGI SR2 SRF SUN SVG SVGZ TGA TIFF TIFF64 TILE TIM TTF UYVY VDA VICAR
          VID VIFF VST WBMP WPG X3F XBM XC XCF XPM XV XWD YCbCr YCbCrA YUV))
  '(imagemagick-render-type 1)
+ '(org-highlight-latex-and-related '(native))
  '(org-latex-preview-appearance-options
    '(:foreground auto :background "Transparent" :scale 1.0 :zoom 1.2 :page-width
                  0.8 :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
