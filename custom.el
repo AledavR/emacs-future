@@ -37,8 +37,6 @@
  '(org-latex-preview-live '(inline block edit-special))
  '(org-latex-preview-live-debounce 0.5)
  '(org-latex-preview-live-display-type 'buffer)
- '(org-latex-preview-preamble
-   "\\documentclass{minimal}\12[DEFAULT-PACKAGES]\12[PACKAGES]\12\\usepackage{amsmath}\12\\usepackage{amssymb}\12\\usepackage{xcolor}")
  '(org-pretty-entities-include-sub-superscripts nil)
  '(org-safe-remote-resources
    '("\\`https://fniessen\\.github\\.io/org-html-themes/org/theme-bigblow\\.setup\\'"

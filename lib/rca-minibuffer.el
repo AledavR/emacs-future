@@ -12,18 +12,6 @@
   (vertico-count 12))
 ;; ~vertico~:1 ends here
 
-;; [[file:../dotemacs.org::*~vertico-posframe~][~vertico-posframe~:1]]
-(use-package vertico-posframe
-  :ensure t
-  :config
-  (setq vertico-posframe-poshandler 'posframe-poshandler-frame-bottom-center)
-  ;; (setq vertico-posframe-parameters
-  ;;       '((left-fringe . 8)
-  ;;         (right-fringe . 8)))
-  (setq vertico-posframe-width 300)
-  (vertico-posframe-mode 1))
-;; ~vertico-posframe~:1 ends here
-
 ;; [[file:../dotemacs.org::*~orderless~][~orderless~:1]]
 (use-package orderless
   :ensure t

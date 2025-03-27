@@ -960,6 +960,17 @@ This file recreates the emacs configuration
     ;; Use dvisvgm to generate previews
     ;; You don't need this, it's the default:
     (setq org-latex-preview-process-default 'dvisvgm)
+
+    ;;(setq-default  org-latex-preview-preamble
+    ;;               "\\documentclass{minimal}\12[DEFAULT-PACKAGES]\12[PACKAGES]\12\\usepackage{amsmath}\12\\usepackage{amssymb}\12\\usepackage{xcolor}\12\\DeclareMathOperator{\\Dom}{Dom}\12\\DeclareMathOperator{\\Ran}{Ran}")
+    (setq-default  org-latex-preview-preamble
+                   "\\documentclass{minimal}
+  [DEFAULT-PACKAGES]
+  [PACKAGES]
+  \\usepackage{amsmath}
+  \\usepackage{amssymb}
+  \\usepackage{mathtools}
+  \\usepackage{xcolor}")
     
     ;; Turn on auto-mode, it's built into Org and much faster/more featured than
     ;; org-fragtog. (Remember to turn off/uninstall org-fragtog.)
@@ -1452,7 +1463,7 @@ This file recreates the emacs configuration
 
 ** ~vertico-posframe~
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   (use-package vertico-posframe
     :ensure t
     :config
@@ -1864,71 +1875,72 @@ This file recreates the emacs configuration
 ** ~cdlatex~
 
 #+begin_src emacs-lisp
-  (use-package cdlatex
-    :ensure t
-    :defer t
-    :init
-    (defvar rc/cdlatex-env-list
-      '(("axiom" "\\begin{axiom}\nLABEL\n?\n\\end{axiom}\n" nil)
-        ("theorem" "\\begin{theorem}\nLABEL\n?\n\\end{theorem}\n" nil))
-      "cdlatex enviroments")
-    (defvar rc/cdlatex-command-list
-      '(
-        ;; ("ref"
-        ;;  "Insert a new reference"
-        ;;  "" consult-reftex-insert-reference nil t nil)
-        ("gph"
-         "Insert an image"
-         "\\includegraphics[width=0.6\\linewidth]{?}"
-         rc/cdlatex-pos-cursor-insert-file ("image") t nil)
-        ("inp"
-         "Input a file"
-         "\\input{?}"
-         rc/cdlatex-pos-cursor-insert-file nil t nil)
-        ("inc"
-         "Include a file"
-         "\\include{?}"
-         rc/cdlatex-pos-cursor-insert-file nil t nil)
-        ("dm"
-         "Insert a math display block"
-         "\\[ ? \\]" cdlatex-position-cursor nil t nil)
-        ("mm"
-         "Insert an inline math block"
-         "\\( ? \\)" cdlatex-position-cursor nil t nil)
-        ("int"
-         "Insert simple integral"
-         "\\int_{?}" cdlatex-position-cursor nil nil t)
-        ("oint"
-         "Insert closed integral"
-         "\\oint_{?}" cdlatex-position-cursor nil nil t)
-        ("dv"
-         "Insert a spaced differential variable"
-         "\\, d?" cdlatex-position-cursor nil nil t)
-        ("t."
-         "Insert therefore symbol"
-         "\\therefore" cdlatex-position-cursor nil nil t)
-        ("intd"
-         "Insert a definite integral limits"
-         "\\biggr\\vert_{?}^{}" cdlatex-position-cursor nil nil t)
-        ("int2"
-         "Insert a definite integral limits"
-         "\\iint" cdlatex-position-cursor nil nil t)
-        ("int3"
-         "Insert a definite integral limits"
-         "\\iiint" cdlatex-position-cursor nil nil t)
-        ("sci"
-         "Insert scientific notation"
-         "\\times 10^{?}" cdlatex-position-cursor nil nil t))
-      "cdlatex custom commands")
-    (setq cdlatex-env-alist rc/cdlatex-env-list
-          cdlatex-command-alist rc/cdlatex-command-list)
-    :custom
-    (cdlatex-paired-parens "$([{")
-    (cdlatex-math-modify-alist '((66 "\\mathbb" nil t nil nil)))
-    :bind ( :map cdlatex-mode-map
-            ("C-<return>" . nil)
-            ("´" . cdlatex-math-symbol)
-            ("<tab>" . cdlatex-tab)))
+    (use-package cdlatex
+      :ensure t
+      :defer t
+      :init
+      (defvar rc/cdlatex-env-list
+        '(("axiom" "\\begin{axiom}\nLABEL\n?\n\\end{axiom}\n" nil)
+          ("theorem" "\\begin{theorem}\nLABEL\n?\n\\end{theorem}\n" nil))
+        "cdlatex enviroments")
+      (defvar rc/cdlatex-command-list
+        '(
+          ;; ("ref"
+          ;;  "Insert a new reference"
+          ;;  "" consult-reftex-insert-reference nil t nil)
+          ("gph"
+           "Insert an image"
+           "\\includegraphics[width=0.6\\linewidth]{?}"
+           rc/cdlatex-pos-cursor-insert-file ("image") t nil)
+          ("inp"
+           "Input a file"
+           "\\input{?}"
+           rc/cdlatex-pos-cursor-insert-file nil t nil)
+          ("inc"
+           "Include a file"
+           "\\include{?}"
+           rc/cdlatex-pos-cursor-insert-file nil t nil)
+          ("dm"
+           "Insert a math display block"
+           "\\[ ? \\]" cdlatex-position-cursor nil t nil)
+          ("mm"
+           "Insert an inline math block"
+           "\\( ? \\)" cdlatex-position-cursor nil t nil)
+          ("int"
+           "Insert simple integral"
+           "\\int_{?}" cdlatex-position-cursor nil nil t)
+          ("oint"
+           "Insert closed integral"
+           "\\oint_{?}" cdlatex-position-cursor nil nil t)
+          ("dv"
+           "Insert a spaced differential variable"
+           "\\, d?" cdlatex-position-cursor nil nil t)
+          ("t."
+           "Insert therefore symbol"
+           "\\therefore" cdlatex-position-cursor nil nil t)
+          ("intd"
+           "Insert a definite integral limits"
+           "\\biggr\\vert_{?}^{}" cdlatex-position-cursor nil nil t)
+          ("int2"
+           "Insert a definite integral limits"
+           "\\iint" cdlatex-position-cursor nil nil t)
+          ("int3"
+           "Insert a definite integral limits"
+           "\\iiint" cdlatex-position-cursor nil nil t)
+          ("sci"
+           "Insert scientific notation"
+           "\\times 10^{?}" cdlatex-position-cursor nil nil t))
+        "cdlatex custom commands")
+      (setq cdlatex-env-alist rc/cdlatex-env-list
+            cdlatex-command-alist rc/cdlatex-command-list)
+      :custom
+      (cdlatex-paired-parens "$([{")
+      (cdlatex-math-modify-alist '((111 "\\operatorname" nil t nil nil)
+                                   (66 "\\mathbb" nil t nil nil)))
+      :bind ( :map cdlatex-mode-map
+              ("C-<return>" . nil)
+              ("´" . cdlatex-math-symbol)
+              ("<tab>" . cdlatex-tab)))
 #+end_src
 
 ** ~pdf-tools~
@@ -1996,7 +2008,7 @@ This file recreates the emacs configuration
   (use-package denote
     :ensure t
     :custom
-    (denote-known-keywords '("material" "examen" "ajeno" "practica" "apuntes"))
+    (denote-known-keywords '("matematica", "programacion"))
     (denote-directory "~/.sync/archive/notes")
     (denote-dired-directories '("~/.sync/archive/notes" "~/.sync/archive/journal" "/home/rcaled/Files/Downloads/universidad"))
     :config

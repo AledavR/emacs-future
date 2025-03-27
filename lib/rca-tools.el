@@ -18,7 +18,7 @@
 (use-package denote
   :ensure t
   :custom
-  (denote-known-keywords '("material" "examen" "ajeno" "practica" "apuntes"))
+  (denote-known-keywords '("matematica", "programacion"))
   (denote-directory "~/.sync/archive/notes")
   (denote-dired-directories '("~/.sync/archive/notes" "~/.sync/archive/journal" "/home/rcaled/Files/Downloads/universidad"))
   :config

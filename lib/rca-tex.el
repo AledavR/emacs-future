@@ -169,7 +169,8 @@ input"
         cdlatex-command-alist rc/cdlatex-command-list)
   :custom
   (cdlatex-paired-parens "$([{")
-  (cdlatex-math-modify-alist '((66 "\\mathbb" nil t nil nil)))
+  (cdlatex-math-modify-alist '((111 "\\operatorname" nil t nil nil)
+                               (66 "\\mathbb" nil t nil nil)))
   :bind ( :map cdlatex-mode-map
           ("C-<return>" . nil)
           ("´" . cdlatex-math-symbol)

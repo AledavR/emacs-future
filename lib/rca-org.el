@@ -185,6 +185,17 @@ are exported to a filename derived from the headline text."
   ;; Use dvisvgm to generate previews
   ;; You don't need this, it's the default:
   (setq org-latex-preview-process-default 'dvisvgm)
+
+  ;;(setq-default  org-latex-preview-preamble
+  ;;               "\\documentclass{minimal}\12[DEFAULT-PACKAGES]\12[PACKAGES]\12\\usepackage{amsmath}\12\\usepackage{amssymb}\12\\usepackage{xcolor}\12\\DeclareMathOperator{\\Dom}{Dom}\12\\DeclareMathOperator{\\Ran}{Ran}")
+  (setq-default  org-latex-preview-preamble
+                 "\\documentclass{minimal}
+[DEFAULT-PACKAGES]
+[PACKAGES]
+\\usepackage{amsmath}
+\\usepackage{amssymb}
+\\usepackage{mathtools}
+\\usepackage{xcolor}")
   
   ;; Turn on auto-mode, it's built into Org and much faster/more featured than
   ;; org-fragtog. (Remember to turn off/uninstall org-fragtog.)
