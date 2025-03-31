@@ -105,7 +105,18 @@ input"
                 TeX-source-correlate-method 'synctex
                 TeX-source-correlate-start-server t
                 TeX-master nil
-                TeX-view-program-selection '((output-pdf "PDF Tools"))))
+                TeX-view-program-selection '((output-pdf "PDF Tools")))
+  
+  ;; Math block minor mode
+  (defun +LaTeX-math-texmathp () t)
+  (defun +LaTeX-math-texmathp-advice (fun)
+    (if LaTeX-math-block-mode
+        (+LaTeX-math-texmathp)
+      (funcall fun)))
+  (define-minor-mode LaTeX-math-block-mode
+    "Mode for entering math blocks in external programs.")
+  (advice-add 'texmathp :around #'+LaTeX-math-texmathp-advice)
+  )
 ;; ~auctex~:1 ends here
 
 ;; [[file:../dotemacs.org::*~cdlatex~][~cdlatex~:1]]

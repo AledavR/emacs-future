@@ -25,7 +25,7 @@
   :preface
   (setq history-excluded-filetypes '(".*gz" ".*pdf" "bookmarks" "recentf"
     			             "init.el" ".*gitignore" "early-init.el"
-    			             ".*log" ".*png" ".*jpg" ".*mp4" ".*gif"
+    			             ".*log" ".*png" ".*jpg" ".*mp4" ".*gif" ".*tmp/lua.*"
     			             ".*agenda/.*" ".*mod/.*" ".*lib/.*" ".*ext/.*" ".*_db"))
   (setq temporal-directory
         (locate-user-emacs-file "temporal/"))
