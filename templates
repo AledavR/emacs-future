@@ -12,3 +12,9 @@ org-mode :when (not (texmathp))
 lua-mode
 
 (req "local " (s mod) " = require(\""(s mod) "\")" q)
+
+
+c++-mode
+
+(for "for(" p ") {" n> q n> "}" >)
+(fun (p "int") " " (p "name") "() {" n> q n> "}" >) 

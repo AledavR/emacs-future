@@ -7,7 +7,7 @@
 
 (provide 'package-manager)
 
-(defvar elpaca-installer-version 0.8)
+(defvar elpaca-installer-version 0.10)
 
 (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
 
@@ -49,34 +49,39 @@
 (elpaca elpaca-use-package
   (elpaca-use-package-mode))
 
+;; (use-package org
+;;   :defer
+;;   :ensure `(org
+;;             :remotes ("tecosaur"
+;;                       :repo "https://code.tecosaur.net/tec/org-mode.git"
+;;                       :branch "dev")
+;;             :files (:defaults ("etc/styles/" "etc/styles/*" "doc/*.texi"))
+;;             :build t
+;;             :pre-build
+;;             (progn
+;;               (with-temp-file "org-version.el"
+;;                 (require 'lisp-mnt)
+;;                 (let ((version
+;;                        (with-temp-buffer
+;;                          (insert-file-contents "lisp/org.el")
+;;                          (lm-header "version")))
+;;                       (git-version
+;;                        (string-trim
+;;                         (with-temp-buffer
+;;                           (call-process "git" nil t nil "rev-parse" "--short" "HEAD")
+;;                           (buffer-string)))))
+;;                   (insert
+;;                    (format "(defun org-release () \"The release version of Org.\" %S)\n" version)
+;;                    (format "(defun org-git-version () \"The truncate git commit hash of Org mode.\" %S)\n" git-version)
+;;                    "(provide 'org-version)\n")))
+;;               (require 'elpaca-menu-org)
+;;               (elpaca-menu-org--build))
+;;             :pin nil))
+
 (use-package org
   :defer
-  :ensure `(org
-            :remotes ("tecosaur"
-                      :repo "https://code.tecosaur.net/tec/org-mode.git"
-                      :branch "dev")
-            :files (:defaults ("etc/styles/" "etc/styles/*" "doc/*.texi"))
-            :build t
-            :pre-build
-            (progn
-              (with-temp-file "org-version.el"
-                (require 'lisp-mnt)
-                (let ((version
-                       (with-temp-buffer
-                         (insert-file-contents "lisp/org.el")
-                         (lm-header "version")))
-                      (git-version
-                       (string-trim
-                        (with-temp-buffer
-                          (call-process "git" nil t nil "rev-parse" "--short" "HEAD")
-                          (buffer-string)))))
-                  (insert
-                   (format "(defun org-release () \"The release version of Org.\" %S)\n" version)
-                   (format "(defun org-git-version () \"The truncate git commit hash of Org mode.\" %S)\n" git-version)
-                   "(provide 'org-version)\n")))
-              (require 'elpaca-menu-org)
-              (elpaca-menu-org--build))
-            :pin nil))
+  :ensure `(org :repo "https://code.tecosaur.net/tec/org-mode.git/"
+                :branch "dev"))
 
 (elpaca-wait)
 

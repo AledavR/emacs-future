@@ -149,6 +149,9 @@ input"
       ("dv"
        "Insert a spaced differential variable"
        "\\, d?" cdlatex-position-cursor nil nil t)
+      ("d."
+       "Insert dots"
+       "\\dots" cdlatex-position-cursor nil nil t)
       ("t."
        "Insert therefore symbol"
        "\\therefore" cdlatex-position-cursor nil nil t)

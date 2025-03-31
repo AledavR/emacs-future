@@ -3,7 +3,7 @@
 #+STARTUP: show3levels
 #+PROPERTY: header-args :comments link :tangle yes :mkdirp yes :results none :noweb yes
 
-This file recreates the emacs configuration
+This file recreates the Emacs configuration
 
 * ~early-init.el~
 :PROPERTIES:
@@ -32,7 +32,7 @@ This file recreates the emacs configuration
 
   (provide 'package-manager)
 
-  (defvar elpaca-installer-version 0.8)
+  (defvar elpaca-installer-version 0.10)
 
   (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
 
@@ -74,34 +74,39 @@ This file recreates the emacs configuration
   (elpaca elpaca-use-package
     (elpaca-use-package-mode))
 
+  ;; (use-package org
+  ;;   :defer
+  ;;   :ensure `(org
+  ;;             :remotes ("tecosaur"
+  ;;                       :repo "https://code.tecosaur.net/tec/org-mode.git"
+  ;;                       :branch "dev")
+  ;;             :files (:defaults ("etc/styles/" "etc/styles/*" "doc/*.texi"))
+  ;;             :build t
+  ;;             :pre-build
+  ;;             (progn
+  ;;               (with-temp-file "org-version.el"
+  ;;                 (require 'lisp-mnt)
+  ;;                 (let ((version
+  ;;                        (with-temp-buffer
+  ;;                          (insert-file-contents "lisp/org.el")
+  ;;                          (lm-header "version")))
+  ;;                       (git-version
+  ;;                        (string-trim
+  ;;                         (with-temp-buffer
+  ;;                           (call-process "git" nil t nil "rev-parse" "--short" "HEAD")
+  ;;                           (buffer-string)))))
+  ;;                   (insert
+  ;;                    (format "(defun org-release () \"The release version of Org.\" %S)\n" version)
+  ;;                    (format "(defun org-git-version () \"The truncate git commit hash of Org mode.\" %S)\n" git-version)
+  ;;                    "(provide 'org-version)\n")))
+  ;;               (require 'elpaca-menu-org)
+  ;;               (elpaca-menu-org--build))
+  ;;             :pin nil))
+
   (use-package org
     :defer
-    :ensure `(org
-              :remotes ("tecosaur"
-                        :repo "https://code.tecosaur.net/tec/org-mode.git"
-                        :branch "dev")
-              :files (:defaults ("etc/styles/" "etc/styles/*" "doc/*.texi"))
-              :build t
-              :pre-build
-              (progn
-                (with-temp-file "org-version.el"
-                  (require 'lisp-mnt)
-                  (let ((version
-                         (with-temp-buffer
-                           (insert-file-contents "lisp/org.el")
-                           (lm-header "version")))
-                        (git-version
-                         (string-trim
-                          (with-temp-buffer
-                            (call-process "git" nil t nil "rev-parse" "--short" "HEAD")
-                            (buffer-string)))))
-                    (insert
-                     (format "(defun org-release () \"The release version of Org.\" %S)\n" version)
-                     (format "(defun org-git-version () \"The truncate git commit hash of Org mode.\" %S)\n" git-version)
-                     "(provide 'org-version)\n")))
-                (require 'elpaca-menu-org)
-                (elpaca-menu-org--build))
-              :pin nil))
+    :ensure `(org :repo "https://code.tecosaur.net/tec/org-mode.git/"
+                  :branch "dev"))
 
   (elpaca-wait)
 
@@ -659,70 +664,71 @@ This file recreates the emacs configuration
 ** Dashboard
 
 #+begin_src emacs-lisp
-  (defun my-inhibit-startup-screen-file ()
-    "Startup screen inhibitor for `command-line-functions`.
-  Inhibits startup screen on the first unrecognised option which
-  names an existing file."
-    (ignore
-     (setq inhibit-startup-screen
-  	 (file-exists-p
-  	  (expand-file-name argi command-line-default-directory)))))
+        (defun my-inhibit-startup-screen-file ()
+          "Startup screen inhibitor for `command-line-functions`.
+        Inhibits startup screen on the first unrecognised option which
+        names an existing file."
+          (ignore
+           (setq inhibit-startup-screen
+        	 (file-exists-p
+        	  (expand-file-name argi command-line-default-directory)))))
 
-  ;; (add-hook 'command-line-functions #'my-inhibit-startup-screen-file)
-  (setq command-line-functions #'my-inhibit-startup-screen-file)
+        ;; (add-hook 'command-line-functions #'my-inhibit-startup-screen-file)
+        (setq command-line-functions #'my-inhibit-startup-screen-file)
 
-  (use-package dashboard
-    :ensure t
-    :preface
-    (defun protect-dashboard ()
-      (define-key
-       dashboard-mode-map (kbd "q") 'dashboard-refresh-buffer))
-    (defun rc/refresh-buffer-maybe ()
-      (when (equal "*dashboard*" (buffer-name))
-        (revert-buffer)))
-    ;; Files don't open from command line if this is in init
-    ;; TODO Check if there is any other problem in this section
-    :init
-    (setq banner-images
-          (directory-files (locate-user-emacs-file "img") t ".*g$"))
-    (setq banner-image-size (if (equal system-name "acer") 500 550))
-    :hook
-    (elpaca-after-init . dashboard-insert-startupify-lists)
-    (elpaca-after-init . dashboard-initialize)
-    (dashboard-mode . protect-dashboard)
-    (dashboard-after-initialize . dashboard-refresh-buffer)
-    (server-after-make-frame . rc/refresh-buffer-maybe)
-    ;; (server-after-make-frame . (lambda () (set-frame-font "Aporetic Sans Mono 13")))
-    :custom
-    (dashboard-center-content t)
-    (dashboard-startup-banner `(,(locate-user-emacs-file (concat "img/" (symbol-name theme-character) ".png"))))
-    ;; (dashboard-startup-banner `(,(rc/list-select-random banner-images)))
-    ;; (dashboard-startup-banner banner-images)
-    (dashboard-set-navigator t)
-    (dashboard-navigator-buttons `(((nil "Open agenda" "Open detailed agenda buffer" (lambda (&rest _) (org-agenda nil "a"))))))
-    (dashboard-image-banner-max-height banner-image-size)
-    (dashboard-startupify-list '(dashboard-insert-banner
-                                 dashboard-insert-newline
-                                 dashboard-insert-banner-title
-                                 dashboard-insert-newline
-                                 dashboard-insert-navigator
-                                 dashboard-insert-init-info
-                                 dashboard-insert-items
-                                 dashboard-insert-newline
-                                 dashboard-insert-footer))
-    (dashboard-banner-logo-title nil)
-    (dashboard-match-agenda-entry "-class")
-    (dashboard-set-footer nil)
-    (dashboard-footer-messages (list nil))
-    (tab-bar-new-tab-choice "*dashboard*")
-    (dashboard-items '((agenda . 10)))
-    ;; (dashboard-agenda-tags-format 'ignore)
-    :init
-    (dashboard-setup-startup-hook)
-    (setq initial-buffer-choice
-          (lambda () (get-buffer-create "*dashboard*"))))
-    ;; :config
-    ;; (add-hook server-after-make-frame-hook 'revert-buffer))
+        (use-package dashboard
+          :ensure t
+          :preface
+          (defun protect-dashboard ()
+            (define-key
+             dashboard-mode-map (kbd "q") 'dashboard-refresh-buffer))
+          (defun rc/refresh-buffer-maybe ()
+            (when (equal "*dashboard*" (buffer-name))
+              (revert-buffer)))
+          ;; Files don't open from command line if this is in init
+          ;; TODO Check if there is any other problem in this section
+          :init
+          (setq banner-images
+                (directory-files (locate-user-emacs-file "img") t ".*g$"))
+          (setq banner-image-size (if (equal system-name "acer") 500 550))
+          :hook
+          (elpaca-after-init . dashboard-insert-startupify-lists)
+          (elpaca-after-init . dashboard-initialize)
+          (dashboard-mode . protect-dashboard)
+          (dashboard-after-initialize . dashboard-refresh-buffer)
+          (server-after-make-frame . rc/refresh-buffer-maybe)
+          ;; (server-after-make-frame . (lambda () (set-frame-font "Aporetic Sans Mono 13")))
+          :custom
+          (dashboard-center-content t)
+          (dashboard-startup-banner `(,(locate-user-emacs-file (concat "img/" (symbol-name theme-character) ".png"))))
+          ;; (dashboard-startup-banner `(,(rc/list-select-random banner-images)))
+          ;; (dashboard-startup-banner banner-images)
+          (dashboard-set-navigator t)
+          (dashboard-navigator-buttons `(((nil "Open agenda" "Open detailed agenda buffer" (lambda (&rest _) (org-agenda nil "a")))
+                                          (nil "Open note directory" "Open note directory" (lambda (&rest _) (dired denote-directory))))))
+          (dashboard-image-banner-max-height banner-image-size)
+          (dashboard-startupify-list '(dashboard-insert-banner
+                                       dashboard-insert-newline
+                                       dashboard-insert-banner-title
+                                       dashboard-insert-newline
+                                       dashboard-insert-navigator
+                                       dashboard-insert-init-info
+                                       dashboard-insert-items
+                                       dashboard-insert-newline
+                                       dashboard-insert-footer))
+          (dashboard-banner-logo-title nil)
+          (dashboard-match-agenda-entry "-class")
+          (dashboard-set-footer nil)
+          (dashboard-footer-messages (list nil))
+          (tab-bar-new-tab-choice "*dashboard*")
+          (dashboard-items '((agenda . 10)))
+          ;; (dashboard-agenda-tags-format 'ignore)
+          :init
+          (dashboard-setup-startup-hook)
+          (setq initial-buffer-choice
+                (lambda () (get-buffer-create "*dashboard*"))))
+          ;; :config
+          ;; (add-hook server-after-make-frame-hook 'revert-buffer))
 #+end_src
 
 ** Rainbow mode
@@ -748,7 +754,8 @@ This file recreates the emacs configuration
     :ensure nil
     :bind (("C-z C-a" . org-agenda)
            :map org-mode-map
-           ("C-c C-x 1" . rc/org-update-idea))
+           ("C-c C-x 1" . rc/org-update-idea)
+           ("C-M-<return>" . +org-insert-math-subtree))
     :hook ((org-capture-mode . org-align-tags)
            (org-mode . variable-pitch-mode)
            (org-mode . visual-line-mode)
@@ -756,13 +763,14 @@ This file recreates the emacs configuration
            (org-babel-after-execute . org-redisplay-inline-images)
            (org-babel-after-execute . org-toggle-inline-images))
     :custom
-    (org-highlight-latex-and-related '(latex script entities))
     (org-agenda-files '("~/.sync/org_files/agenda/"))
     (org-log-done 'time)
     (org-confirm-babel-evaluate nil)
     (org-agenda-skip-deadline-if-done t)
     (org-agenda-skip-scheduled-if-done t)
     (org-agenda-skip-scheduled-repeats-after-deadline t)
+    ;; (org-highlight-latex-and-related '(latex script entities))
+    (org-highlight-latex-and-related '(native))
     (org-image-actual-width nil)
     (org-fold-catch-invisible-edits 'show-and-error)
     (org-list-demote-modify-bullet '(("+" . "-") ("-" . "+")))
@@ -806,6 +814,22 @@ This file recreates the emacs configuration
     (defun +org-link-remote-open-in-mpv (url)
       "Opens linked file in an new mpv process"
       (start-process "open url" nil "mpv" "--title=mpv_emacs" url))
+
+    (defun +org-get-top-header-title ()
+      (let ((title (substring-no-properties
+                    (if (= (org-outline-level) 1)
+                        (org-get-heading) (org-display-outline-path)))))
+        (replace-regexp-in-string " - Definición" "" title)))
+
+    (defun +org-insert-math-subtree (type)
+      (interactive (list (completing-read "Tipo: " +org-math-bodies nil t)))
+      (let ((title (+org-get-top-header-title)))
+        (if (= (org-outline-level) 1)
+            (org-insert-subheading 4)
+          (org-insert-heading))
+        (insert (concat title " - " type " "))))
+
+    (defvar +org-math-bodies '("Proposición" "Teorema" "Corolario" "Nota"))
 
     (defun browse-steam-page (steam-id)
       (browse-url (concat "steam://advertise/" steam-id)))
@@ -1915,6 +1939,9 @@ This file recreates the emacs configuration
           ("dv"
            "Insert a spaced differential variable"
            "\\, d?" cdlatex-position-cursor nil nil t)
+          ("d."
+           "Insert dots"
+           "\\dots" cdlatex-position-cursor nil nil t)
           ("t."
            "Insert therefore symbol"
            "\\therefore" cdlatex-position-cursor nil nil t)
@@ -2008,7 +2035,7 @@ This file recreates the emacs configuration
   (use-package denote
     :ensure t
     :custom
-    (denote-known-keywords '("matematica", "programacion"))
+    (denote-known-keywords '("matematica" "programacion"))
     (denote-directory "~/.sync/archive/notes")
     (denote-dired-directories '("~/.sync/archive/notes" "~/.sync/archive/journal" "/home/rcaled/Files/Downloads/universidad"))
     :config
@@ -2032,7 +2059,11 @@ This file recreates the emacs configuration
     :ensure t
     :bind (("C-c o" . embark-act)
            :map embark-general-map
-           ("G" . +embark-google-search))
+           ("G" . +embark-google-search)
+           :map embark-url-map
+           ("M" . +org-link-remote-open-in-mpv)
+           :map embark-file-map
+           ("M" . +org-link-open-in-mpv))
     :init
     (defun +embark-google-search (term)
       (interactive "sSearch Term: ")
@@ -2172,6 +2203,18 @@ This file recreates the emacs configuration
     (setq org-wild-notifier-alert-time '(4320 2880 1440 720 360 180 120 60 15 5 1))
     ;; (setq org-wild-notifier-keyword-whitelist nil)
     (org-wild-notifier-mode))
+#+end_src
+
+** ~dired~
+
+#+begin_src emacs-lisp
+  (use-package dired
+    :ensure nil
+    :hook (dired-mode . dired-hide-details-mode))
+
+  (use-package dired-narrow
+    :ensure t
+    :bind (:map dired-mode-map ("\/" . dired-narrow)))
 #+end_src
 
 * Local variables

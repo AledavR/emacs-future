@@ -30,7 +30,6 @@
          SGI SR2 SRF SUN SVG SVGZ TGA TIFF TIFF64 TILE TIM TTF UYVY VDA VICAR
          VID VIFF VST WBMP WPG X3F XBM XC XCF XPM XV XWD YCbCr YCbCrA YUV))
  '(imagemagick-render-type 1)
- '(org-highlight-latex-and-related '(native))
  '(org-latex-preview-appearance-options
    '(:foreground auto :background "Transparent" :scale 1.0 :zoom 1.2 :page-width
                  0.8 :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
@@ -38,9 +37,6 @@
  '(org-latex-preview-live-debounce 0.5)
  '(org-latex-preview-live-display-type 'buffer)
  '(org-pretty-entities-include-sub-superscripts nil)
- '(org-safe-remote-resources
-   '("\\`https://fniessen\\.github\\.io/org-html-themes/org/theme-bigblow\\.setup\\'"
-     "\\`https://fniessen\\.github\\.io/org-html-themes/org/theme-readtheorg\\.setup\\'"))
  '(package-selected-packages
    '(ace-window auctex cape cdlatex circadian consult corfu dashboard diminish
                 ef-themes eglot-java gnuplot htmlize kind-icon lua-mode magit
@@ -59,7 +55,7 @@
      ("subsubsection" . 4) ("paragraph" . 5) ("subparagraph" . 6)
      ("addchap" . -1) ("addsec" . -2) ("frametitle" . -2)))
  '(safe-local-variable-values
-   '((TeX-command-extra-options . "-shell-escape")
+   '((org-cdlatex-mode . t) (TeX-command-extra-options . "-shell-escape")
      (eval add-hook 'after-save-hook (lambda nil (org-babel-tangle)) nil t)
      (eval add-hook 'after-save-hook (lambda nil (org-babel-detangle)) nil t)
      (ispell-dictionary . "en_US")))

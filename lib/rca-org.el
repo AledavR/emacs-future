@@ -7,7 +7,8 @@
   :ensure nil
   :bind (("C-z C-a" . org-agenda)
          :map org-mode-map
-         ("C-c C-x 1" . rc/org-update-idea))
+         ("C-c C-x 1" . rc/org-update-idea)
+         ("C-M-<return>" . +org-insert-math-subtree))
   :hook ((org-capture-mode . org-align-tags)
          (org-mode . variable-pitch-mode)
          (org-mode . visual-line-mode)
@@ -15,13 +16,14 @@
          (org-babel-after-execute . org-redisplay-inline-images)
          (org-babel-after-execute . org-toggle-inline-images))
   :custom
-  (org-highlight-latex-and-related '(latex script entities))
   (org-agenda-files '("~/.sync/org_files/agenda/"))
   (org-log-done 'time)
   (org-confirm-babel-evaluate nil)
   (org-agenda-skip-deadline-if-done t)
   (org-agenda-skip-scheduled-if-done t)
   (org-agenda-skip-scheduled-repeats-after-deadline t)
+  ;; (org-highlight-latex-and-related '(latex script entities))
+  (org-highlight-latex-and-related '(native))
   (org-image-actual-width nil)
   (org-fold-catch-invisible-edits 'show-and-error)
   (org-list-demote-modify-bullet '(("+" . "-") ("-" . "+")))
@@ -65,6 +67,22 @@
   (defun +org-link-remote-open-in-mpv (url)
     "Opens linked file in an new mpv process"
     (start-process "open url" nil "mpv" "--title=mpv_emacs" url))
+
+  (defun +org-get-top-header-title ()
+    (let ((title (substring-no-properties
+                  (if (= (org-outline-level) 1)
+                      (org-get-heading) (org-display-outline-path)))))
+      (replace-regexp-in-string " - Definición" "" title)))
+
+  (defun +org-insert-math-subtree (type)
+    (interactive (list (completing-read "Tipo: " +org-math-bodies nil t)))
+    (let ((title (+org-get-top-header-title)))
+      (if (= (org-outline-level) 1)
+          (org-insert-subheading 4)
+        (org-insert-heading))
+      (insert (concat title " - " type " "))))
+
+  (defvar +org-math-bodies '("Proposición" "Teorema" "Corolario" "Nota"))
 
   (defun browse-steam-page (steam-id)
     (browse-url (concat "steam://advertise/" steam-id)))

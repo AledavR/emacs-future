@@ -18,7 +18,7 @@
 (use-package denote
   :ensure t
   :custom
-  (denote-known-keywords '("matematica", "programacion"))
+  (denote-known-keywords '("matematica" "programacion"))
   (denote-directory "~/.sync/archive/notes")
   (denote-dired-directories '("~/.sync/archive/notes" "~/.sync/archive/journal" "/home/rcaled/Files/Downloads/universidad"))
   :config
@@ -40,7 +40,11 @@
   :ensure t
   :bind (("C-c o" . embark-act)
          :map embark-general-map
-         ("G" . +embark-google-search))
+         ("G" . +embark-google-search)
+         :map embark-url-map
+         ("M" . +org-link-remote-open-in-mpv)
+         :map embark-file-map
+         ("M" . +org-link-open-in-mpv))
   :init
   (defun +embark-google-search (term)
     (interactive "sSearch Term: ")
@@ -175,3 +179,13 @@
   ;; (setq org-wild-notifier-keyword-whitelist nil)
   (org-wild-notifier-mode))
 ;; ~alert~:1 ends here
+
+;; [[file:../dotemacs.org::*~dired~][~dired~:1]]
+(use-package dired
+  :ensure nil
+  :hook (dired-mode . dired-hide-details-mode))
+
+(use-package dired-narrow
+  :ensure t
+  :bind (:map dired-mode-map ("\/" . dired-narrow)))
+;; ~dired~:1 ends here

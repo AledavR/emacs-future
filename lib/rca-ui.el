@@ -227,7 +227,8 @@ names an existing file."
   ;; (dashboard-startup-banner `(,(rc/list-select-random banner-images)))
   ;; (dashboard-startup-banner banner-images)
   (dashboard-set-navigator t)
-  (dashboard-navigator-buttons `(((nil "Open agenda" "Open detailed agenda buffer" (lambda (&rest _) (org-agenda nil "a"))))))
+  (dashboard-navigator-buttons `(((nil "Open agenda" "Open detailed agenda buffer" (lambda (&rest _) (org-agenda nil "a")))
+                                  (nil "Open note directory" "Open note directory" (lambda (&rest _) (dired denote-directory))))))
   (dashboard-image-banner-max-height banner-image-size)
   (dashboard-startupify-list '(dashboard-insert-banner
                                dashboard-insert-newline
