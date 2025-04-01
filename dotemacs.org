@@ -352,6 +352,7 @@ This file recreates the Emacs configuration
            ("M-o" . other-window)
            ("C-c P" . find-file-at-point)
            ("C-x K" . (lambda () (interactive) (kill-buffer (current-buffer))))
+           ("C-z K" . +save-n-kill-buffer-delete-frame)
            ("C-x C-c" . nil)
            ("C-h h" . nil)
            ("M-`" . nil)
@@ -422,6 +423,12 @@ This file recreates the Emacs configuration
       (load custom-file))
     (when (not (file-exists-p temporal-directory))
       (make-directory temporal-directory))
+    
+    (defun +save-n-kill-buffer-delete-frame ()
+      (interactive)
+      (save-buffer)
+      (kill-buffer (current-buffer))
+      (delete-frame))
 
     ;; Greentext mode
     (setq greentext-font-lock
