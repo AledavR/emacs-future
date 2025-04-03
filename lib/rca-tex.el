@@ -113,10 +113,14 @@ input"
     (if LaTeX-math-block-mode
         (+LaTeX-math-texmathp)
       (funcall fun)))
+  
   (define-minor-mode LaTeX-math-block-mode
-    "Mode for entering math blocks in external programs.")
-  (advice-add 'texmathp :around #'+LaTeX-math-texmathp-advice)
-  )
+    "Mode for entering math blocks in external programs."
+    :lighter " Math Block"
+    :keymap `(
+              (,(kbd "C-x C-s") . +save-n-kill-buffer-delete-frame)
+              )
+    (advice-add 'texmathp :around #'+LaTeX-math-texmathp-advice)))
 ;; ~auctex~:1 ends here
 
 ;; [[file:../dotemacs.org::*~cdlatex~][~cdlatex~:1]]

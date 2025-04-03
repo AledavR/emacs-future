@@ -671,71 +671,75 @@ This file recreates the Emacs configuration
 ** Dashboard
 
 #+begin_src emacs-lisp
-        (defun my-inhibit-startup-screen-file ()
-          "Startup screen inhibitor for `command-line-functions`.
-        Inhibits startup screen on the first unrecognised option which
-        names an existing file."
-          (ignore
-           (setq inhibit-startup-screen
-        	 (file-exists-p
-        	  (expand-file-name argi command-line-default-directory)))))
+  (defun my-inhibit-startup-screen-file ()
+    "Startup screen inhibitor for `command-line-functions`.
+  Inhibits startup screen on the first unrecognised option which
+  names an existing file."
+    (ignore
+     (setq inhibit-startup-screen
+  	 (file-exists-p
+  	  (expand-file-name argi command-line-default-directory)))))
 
-        ;; (add-hook 'command-line-functions #'my-inhibit-startup-screen-file)
-        (setq command-line-functions #'my-inhibit-startup-screen-file)
+  ;; (add-hook 'command-line-functions #'my-inhibit-startup-screen-file)
+  (setq command-line-functions #'my-inhibit-startup-screen-file)
 
-        (use-package dashboard
-          :ensure t
-          :preface
-          (defun protect-dashboard ()
-            (define-key
-             dashboard-mode-map (kbd "q") 'dashboard-refresh-buffer))
-          (defun rc/refresh-buffer-maybe ()
-            (when (equal "*dashboard*" (buffer-name))
-              (revert-buffer)))
-          ;; Files don't open from command line if this is in init
-          ;; TODO Check if there is any other problem in this section
-          :init
-          (setq banner-images
-                (directory-files (locate-user-emacs-file "img") t ".*g$"))
-          (setq banner-image-size (if (equal system-name "acer") 500 550))
-          :hook
-          (elpaca-after-init . dashboard-insert-startupify-lists)
-          (elpaca-after-init . dashboard-initialize)
-          (dashboard-mode . protect-dashboard)
-          (dashboard-after-initialize . dashboard-refresh-buffer)
-          (server-after-make-frame . rc/refresh-buffer-maybe)
-          ;; (server-after-make-frame . (lambda () (set-frame-font "Aporetic Sans Mono 13")))
-          :custom
-          (dashboard-center-content t)
-          (dashboard-startup-banner `(,(locate-user-emacs-file (concat "img/" (symbol-name theme-character) ".png"))))
-          ;; (dashboard-startup-banner `(,(rc/list-select-random banner-images)))
-          ;; (dashboard-startup-banner banner-images)
-          (dashboard-set-navigator t)
-          (dashboard-navigator-buttons `(((nil "Open agenda" "Open detailed agenda buffer" (lambda (&rest _) (org-agenda nil "a")))
-                                          (nil "Open note directory" "Open note directory" (lambda (&rest _) (dired denote-directory))))))
-          (dashboard-image-banner-max-height banner-image-size)
-          (dashboard-startupify-list '(dashboard-insert-banner
-                                       dashboard-insert-newline
-                                       dashboard-insert-banner-title
-                                       dashboard-insert-newline
-                                       dashboard-insert-navigator
-                                       dashboard-insert-init-info
-                                       dashboard-insert-items
-                                       dashboard-insert-newline
-                                       dashboard-insert-footer))
-          (dashboard-banner-logo-title nil)
-          (dashboard-match-agenda-entry "-class")
-          (dashboard-set-footer nil)
-          (dashboard-footer-messages (list nil))
-          (tab-bar-new-tab-choice "*dashboard*")
-          (dashboard-items '((agenda . 10)))
-          ;; (dashboard-agenda-tags-format 'ignore)
-          :init
-          (dashboard-setup-startup-hook)
-          (setq initial-buffer-choice
-                (lambda () (get-buffer-create "*dashboard*"))))
-          ;; :config
-          ;; (add-hook server-after-make-frame-hook 'revert-buffer))
+  (use-package dashboard
+    :ensure t
+    :preface
+    (defun protect-dashboard ()
+      (define-key
+       dashboard-mode-map (kbd "q") 'dashboard-refresh-buffer))
+    (defun rc/refresh-buffer-maybe ()
+      (when (equal "*dashboard*" (buffer-name))
+        (revert-buffer)))
+    ;; Files don't open from command line if this is in init
+    ;; TODO Check if there is any other problem in this section
+    :init
+    (setq banner-images
+          (directory-files (locate-user-emacs-file "img") t ".*g$"))
+    (setq banner-image-size (if (equal system-name "acer") 500 550))
+    :hook
+    (elpaca-after-init . dashboard-insert-startupify-lists)
+    (elpaca-after-init . dashboard-initialize)
+    (dashboard-mode . protect-dashboard)
+    (dashboard-after-initialize . dashboard-refresh-buffer)
+    (server-after-make-frame . rc/refresh-buffer-maybe)
+    ;; (server-after-make-frame . (lambda () (set-frame-font "Aporetic Sans Mono 13")))
+    :custom
+    (dashboard-center-content t)
+    (dashboard-startup-banner `(,(locate-user-emacs-file (concat "img/" (symbol-name theme-character) ".png"))))
+    ;; (dashboard-startup-banner `(,(rc/list-select-random banner-images)))
+    ;; (dashboard-startup-banner banner-images)
+    (dashboard-set-navigator t)
+    (dashboard-navigator-buttons `(((nil "Agenda" "Open detailed agenda buffer"
+                                         (lambda (&rest _) (org-agenda nil "a")))
+                                    (nil "Notes" "Open note directory"
+                                         (lambda (&rest _) (dired denote-directory)))
+                                    (nil "Ideas" "Open ideas notebook"
+                                         (lambda (&rest _) (find-file my/org-idea-notebook))))))
+    (dashboard-image-banner-max-height banner-image-size)
+    (dashboard-startupify-list '(dashboard-insert-banner
+                                 dashboard-insert-newline
+                                 dashboard-insert-banner-title
+                                 dashboard-insert-newline
+                                 dashboard-insert-navigator
+                                 dashboard-insert-init-info
+                                 dashboard-insert-items
+                                 dashboard-insert-newline
+                                 dashboard-insert-footer))
+    (dashboard-banner-logo-title nil)
+    (dashboard-match-agenda-entry "-class")
+    (dashboard-set-footer nil)
+    (dashboard-footer-messages (list nil))
+    (tab-bar-new-tab-choice "*dashboard*")
+    (dashboard-items '((agenda . 10)))
+    ;; (dashboard-agenda-tags-format 'ignore)
+    :init
+    (dashboard-setup-startup-hook)
+    (setq initial-buffer-choice
+          (lambda () (get-buffer-create "*dashboard*"))))
+    ;; :config
+    ;; (add-hook server-after-make-frame-hook 'revert-buffer))
 #+end_src
 
 ** Rainbow mode
@@ -1858,60 +1862,64 @@ This file recreates the Emacs configuration
 ** ~auctex~
 
 #+begin_src emacs-lisp
-    (use-package tex
-      :ensure auctex
-      :after pdf-tools
-      :preface
-      (defun rc/latex-init ()
-        "Defines what modes are activated by default when entering AuCtex mode"
-        (prettify-symbols-mode)
-        (turn-on-cdlatex)
-        (outline-minor-mode)  
-        ;; (rc/auctex-macros)
-        (TeX-source-correlate-mode t)
-        (tex-fold-mode 1)
-        (TeX-PDF-mode t)
-        (reftex-mode t)
-        (LaTeX-math-mode t))
-      :init
-      ;; Correct way to call hooks for auctex
-      (add-hook 'LaTeX-mode-hook 'rc/latex-init)
-      (setopt
-       TeX-fold-macro-spec-list
-       '(("{1}" ("emph")) ("{1}" ("textbf"))
-         ("{1}" ("textit")) ("[1]:||►" ("item"))
-         ("§ {1}" ("section" "section*"))
-         ("[f]→‖{1}‖" ("footnote" "marginpar"))
-         ("[c]→‖{1}‖" ("cite")) ("[l]→‖{1}‖" ("label"))
-         ("[r]→‖{1}‖" ("ref" "pageref" "eqref" "footref"))
-         ("[i]→‖{1}‖" ("index" "glossary"))
-         ("§§ {1}" ("subsection" "subsection*"))
-         ("§§§ {1}" ("subsubsection" "subsubsection*"))
-         ("¶¶ {1}" ("subparagraph" "subparagraph*"))
-         ("¶ {1}" ("paragraph" "paragraph*"))))
-      :custom
-      (TeX-parse-self t "Enable parse on load")
-      (TeX-auto-save t "Enable parse on save")
-      (TeX-arg-input-file-search 'nil "Find file manually")
-      :config
-      (setq-default preview-scale 1.4
-                    prettify-symbols-unprettify-at-point 'right-edge
-                    preview-scale-function (lambda () (* (/ 10.0 (preview-document-pt)) preview-scale))
-                    TeX-source-correlate-method 'synctex
-                    TeX-source-correlate-start-server t
-                    TeX-master nil
-                    TeX-view-program-selection '((output-pdf "PDF Tools")))
-      
-      ;; Math block minor mode
-      (defun +LaTeX-math-texmathp () t)
-      (defun +LaTeX-math-texmathp-advice (fun)
-        (if LaTeX-math-block-mode
-            (+LaTeX-math-texmathp)
-          (funcall fun)))
-      (define-minor-mode LaTeX-math-block-mode
-        "Mode for entering math blocks in external programs.")
-      (advice-add 'texmathp :around #'+LaTeX-math-texmathp-advice)
-      )
+  (use-package tex
+    :ensure auctex
+    :after pdf-tools
+    :preface
+    (defun rc/latex-init ()
+      "Defines what modes are activated by default when entering AuCtex mode"
+      (prettify-symbols-mode)
+      (turn-on-cdlatex)
+      (outline-minor-mode)  
+      ;; (rc/auctex-macros)
+      (TeX-source-correlate-mode t)
+      (tex-fold-mode 1)
+      (TeX-PDF-mode t)
+      (reftex-mode t)
+      (LaTeX-math-mode t))
+    :init
+    ;; Correct way to call hooks for auctex
+    (add-hook 'LaTeX-mode-hook 'rc/latex-init)
+    (setopt
+     TeX-fold-macro-spec-list
+     '(("{1}" ("emph")) ("{1}" ("textbf"))
+       ("{1}" ("textit")) ("[1]:||►" ("item"))
+       ("§ {1}" ("section" "section*"))
+       ("[f]→‖{1}‖" ("footnote" "marginpar"))
+       ("[c]→‖{1}‖" ("cite")) ("[l]→‖{1}‖" ("label"))
+       ("[r]→‖{1}‖" ("ref" "pageref" "eqref" "footref"))
+       ("[i]→‖{1}‖" ("index" "glossary"))
+       ("§§ {1}" ("subsection" "subsection*"))
+       ("§§§ {1}" ("subsubsection" "subsubsection*"))
+       ("¶¶ {1}" ("subparagraph" "subparagraph*"))
+       ("¶ {1}" ("paragraph" "paragraph*"))))
+    :custom
+    (TeX-parse-self t "Enable parse on load")
+    (TeX-auto-save t "Enable parse on save")
+    (TeX-arg-input-file-search 'nil "Find file manually")
+    :config
+    (setq-default preview-scale 1.4
+                  prettify-symbols-unprettify-at-point 'right-edge
+                  preview-scale-function (lambda () (* (/ 10.0 (preview-document-pt)) preview-scale))
+                  TeX-source-correlate-method 'synctex
+                  TeX-source-correlate-start-server t
+                  TeX-master nil
+                  TeX-view-program-selection '((output-pdf "PDF Tools")))
+    
+    ;; Math block minor mode
+    (defun +LaTeX-math-texmathp () t)
+    (defun +LaTeX-math-texmathp-advice (fun)
+      (if LaTeX-math-block-mode
+          (+LaTeX-math-texmathp)
+        (funcall fun)))
+    
+    (define-minor-mode LaTeX-math-block-mode
+      "Mode for entering math blocks in external programs."
+      :lighter " Math Block"
+      :keymap `(
+                (,(kbd "C-x C-s") . +save-n-kill-buffer-delete-frame)
+                )
+      (advice-add 'texmathp :around #'+LaTeX-math-texmathp-advice)))
 #+end_src
 
 ** ~cdlatex~
@@ -2056,18 +2064,31 @@ This file recreates the Emacs configuration
     (denote-known-keywords '("matematica" "informatica"))
     (denote-directory "~/.sync/archive/notes")
     (denote-dired-directories '("~/.sync/archive/notes" "~/.sync/archive/journal" "/home/rcaled/Files/Downloads/universidad"))
+    ;; :bind (("C-z C-n" . denote-prefix))
+    :init
+    (defvar-keymap denote-prefix-map
+      :doc "Denote commands"
+      "n" #'denote
+      "o" #'denote-open-or-create
+      "l" #'denote-link
+      "L" #'denote-link-or-create)
+    (defalias 'denote-prefix denote-prefix-map)
     :config
-    (add-hook 'dired-mode-hook 'denote-dired-mode-in-directories))
+    (add-hook 'dired-mode-hook 'denote-dired-mode-in-directories)
+    (global-set-key (kbd "C-z C-n") 'denote-prefix))
 
   (use-package denote-journal
     :ensure t
+    :defer t
+    :bind (:map denote-prefix-map ("j" . denote-journal-new-entry))
     :custom
     (denote-journal-title-format 'day-date-month-year)
     (denote-journal-directory "~/.sync/archive/journal"))
 
   (use-package denote-search
     :ensure t
-    :defer t)
+    :defer t
+    :bind (:map denote-prefix-map ("s" . denote-search)))
 #+end_src
 
 ** ~embark~

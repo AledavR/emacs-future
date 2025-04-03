@@ -21,18 +21,31 @@
   (denote-known-keywords '("matematica" "informatica"))
   (denote-directory "~/.sync/archive/notes")
   (denote-dired-directories '("~/.sync/archive/notes" "~/.sync/archive/journal" "/home/rcaled/Files/Downloads/universidad"))
+  ;; :bind (("C-z C-n" . denote-prefix))
+  :init
+  (defvar-keymap denote-prefix-map
+    :doc "Denote commands"
+    "n" #'denote
+    "o" #'denote-open-or-create
+    "l" #'denote-link
+    "L" #'denote-link-or-create)
+  (defalias 'denote-prefix denote-prefix-map)
   :config
-  (add-hook 'dired-mode-hook 'denote-dired-mode-in-directories))
+  (add-hook 'dired-mode-hook 'denote-dired-mode-in-directories)
+  (global-set-key (kbd "C-z C-n") 'denote-prefix))
 
 (use-package denote-journal
   :ensure t
+  :defer t
+  :bind (:map denote-prefix-map ("j" . denote-journal-new-entry))
   :custom
   (denote-journal-title-format 'day-date-month-year)
   (denote-journal-directory "~/.sync/archive/journal"))
 
 (use-package denote-search
   :ensure t
-  :defer t)
+  :defer t
+  :bind (:map denote-prefix-map ("s" . denote-search)))
 ;; ~denote~:1 ends here
 
 ;; [[file:../dotemacs.org::*~embark~][~embark~:1]]
