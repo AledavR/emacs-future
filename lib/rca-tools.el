@@ -20,7 +20,7 @@
   :custom
   (denote-known-keywords '("matematica" "informatica"))
   (denote-directory "~/.sync/archive/notes")
-  (denote-dired-directories '("~/.sync/archive/notes" "~/.sync/archive/journal" "/home/rcaled/Files/Downloads/universidad"))
+  (denote-dired-directories '("~/.sync/archive/notes" "~/.sync/archive/journal" "~/.sync/archive/posts"))
   ;; :bind (("C-z C-n" . denote-prefix))
   :init
   (defvar-keymap denote-prefix-map
@@ -37,7 +37,7 @@
 (use-package denote-journal
   :ensure t
   :defer t
-  :bind (:map denote-prefix-map ("j" . denote-journal-new-entry))
+  :bind (:map denote-prefix-map ("j" . denote-journal-new-or-existing-entry))
   :custom
   (denote-journal-title-format 'day-date-month-year)
   (denote-journal-directory "~/.sync/archive/journal"))
@@ -83,7 +83,7 @@
   (org-cite-activate-processor 'citar)
   :config
   (let ((documents-path (xdg-user-dir "DOCUMENTS"))
-        (archive-path "~/.sync/archive/"))
+        (archive-path "~/.sync/archive/bibliography/"))
     (setq org-cite-global-bibliography
           (mapcar (lambda (entry) (concat archive-path entry)) '("articles.bib" "books.bib")))
     (setq citar-library-paths
@@ -137,7 +137,7 @@
   :ensure t
   :defer t
   :custom
-  (ebib-preload-bib-files '("~/.sync/archive/articles.bib" "~/.sync/archive/books.bib"))
+  (ebib-preload-bib-files '("~/.sync/archive/bibliography/articles.bib" "~/.sync/archive/bibliography/books.bib"))
   (ebib-file-search-dirs '("~/Files/Documents/library/articles" "~/Files/Documents/library/books"))
   (ebib-file-associations '(("ps" . "gv")))
   :config

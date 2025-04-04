@@ -111,7 +111,7 @@
   :bind (("<f6> c" . calendar))
   :mode ("diary" . diary-mode)
   :custom
-  (diary-file "~/.sync/org_files/agenda/diary")
+  (diary-file "~/.sync/archive/agenda/diary")
   (calendar-latitude -12.0)
   (calendar-longitude -77.1)
   (calendar-mark-diary-entries-flag t)

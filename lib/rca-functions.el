@@ -140,7 +140,8 @@ If POSITION is nil appends to the beginning of each element."
   (newline)
   (insert "UPDATE ")
   (org-insert-timestamp (current-time) t t)
-  (insert ": "))
+  (insert ": ")
+  (bookmark-set "org-last-updated-idea"))
 
 (defun +diary-schedule-class (start-month start-day end-month end-day year days-of-week)
   (and (diary-block start-month start-day year

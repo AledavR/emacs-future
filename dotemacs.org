@@ -320,7 +320,8 @@ This file recreates the Emacs configuration
     (newline)
     (insert "UPDATE ")
     (org-insert-timestamp (current-time) t t)
-    (insert ": "))
+    (insert ": ")
+    (bookmark-set "org-last-updated-idea"))
 
   (defun +diary-schedule-class (start-month start-day end-month end-day year days-of-week)
     (and (diary-block start-month start-day year
@@ -447,7 +448,7 @@ This file recreates the Emacs configuration
     :bind (("<f6> c" . calendar))
     :mode ("diary" . diary-mode)
     :custom
-    (diary-file "~/.sync/org_files/agenda/diary")
+    (diary-file "~/.sync/archive/agenda/diary")
     (calendar-latitude -12.0)
     (calendar-longitude -77.1)
     (calendar-mark-diary-entries-flag t)
@@ -774,10 +775,11 @@ This file recreates the Emacs configuration
            (org-babel-after-execute . org-redisplay-inline-images)
            (org-babel-after-execute . org-toggle-inline-images))
     :custom
-    (org-agenda-files '("~/.sync/org_files/agenda/"))
+    (org-agenda-files '("~/.sync/archive/agenda/"))
     (org-log-done 'time)
     (org-confirm-babel-evaluate nil)
     (org-agenda-skip-deadline-if-done t)
+    (org-src-window-setup 'other-frame)
     (org-agenda-skip-scheduled-if-done t)
     (org-agenda-skip-scheduled-repeats-after-deadline t)
     ;; (org-highlight-latex-and-related '(latex script entities))
@@ -806,17 +808,17 @@ This file recreates the Emacs configuration
        (octave . t)))
     (defun +org-link-mpv-complete-file ()
       (let ((file (read-file-name "File: "))
-  	  (pwd (file-name-as-directory (expand-file-name ".")))
-  	  (pwd1 (file-name-as-directory (abbreviate-file-name
-  				         (expand-file-name ".")))))
+    	  (pwd (file-name-as-directory (expand-file-name ".")))
+    	  (pwd1 (file-name-as-directory (abbreviate-file-name
+    				         (expand-file-name ".")))))
         (cond ((string-match
                 (concat "^" (regexp-quote pwd1) "\\(.+\\)") file)
                (concat "mpv:" (match-string 1 file)))
-  	    ((string-match
+    	    ((string-match
                 (concat "^" (regexp-quote pwd) "\\(.+\\)")
                 (expand-file-name file))
                (concat "mpv:" (match-string 1 (expand-file-name file))))
-  	    (t (concat "mpv:" file)))))
+    	    (t (concat "mpv:" file)))))
 
     (defun +org-link-open-in-mpv (file)
       "Opens linked file in an new mpv process"
@@ -859,10 +861,10 @@ This file recreates the Emacs configuration
     :bind (("C-z C-c" . org-capture)
            ("C-z C-l" . org-store-link))
     :preface
-    (defvar my/org-academic-agenda "~/.sync/org_files/agenda/academic.org")
-    (defvar my/org-personal-agenda "~/.sync/org_files/agenda/personal.org")
-    (defvar my/org-idea-notebook "~/.sync/org_files/notes/ideas.org")
-    (defvar my/org-dream-diary "~/.sync/org_files/notes/dreams.org")
+    (defvar my/org-academic-agenda "~/.sync/archive/agenda/academic.org")
+    (defvar my/org-personal-agenda "~/.sync/archive/agenda/personal.org")
+    (defvar my/org-idea-notebook "~/.sync/archive/notebooks/ideas.org")
+    (defvar my/org-dream-diary "~/.sync/archive/notebooks/dreams.org")
     
     (defvar my/org-created-property
       "\n:PROPERTIES:\n:CREATED: [%<%Y-%m-%d %a %H:%M>]\n:END:")
@@ -2063,7 +2065,7 @@ This file recreates the Emacs configuration
     :custom
     (denote-known-keywords '("matematica" "informatica"))
     (denote-directory "~/.sync/archive/notes")
-    (denote-dired-directories '("~/.sync/archive/notes" "~/.sync/archive/journal" "/home/rcaled/Files/Downloads/universidad"))
+    (denote-dired-directories '("~/.sync/archive/notes" "~/.sync/archive/journal" "~/.sync/archive/posts"))
     ;; :bind (("C-z C-n" . denote-prefix))
     :init
     (defvar-keymap denote-prefix-map
@@ -2080,7 +2082,7 @@ This file recreates the Emacs configuration
   (use-package denote-journal
     :ensure t
     :defer t
-    :bind (:map denote-prefix-map ("j" . denote-journal-new-entry))
+    :bind (:map denote-prefix-map ("j" . denote-journal-new-or-existing-entry))
     :custom
     (denote-journal-title-format 'day-date-month-year)
     (denote-journal-directory "~/.sync/archive/journal"))
@@ -2130,7 +2132,7 @@ This file recreates the Emacs configuration
     (org-cite-activate-processor 'citar)
     :config
     (let ((documents-path (xdg-user-dir "DOCUMENTS"))
-          (archive-path "~/.sync/archive/"))
+          (archive-path "~/.sync/archive/bibliography/"))
       (setq org-cite-global-bibliography
             (mapcar (lambda (entry) (concat archive-path entry)) '("articles.bib" "books.bib")))
       (setq citar-library-paths
@@ -2186,7 +2188,7 @@ This file recreates the Emacs configuration
     :ensure t
     :defer t
     :custom
-    (ebib-preload-bib-files '("~/.sync/archive/articles.bib" "~/.sync/archive/books.bib"))
+    (ebib-preload-bib-files '("~/.sync/archive/bibliography/articles.bib" "~/.sync/archive/bibliography/books.bib"))
     (ebib-file-search-dirs '("~/Files/Documents/library/articles" "~/Files/Documents/library/books"))
     (ebib-file-associations '(("ps" . "gv")))
     :config

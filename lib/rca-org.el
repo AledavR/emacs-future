@@ -16,10 +16,11 @@
          (org-babel-after-execute . org-redisplay-inline-images)
          (org-babel-after-execute . org-toggle-inline-images))
   :custom
-  (org-agenda-files '("~/.sync/org_files/agenda/"))
+  (org-agenda-files '("~/.sync/archive/agenda/"))
   (org-log-done 'time)
   (org-confirm-babel-evaluate nil)
   (org-agenda-skip-deadline-if-done t)
+  (org-src-window-setup 'other-frame)
   (org-agenda-skip-scheduled-if-done t)
   (org-agenda-skip-scheduled-repeats-after-deadline t)
   ;; (org-highlight-latex-and-related '(latex script entities))
@@ -48,17 +49,17 @@
      (octave . t)))
   (defun +org-link-mpv-complete-file ()
     (let ((file (read-file-name "File: "))
-	  (pwd (file-name-as-directory (expand-file-name ".")))
-	  (pwd1 (file-name-as-directory (abbreviate-file-name
-				         (expand-file-name ".")))))
+  	  (pwd (file-name-as-directory (expand-file-name ".")))
+  	  (pwd1 (file-name-as-directory (abbreviate-file-name
+  				         (expand-file-name ".")))))
       (cond ((string-match
               (concat "^" (regexp-quote pwd1) "\\(.+\\)") file)
              (concat "mpv:" (match-string 1 file)))
-	    ((string-match
+  	    ((string-match
               (concat "^" (regexp-quote pwd) "\\(.+\\)")
               (expand-file-name file))
              (concat "mpv:" (match-string 1 (expand-file-name file))))
-	    (t (concat "mpv:" file)))))
+  	    (t (concat "mpv:" file)))))
 
   (defun +org-link-open-in-mpv (file)
     "Opens linked file in an new mpv process"
@@ -100,10 +101,10 @@
   :bind (("C-z C-c" . org-capture)
          ("C-z C-l" . org-store-link))
   :preface
-  (defvar my/org-academic-agenda "~/.sync/org_files/agenda/academic.org")
-  (defvar my/org-personal-agenda "~/.sync/org_files/agenda/personal.org")
-  (defvar my/org-idea-notebook "~/.sync/org_files/notes/ideas.org")
-  (defvar my/org-dream-diary "~/.sync/org_files/notes/dreams.org")
+  (defvar my/org-academic-agenda "~/.sync/archive/agenda/academic.org")
+  (defvar my/org-personal-agenda "~/.sync/archive/agenda/personal.org")
+  (defvar my/org-idea-notebook "~/.sync/archive/notebooks/ideas.org")
+  (defvar my/org-dream-diary "~/.sync/archive/notebooks/dreams.org")
   
   (defvar my/org-created-property
     "\n:PROPERTIES:\n:CREATED: [%<%Y-%m-%d %a %H:%M>]\n:END:")
