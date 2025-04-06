@@ -87,35 +87,6 @@
   :ensure t)
 ;; Markdown:1 ends here
 
-;; [[file:../dotemacs.org::*Java][Java:1]]
-(use-package eglot-java
-  :ensure t
-  :defer t
-  :config
-  (setq eglot-java-eclipse-jdt-args `("-Xmx1G" "--add-modules=ALL-SYSTEM" "--add-opens"
-                                      "java.base/java.util=ALL-UNNAMED" "--add-opens"
-                                      "java.base/java.lang=ALL-UNNAMED"
-                                      ,(concat "-javaagent:" (expand-file-name user-emacs-directory) "share/eclipse.jdt.ls/plugins/lombok.jar")
-                                      ,(concat "-Xbootclasspath/a:" (expand-file-name user-emacs-directory) "share/eclips.jdtls/plugins/lombok.jar"))))
-
-(use-package java
-  :ensure nil
-  :defer t
-  :config
-  (defun rc/spring-run ()
-    "Runs current spring boot project in an async shell window"
-    (interactive)
-    (let ((default-directory (project-root (project-current t))))
-      (async-shell-command "mvn spring-boot:run" "\*Spring Boot\*")))
-
-  (defun rc/spring-shell ()
-    "Opens the current spring shell"
-    (interactive)
-    (if (get-buffer "\*Spring Boot\*")
-        (display-buffer "\*Spring Boot\*")
-      (message "No spring boot proccess running. Try spring-run."))))
-;; Java:1 ends here
-
 ;; [[file:../dotemacs.org::*HTML][HTML:1]]
 (use-package mhtml-mode
   :ensure nil

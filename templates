@@ -13,8 +13,11 @@ lua-mode
 
 (req "local " (s mod) " = require(\""(s mod) "\")" q)
 
-
 c++-mode
 
 (for "for(" p ") {" n> q n> "}" >)
-(fun (p "int") " " (p "name") "() {" n> q n> "}" >) 
+(fun (p "int") " " (p "name") "() {" n> q n> "}" >)
+
+(glbeg "glBegin("
+(p (completing-read "GLEnum" '("GL_POINTS" "GL_LINES" "GL_LINE_STRIP" "GL_LINE_LOOP" "GL_TRIANGLES" "GL_TRIANGLE_STRIP" "GL_TRIANGLE_FAN" "GL_QUADS" "GL_QUAD_STRIP" "GL_POLYGON")) (tempel-next))
+");" n> q n> "glEnd();")

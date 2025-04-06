@@ -15,7 +15,7 @@
 ;; [[file:../dotemacs.org::*~magit~][~magit~:1]]
 (use-package magit
   :ensure t
-  :requires transient
+  :requires transient llama
   :defer 1)
 ;; ~magit~:1 ends here
 

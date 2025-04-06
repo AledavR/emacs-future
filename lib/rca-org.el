@@ -40,6 +40,7 @@
    '("\\`https://fniessen\\.github\\.io/org-html-themes/org/theme-readtheorg\\.setup\\'"))
   :config
   (setf (cdr (assoc 'file org-link-frame-setup)) 'find-file)
+  (set-face-attribute 'org-latex-and-related nil :family "Aporetic Sans Mono")
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((python . t)
@@ -47,6 +48,8 @@
      (shell . t)
      (calc . t)
      (octave . t)))
+
+  ;; Org link extensions
   (defun +org-link-mpv-complete-file ()
     (let ((file (read-file-name "File: "))
   	  (pwd (file-name-as-directory (expand-file-name ".")))
@@ -68,7 +71,18 @@
   (defun +org-link-remote-open-in-mpv (url)
     "Opens linked file in an new mpv process"
     (start-process "open url" nil "mpv" "--title=mpv_emacs" url))
+  
+  (defun +browse-steam-page (steam-id)
+    (browse-url (concat "steam://advertise/" steam-id)))
+  
+  (org-link-set-parameters "steam" :follow 'browse-steam-page)
+  (org-link-set-parameters "mpv" :complete '+org-link-mpv-complete-file :follow '+org-link-open-in-mpv)
+  (org-link-set-parameters "mpv-url" :follow '+org-link-remote-open-in-mpv)
 
+  ;; Org notes functions
+  
+  (defvar +org-math-bodies '("Proposición" "Teorema" "Corolario" "Nota"))
+  
   (defun +org-get-top-header-title ()
     (let ((title (substring-no-properties
                   (if (= (org-outline-level) 1)
@@ -83,14 +97,52 @@
         (org-insert-heading))
       (insert (concat title " - " type " "))))
 
-  (defvar +org-math-bodies '("Proposición" "Teorema" "Corolario" "Nota"))
 
-  (defun browse-steam-page (steam-id)
-    (browse-url (concat "steam://advertise/" steam-id)))
-  (set-face-attribute 'org-latex-and-related nil :family "Aporetic Sans Mono")
-  (org-link-set-parameters "steam" :follow 'browse-steam-page)
-  (org-link-set-parameters "mpv" :complete '+org-link-mpv-complete-file :follow '+org-link-open-in-mpv)
-  (org-link-set-parameters "mpv-url" :follow '+org-link-remote-open-in-mpv)
+  (defvar +org-table-replacement-alist
+    '(("v" . "\\\\downarrow")
+      ("^" . "\\\\uparrow")
+      (">" . "\\\\xrightarrow")
+      ("<" . "\\\\xleftarrow")
+      ("<>" . "\\\\xrightleftharpoons")
+      ("q" . "\\\\quad"))
+    "List of values replaced in org-table custom export
+commands")
+
+  (defun +org-table-to-commutative-diagram ()
+    (interactive)
+    (unless (org-at-table-p) (user-error "Not at a table"))
+    (mapc (lambda (x)
+            (replace-regexp-in-region
+             (concat "~" (car x) "~") (cdr x) (org-table-begin) (org-table-end)))
+          +org-table-replacement-alist)
+    (let* ((table (org-table-to-lisp))
+           (params '(:backend latex :raw t :environment "array"))
+           (replacement-table
+            (replace-regexp-in-string
+             "  +" " "
+             (replace-regexp-in-string
+              "{array}{\\(l+\\)}"
+              (lambda (match) (concat "{array}{" (make-string (- (length match) 9) ?c) "}")) (orgtbl-to-latex table params)))))
+      (kill-region (org-table-begin) (org-table-end))
+      (open-line 1)
+      (push-mark)
+      (insert "\\[" replacement-table "\\]")))
+
+  (defun +org-table-from-latex-table ()
+    (interactive)
+    (search-backward "\[")
+    (kill-whole-line)
+    (set-mark (point))
+    (search-forward "\]")
+    (kill-whole-line)
+    (backward-char)
+    (activate-mark)
+    (let ((beg (region-beginning))
+          (end (region-end)))
+      (replace-regexp-in-region "^\\|\\\\\\\\\\|&" "|" beg end)
+      (goto-char beg)
+      (org-table-next-field)))
+
   )
 ;; Org general options:1 ends here
 
@@ -226,11 +278,13 @@ are exported to a filename derived from the headline text."
                     scroll-up-command scroll-down-command))
 
   ;; Enable consistent equation numbering
-  (setq org-latex-preview-numbered t)
+  (setq org-latex-preview-cache 'temp)
 
   ;; Bonus: Turn on live previews.  This shows you a live preview of a LaTeX
   ;; fragment and updates the preview in real-time as you edit it.
   ;; To preview only environments, set it to '(block edit-special) instead
+  (setq org-latex-preview-live t)
+  
   (setq org-latex-preview-live t)
 
   ;; More immediate live-previews -- the default delay is 1 second

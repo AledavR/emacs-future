@@ -3,9 +3,7 @@
         (add-to-list 'load-path (locate-user-emacs-file string)))
       '("ext" "lib"))
 
-
 (require 'package-manager)
-
 
 (require 'rca-macros)
 (require 'rca-functions)

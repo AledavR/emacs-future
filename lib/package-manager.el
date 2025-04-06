@@ -1,10 +1,4 @@
 ;; [[file:../dotemacs.org::*Package management][Package management:1]]
-;; (provide 'package-manager)
-
-;; (require 'package)
-;; (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-;; (package-initialize)
-
 (provide 'package-manager)
 
 (defvar elpaca-installer-version 0.10)
@@ -49,52 +43,12 @@
 (elpaca elpaca-use-package
   (elpaca-use-package-mode))
 
-;; (use-package org
-;;   :defer
-;;   :ensure `(org
-;;             :remotes ("tecosaur"
-;;                       :repo "https://code.tecosaur.net/tec/org-mode.git"
-;;                       :branch "dev")
-;;             :files (:defaults ("etc/styles/" "etc/styles/*" "doc/*.texi"))
-;;             :build t
-;;             :pre-build
-;;             (progn
-;;               (with-temp-file "org-version.el"
-;;                 (require 'lisp-mnt)
-;;                 (let ((version
-;;                        (with-temp-buffer
-;;                          (insert-file-contents "lisp/org.el")
-;;                          (lm-header "version")))
-;;                       (git-version
-;;                        (string-trim
-;;                         (with-temp-buffer
-;;                           (call-process "git" nil t nil "rev-parse" "--short" "HEAD")
-;;                           (buffer-string)))))
-;;                   (insert
-;;                    (format "(defun org-release () \"The release version of Org.\" %S)\n" version)
-;;                    (format "(defun org-git-version () \"The truncate git commit hash of Org mode.\" %S)\n" git-version)
-;;                    "(provide 'org-version)\n")))
-;;               (require 'elpaca-menu-org)
-;;               (elpaca-menu-org--build))
-;;             :pin nil))
-
 (use-package org
   :defer
   :ensure `(org :repo "https://code.tecosaur.net/tec/org-mode.git/"
                 :branch "dev"))
 
 (elpaca-wait)
-
-;; (defun +elpaca-unload-seq (e)
-;;   "Unload seq before continuing the elpaca build, then continue to build the recipe E."
-;;   (and (featurep 'seq) (unload-feature 'seq t))
-;;   (elpaca--continue-build e))
-
-;; (elpaca `(seq :build ,(append (butlast (if (file-exists-p (expand-file-name "seq" elpaca-builds-directory))
-;;                                           elpaca--pre-built-steps
-;;                                         elpaca-build-steps))
-;;                              (list '+elpaca-unload-seq 'elpaca--activate-package))))
-
 
 (unless (equal system-type 'gnu/linux)
   (elpaca-no-symlink-mode))

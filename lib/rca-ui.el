@@ -6,9 +6,6 @@
 (use-package emacs
   :ensure nil
   :init
-  ;; (set-face-attribute 'default nil :family "Iosevka Comfy" :height 130)
-  ;; (set-face-attribute 'fixed-pitch nil :family "Iosevka Comfy")
-  ;; (set-face-attribute 'variable-pitch nil :family "Iosevka Comfy Motion")
   (set-face-attribute 'default nil :family "Aporetic Sans Mono" :height 130)
   (set-face-attribute 'fixed-pitch nil :family "Aporetic Sans Mono")
   (set-face-attribute 'variable-pitch nil :family "Aporetic Serif Mono")

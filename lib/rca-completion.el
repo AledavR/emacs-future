@@ -149,7 +149,7 @@
   :bind (("M-$" . jinx-correct)
          ("C-M-$" . jinx-languages))
   :config
-  (setq jinx-languages "es en_US"))
+  (setq jinx-languages "es estec en_US"))
 ;; ~jinx~:1 ends here
 
 ;; [[file:../dotemacs.org::*~vundo~][~vundo~:1]]

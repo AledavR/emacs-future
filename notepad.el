@@ -48,9 +48,6 @@ command. So the following works as expected:
         (eshell-named-command cmd args)))))
 
 
-
-
-
 ;;;; ORG-STEAM-LINK-PREVIEW
 
 (defun org-steam-link-preview (ov path link)
@@ -94,3 +91,82 @@ command. So the following works as expected:
          ((agenda "" ((org-agenda-time-grid nil))))
          ((org-agenda-tag-filter-preset '("+class")))
          ("~/clases_semana.txt"))))
+
+;;;; ADD WORD TO TECHNICAL DICTIONARY
+
+(defun add-word-to-technical-dictionary ()
+  "Remove the first line and add the word at point to the end of the dictionary."
+  (interactive)
+  (let ((word (thing-at-point 'word t))  ; Get the word under the cursor
+        (file "/home/rcaled/.config/enchant/hunspell/estec.dic"))
+    (if (not word)
+        (message "No word at point.")
+      (if (file-exists-p file)
+          (with-temp-buffer
+            (insert-file-contents file)
+            ;; Remove the first line (which contains '1')
+            (goto-char (point-min))
+            (delete-region (point-min) (line-end-position))
+            (insert (number-to-string (count-lines (point-min) (point-max))))
+            ;; Add the word at the end of the file
+            (goto-char (point-max))
+            (newline)
+            (insert word)
+            (write-file file)
+            (message "Word '%s' added to dictionary." word))
+        (message "Dictionary file does not exist.")))))
+
+;;;; TABLE TO COMM DIAG CONVERSION
+
+(defvar org-table-replacement-alist
+  '(("v" . "\\\\downarrow")
+    ("^" . "\\\\uparrow")
+    (">" . "\\\\xrightarrow")
+    ("<" . "\\\\xleftarrow")
+    ("<>" . "\\\\xrightleftharpoons")
+    ("q" . "\\\\quad"))
+  "List of values replaced in org-table custom export
+commands")
+
+(defun org-table-to-commutative-diagram ()
+  (interactive)
+  (unless (org-at-table-p) (user-error "Not at a table"))
+  (mapc (lambda (x)
+          (replace-regexp-in-region
+           (concat "~" (car x) "~") (cdr x) (org-table-begin) (org-table-end)))
+        org-table-replacement-alist)
+  (let* ((table (org-table-to-lisp))
+         (params '(:backend latex :raw t :environment "array"))
+         (replacement-table
+          (replace-regexp-in-string
+           "  +" " "
+           (replace-regexp-in-string
+            "{array}{\\(l+\\)}"
+            (lambda (match) (concat "{array}{" (make-string (- (length match) 9) ?c) "}")) (orgtbl-to-latex table params)))))
+    (kill-region (org-table-begin) (org-table-end))
+    (open-line 1)
+    (push-mark)
+    (insert "\\[" replacement-table "\\]")))
+
+(defun org-table-from-latex-table ()
+  (interactive)
+  (search-backward "\[")
+  (kill-whole-line)
+  (set-mark (point))
+  (search-forward "\]")
+  (kill-whole-line)
+  (backward-char)
+  (activate-mark)
+  (let ((beg (region-beginning))
+        (end (region-end)))
+    (replace-regexp-in-region "^\\|\\\\\\\\\\|&" "|" beg end)
+    (goto-char beg)
+    (org-table-next-field)))
+
+(defun org-table-test ()
+  (interactive)
+  (message (orgtbl-to-latex (org-table-to-lisp) '(:backend latex :raw t :environment "array"))))
+
+(defun org-table-test-2 ()
+  (interactive)
+  (org-table-to-lisp))
