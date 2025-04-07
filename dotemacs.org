@@ -2049,37 +2049,41 @@ This file recreates the Emacs configuration
 ** ~denote~
 
 #+begin_src emacs-lisp
-  (use-package denote
-    :ensure t
-    :custom
-    (denote-known-keywords '("matematica" "informatica"))
-    (denote-directory "~/.sync/archive/notes")
-    (denote-dired-directories '("~/.sync/archive/notes" "~/.sync/archive/journal" "~/.sync/archive/posts"))
-    ;; :bind (("C-z C-n" . denote-prefix))
-    :init
-    (defvar-keymap denote-prefix-map
-      :doc "Denote commands"
-      "n" #'denote
-      "o" #'denote-open-or-create
-      "l" #'denote-link
-      "L" #'denote-link-or-create)
-    (defalias 'denote-prefix denote-prefix-map)
-    :config
-    (add-hook 'dired-mode-hook 'denote-dired-mode-in-directories)
-    (global-set-key (kbd "C-z C-n") 'denote-prefix))
+    (use-package denote
+      :ensure t
+      :custom
+      (denote-known-keywords '("matematica" "informatica"))
+      (denote-directory "~/.sync/archive/notes")
+      (denote-dired-directories '("~/.sync/archive/notes" "~/.sync/archive/journal" "~/.sync/archive/posts"))
+      :init
+      (defvar-keymap denote-prefix-map
+        :doc "Denote commands"
+        "n" #'denote
+        "o" #'denote-open-or-create
+        "l" #'denote-link
+        "L" #'denote-link-or-create
+        "s" #'denote-grep)
+      (defalias 'denote-prefix denote-prefix-map)
+      :config
+      (setq denote-org-front-matter
+            "#+title:      %s
+  ,#+date:       %s
+  ,#+filetags:   %s
+  ,#+identifier: %s
+  ,#+signature:  %s
+  ,#+startup:    nofold
+  ,#+startup:    hideblocks
+  \n")
+      (add-hook 'dired-mode-hook 'denote-dired-mode-in-directories)
+      (global-set-key (kbd "C-z C-n") 'denote-prefix))
 
-  (use-package denote-journal
-    :ensure t
-    :defer t
-    :bind (:map denote-prefix-map ("j" . denote-journal-new-or-existing-entry))
-    :custom
-    (denote-journal-title-format 'day-date-month-year)
-    (denote-journal-directory "~/.sync/archive/journal"))
-
-  (use-package denote-search
-    :ensure t
-    :defer t
-    :bind (:map denote-prefix-map ("s" . denote-search)))
+    (use-package denote-journal
+      :ensure t
+      :defer t
+      :bind (:map denote-prefix-map ("j" . denote-journal-new-or-existing-entry))
+      :custom
+      (denote-journal-title-format 'day-date-month-year)
+      (denote-journal-directory "~/.sync/archive/journal"))
 #+end_src
 
 ** ~embark~
