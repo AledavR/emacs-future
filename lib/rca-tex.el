@@ -106,6 +106,31 @@ input"
                 TeX-source-correlate-start-server t
                 TeX-master nil
                 TeX-view-program-selection '((output-pdf "PDF Tools")))
+
+  (defun +TeX-change-math-delimiter ()
+    (interactive)
+    (unless (texmathp) (user-error "Not in math expression"))
+    (save-excursion
+      (re-search-backward "\\\\\\[\\|\\\\(")
+      (when (string-equal (match-string 0) "\\[")
+        (replace-match "\\\\(")
+        (re-search-forward "\\\\\\]")
+        (replace-match "\\\\)"))
+      (when (string-equal (match-string 0) "\\(")
+        (replace-match "\\\\[")
+        (re-search-forward "\\\\)")
+        (replace-match "\\\\]"))))
+
+  (defun +Tex-mark-math-block ()
+    (interactive)
+    (unless (texmathp) (user-error "Not in math expression"))
+    (re-search-backward "\\\\\\[\\|\\\\(")
+    (push-mark (point) t t)
+    (when (string-equal (match-string 0) "\\[")
+      (re-search-forward "\\\\\\]"))
+    (when (string-equal (match-string 0) "\\(")
+      (re-search-forward "\\\\)")))
+
   
   ;; Math block minor mode
   (defun +LaTeX-math-texmathp () t)
@@ -189,6 +214,7 @@ input"
   (cdlatex-paired-parens "$([{")
   (cdlatex-math-modify-alist '((111 "\\operatorname" nil t nil nil)
                                (66 "\\mathbb" nil t nil nil)))
+  (cdlatex-math-symbol-alist '((61 ("\\Leftrightarrow" "\\Longleftrightarrow" "\\coloneq"))))
   :bind ( :map cdlatex-mode-map
           ("C-<return>" . nil)
           ("´" . cdlatex-math-symbol)

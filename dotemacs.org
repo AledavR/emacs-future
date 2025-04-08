@@ -1579,17 +1579,19 @@ This file recreates the Emacs configuration
   (use-package skeletor
     :ensure t
     :custom
-    (skeletor-project-directory "~/Files/workspace/projects/")
+    (skeletor-user-directory "~/.sync/skeletons/")
+    (skeletor-project-directory "~/Files/Documents/workspace/")
+    (skeletor-completing-read-function 'completing-read)
     :config
     (skeletor-define-template "latex-article"
-      :title "LaTeX Article"
-      :no-license? t)
-    (skeletor-define-template "LaTeX-APA7"
-      :title "LaTeX APA 7th Article"
-      :no-license? t)
+      :title "Latex Article"
+      :no-license? t :no-git? t)
+    (skeletor-define-template "latex-apa7"
+      :title "Latex APA 7th Article"
+      :no-license? t :no-git? t)
     (skeletor-define-template "latex-beamer"
-      :title "LaTeX Beamer"
-      :no-license? t))
+      :title "Latex Beamer"
+      :no-license? t :no-git? t))
 #+end_src
 
 * Input
@@ -1853,138 +1855,164 @@ This file recreates the Emacs configuration
 ** ~auctex~
 
 #+begin_src emacs-lisp
-  (use-package tex
-    :ensure auctex
-    :after pdf-tools
-    :preface
-    (defun rc/latex-init ()
-      "Defines what modes are activated by default when entering AuCtex mode"
-      (prettify-symbols-mode)
-      (turn-on-cdlatex)
-      (outline-minor-mode)  
-      ;; (rc/auctex-macros)
-      (TeX-source-correlate-mode t)
-      (tex-fold-mode 1)
-      (TeX-PDF-mode t)
-      (reftex-mode t)
-      (LaTeX-math-mode t))
-    :init
-    ;; Correct way to call hooks for auctex
-    (add-hook 'LaTeX-mode-hook 'rc/latex-init)
-    (setopt
-     TeX-fold-macro-spec-list
-     '(("{1}" ("emph")) ("{1}" ("textbf"))
-       ("{1}" ("textit")) ("[1]:||►" ("item"))
-       ("§ {1}" ("section" "section*"))
-       ("[f]→‖{1}‖" ("footnote" "marginpar"))
-       ("[c]→‖{1}‖" ("cite")) ("[l]→‖{1}‖" ("label"))
-       ("[r]→‖{1}‖" ("ref" "pageref" "eqref" "footref"))
-       ("[i]→‖{1}‖" ("index" "glossary"))
-       ("§§ {1}" ("subsection" "subsection*"))
-       ("§§§ {1}" ("subsubsection" "subsubsection*"))
-       ("¶¶ {1}" ("subparagraph" "subparagraph*"))
-       ("¶ {1}" ("paragraph" "paragraph*"))))
-    :custom
-    (TeX-parse-self t "Enable parse on load")
-    (TeX-auto-save t "Enable parse on save")
-    (TeX-arg-input-file-search 'nil "Find file manually")
-    :config
-    (setq-default preview-scale 1.4
-                  prettify-symbols-unprettify-at-point 'right-edge
-                  preview-scale-function (lambda () (* (/ 10.0 (preview-document-pt)) preview-scale))
-                  TeX-source-correlate-method 'synctex
-                  TeX-source-correlate-start-server t
-                  TeX-master nil
-                  TeX-view-program-selection '((output-pdf "PDF Tools")))
-    
-    ;; Math block minor mode
-    (defun +LaTeX-math-texmathp () t)
-    (defun +LaTeX-math-texmathp-advice (fun)
-      (if LaTeX-math-block-mode
-          (+LaTeX-math-texmathp)
-        (funcall fun)))
-    
-    (define-minor-mode LaTeX-math-block-mode
-      "Mode for entering math blocks in external programs."
-      :lighter " Math Block"
-      :keymap `(
-                (,(kbd "C-x C-s") . +save-n-kill-buffer-delete-frame)
-                )
-      (advice-add 'texmathp :around #'+LaTeX-math-texmathp-advice)))
+    (use-package tex
+      :ensure auctex
+      :after pdf-tools
+      :preface
+      (defun rc/latex-init ()
+        "Defines what modes are activated by default when entering AuCtex mode"
+        (prettify-symbols-mode)
+        (turn-on-cdlatex)
+        (outline-minor-mode)  
+        ;; (rc/auctex-macros)
+        (TeX-source-correlate-mode t)
+        (tex-fold-mode 1)
+        (TeX-PDF-mode t)
+        (reftex-mode t)
+        (LaTeX-math-mode t))
+      :init
+      ;; Correct way to call hooks for auctex
+      (add-hook 'LaTeX-mode-hook 'rc/latex-init)
+      (setopt
+       TeX-fold-macro-spec-list
+       '(("{1}" ("emph")) ("{1}" ("textbf"))
+         ("{1}" ("textit")) ("[1]:||►" ("item"))
+         ("§ {1}" ("section" "section*"))
+         ("[f]→‖{1}‖" ("footnote" "marginpar"))
+         ("[c]→‖{1}‖" ("cite")) ("[l]→‖{1}‖" ("label"))
+         ("[r]→‖{1}‖" ("ref" "pageref" "eqref" "footref"))
+         ("[i]→‖{1}‖" ("index" "glossary"))
+         ("§§ {1}" ("subsection" "subsection*"))
+         ("§§§ {1}" ("subsubsection" "subsubsection*"))
+         ("¶¶ {1}" ("subparagraph" "subparagraph*"))
+         ("¶ {1}" ("paragraph" "paragraph*"))))
+      :custom
+      (TeX-parse-self t "Enable parse on load")
+      (TeX-auto-save t "Enable parse on save")
+      (TeX-arg-input-file-search 'nil "Find file manually")
+      :config
+      (setq-default preview-scale 1.4
+                    prettify-symbols-unprettify-at-point 'right-edge
+                    preview-scale-function (lambda () (* (/ 10.0 (preview-document-pt)) preview-scale))
+                    TeX-source-correlate-method 'synctex
+                    TeX-source-correlate-start-server t
+                    TeX-master nil
+                    TeX-view-program-selection '((output-pdf "PDF Tools")))
+
+      (defun +TeX-change-math-delimiter ()
+        (interactive)
+        (unless (texmathp) (user-error "Not in math expression"))
+        (save-excursion
+          (re-search-backward "\\\\\\[\\|\\\\(")
+          (when (string-equal (match-string 0) "\\[")
+            (replace-match "\\\\(")
+            (re-search-forward "\\\\\\]")
+            (replace-match "\\\\)"))
+          (when (string-equal (match-string 0) "\\(")
+            (replace-match "\\\\[")
+            (re-search-forward "\\\\)")
+            (replace-match "\\\\]"))))
+
+      (defun +Tex-mark-math-block ()
+        (interactive)
+        (unless (texmathp) (user-error "Not in math expression"))
+        (re-search-backward "\\\\\\[\\|\\\\(")
+        (push-mark (point) t t)
+        (when (string-equal (match-string 0) "\\[")
+          (re-search-forward "\\\\\\]"))
+        (when (string-equal (match-string 0) "\\(")
+          (re-search-forward "\\\\)")))
+
+      
+      ;; Math block minor mode
+      (defun +LaTeX-math-texmathp () t)
+      (defun +LaTeX-math-texmathp-advice (fun)
+        (if LaTeX-math-block-mode
+            (+LaTeX-math-texmathp)
+          (funcall fun)))
+      
+      (define-minor-mode LaTeX-math-block-mode
+        "Mode for entering math blocks in external programs."
+        :lighter " Math Block"
+        :keymap `(
+                  (,(kbd "C-x C-s") . +save-n-kill-buffer-delete-frame)
+                  )
+        (advice-add 'texmathp :around #'+LaTeX-math-texmathp-advice)))
 #+end_src
 
 ** ~cdlatex~
 
 #+begin_src emacs-lisp
-    (use-package cdlatex
-      :ensure t
-      :defer t
-      :init
-      (defvar rc/cdlatex-env-list
-        '(("axiom" "\\begin{axiom}\nLABEL\n?\n\\end{axiom}\n" nil)
-          ("theorem" "\\begin{theorem}\nLABEL\n?\n\\end{theorem}\n" nil))
-        "cdlatex enviroments")
-      (defvar rc/cdlatex-command-list
-        '(
-          ;; ("ref"
-          ;;  "Insert a new reference"
-          ;;  "" consult-reftex-insert-reference nil t nil)
-          ("gph"
-           "Insert an image"
-           "\\includegraphics[width=0.6\\linewidth]{?}"
-           rc/cdlatex-pos-cursor-insert-file ("image") t nil)
-          ("inp"
-           "Input a file"
-           "\\input{?}"
-           rc/cdlatex-pos-cursor-insert-file nil t nil)
-          ("inc"
-           "Include a file"
-           "\\include{?}"
-           rc/cdlatex-pos-cursor-insert-file nil t nil)
-          ("dm"
-           "Insert a math display block"
-           "\\[ ? \\]" cdlatex-position-cursor nil t nil)
-          ("mm"
-           "Insert an inline math block"
-           "\\( ? \\)" cdlatex-position-cursor nil t nil)
-          ("int"
-           "Insert simple integral"
-           "\\int_{?}" cdlatex-position-cursor nil nil t)
-          ("oint"
-           "Insert closed integral"
-           "\\oint_{?}" cdlatex-position-cursor nil nil t)
-          ("dv"
-           "Insert a spaced differential variable"
-           "\\, d?" cdlatex-position-cursor nil nil t)
-          ("d."
-           "Insert dots"
-           "\\dots" cdlatex-position-cursor nil nil t)
-          ("t."
-           "Insert therefore symbol"
-           "\\therefore" cdlatex-position-cursor nil nil t)
-          ("intd"
-           "Insert a definite integral limits"
-           "\\biggr\\vert_{?}^{}" cdlatex-position-cursor nil nil t)
-          ("int2"
-           "Insert a definite integral limits"
-           "\\iint" cdlatex-position-cursor nil nil t)
-          ("int3"
-           "Insert a definite integral limits"
-           "\\iiint" cdlatex-position-cursor nil nil t)
-          ("sci"
-           "Insert scientific notation"
-           "\\times 10^{?}" cdlatex-position-cursor nil nil t))
-        "cdlatex custom commands")
-      (setq cdlatex-env-alist rc/cdlatex-env-list
-            cdlatex-command-alist rc/cdlatex-command-list)
-      :custom
-      (cdlatex-paired-parens "$([{")
-      (cdlatex-math-modify-alist '((111 "\\operatorname" nil t nil nil)
-                                   (66 "\\mathbb" nil t nil nil)))
-      :bind ( :map cdlatex-mode-map
-              ("C-<return>" . nil)
-              ("´" . cdlatex-math-symbol)
-              ("<tab>" . cdlatex-tab)))
+  (use-package cdlatex
+    :ensure t
+    :defer t
+    :init
+    (defvar rc/cdlatex-env-list
+      '(("axiom" "\\begin{axiom}\nLABEL\n?\n\\end{axiom}\n" nil)
+        ("theorem" "\\begin{theorem}\nLABEL\n?\n\\end{theorem}\n" nil))
+      "cdlatex enviroments")
+    (defvar rc/cdlatex-command-list
+      '(
+        ;; ("ref"
+        ;;  "Insert a new reference"
+        ;;  "" consult-reftex-insert-reference nil t nil)
+        ("gph"
+         "Insert an image"
+         "\\includegraphics[width=0.6\\linewidth]{?}"
+         rc/cdlatex-pos-cursor-insert-file ("image") t nil)
+        ("inp"
+         "Input a file"
+         "\\input{?}"
+         rc/cdlatex-pos-cursor-insert-file nil t nil)
+        ("inc"
+         "Include a file"
+         "\\include{?}"
+         rc/cdlatex-pos-cursor-insert-file nil t nil)
+        ("dm"
+         "Insert a math display block"
+         "\\[ ? \\]" cdlatex-position-cursor nil t nil)
+        ("mm"
+         "Insert an inline math block"
+         "\\( ? \\)" cdlatex-position-cursor nil t nil)
+        ("int"
+         "Insert simple integral"
+         "\\int_{?}" cdlatex-position-cursor nil nil t)
+        ("oint"
+         "Insert closed integral"
+         "\\oint_{?}" cdlatex-position-cursor nil nil t)
+        ("dv"
+         "Insert a spaced differential variable"
+         "\\, d?" cdlatex-position-cursor nil nil t)
+        ("d."
+         "Insert dots"
+         "\\dots" cdlatex-position-cursor nil nil t)
+        ("t."
+         "Insert therefore symbol"
+         "\\therefore" cdlatex-position-cursor nil nil t)
+        ("intd"
+         "Insert a definite integral limits"
+         "\\biggr\\vert_{?}^{}" cdlatex-position-cursor nil nil t)
+        ("int2"
+         "Insert a definite integral limits"
+         "\\iint" cdlatex-position-cursor nil nil t)
+        ("int3"
+         "Insert a definite integral limits"
+         "\\iiint" cdlatex-position-cursor nil nil t)
+        ("sci"
+         "Insert scientific notation"
+         "\\times 10^{?}" cdlatex-position-cursor nil nil t))
+      "cdlatex custom commands")
+    (setq cdlatex-env-alist rc/cdlatex-env-list
+          cdlatex-command-alist rc/cdlatex-command-list)
+    :custom
+    (cdlatex-paired-parens "$([{")
+    (cdlatex-math-modify-alist '((111 "\\operatorname" nil t nil nil)
+                                 (66 "\\mathbb" nil t nil nil)))
+    (cdlatex-math-symbol-alist '((61 ("\\Leftrightarrow" "\\Longleftrightarrow" "\\coloneq"))))
+    :bind ( :map cdlatex-mode-map
+            ("C-<return>" . nil)
+            ("´" . cdlatex-math-symbol)
+            ("<tab>" . cdlatex-tab)))
 #+end_src
 
 ** ~pdf-tools~
