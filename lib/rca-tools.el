@@ -150,8 +150,11 @@
   (define-key ebib-index-mode-map (kbd "L") '+ebib-scholar-search)
   (defun +ebib-open-file-externally () ; Maybe I can define args?
     (interactive)
-    (let ((file (ebib--expand-file-name (ebib--select-file nil 1 (ebib--get-key-at-point)))))
-      (if file (start-process "open pdf" nil "xdg-open" file)
+    (let* ((file (ebib-get-field-value "file" (ebib--get-key-at-point) ebib--cur-db t 'unbraced))
+           (filename (if file (ebib--expand-file-name file)
+                       (ebib--expand-file-name (ebib--create-file-name-from-key (ebib--get-key-at-point) "pdf")))))
+      (if filename
+          (start-process "open pdf" nil "xdg-open" filename)
         (message "No PDF file found with this citekey"))))
   (defun +ebib-scholar-search ()
     (interactive)
