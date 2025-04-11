@@ -79,7 +79,7 @@
   :bind (("C-z c o" . citar-open)
          ("C-z c c" . citar-insert-citation)
          ("C-z c r" . citar-insert-reference)
-         ("C-z c b" . citar-insert-bibtex)
+         ("C-z c B" . citar-insert-bibtex)
          ("C-z c k" . citar-insert-keys))
   :custom
   (org-cite-insert-processor 'citar)
@@ -140,6 +140,7 @@
 (use-package ebib
   :ensure t
   :defer t
+  :bind (("C-z c b" . ebib))
   :custom
   (ebib-preload-bib-files '("~/.sync/archive/bibliography/articles.bib" "~/.sync/archive/bibliography/books.bib"))
   (ebib-file-search-dirs '("~/Files/Documents/library/articles" "~/Files/Documents/library/books"))

@@ -123,7 +123,7 @@
   :defer t
   :custom
   (eldoc-echo-area-use-multiline-p nil)
-  ;; (eglot-ignored-server-capabilities '(:hoverProvider))
+  (eglot-ignored-server-capabilities '(:inlayHintProvider))
   :config
   (defun eglot-open-link ()
     "Open markdown link at point in the `eldoc-doc-buffer'."

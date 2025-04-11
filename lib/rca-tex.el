@@ -107,19 +107,40 @@ input"
                 TeX-master nil
                 TeX-view-program-selection '((output-pdf "PDF Tools")))
 
+  ;; LaTeX math delimiters functions
+
+  (defun +TeX--modify-math-delimiters (open-replacement close-replacement)
+    (when (string-equal (match-string 0) "\\[")
+      (replace-match open-replacement)
+      (re-search-forward "\\\\\\]")
+      (replace-match close-replacement))
+    (when (string-equal (match-string 0) "\\(")
+      (replace-match open-replacement)
+      (re-search-forward "\\\\)")
+      (replace-match close-replacement)))
+
+  (defun +TeX-remove-math-delimiters ()
+    "Removes math delimiters from the math block at point"
+    (interactive)
+    (unless (texmathp) (user-error "Not in math expression"))
+    (save-mark-and-excursion
+      (if (texmathp-match-environment nil)
+          (progn
+            (LaTeX-mark-environment)
+            (re-search-forward "\\\\\\[\\|\\\\(" (region-end) t)
+            (+TeX--modify-math-delimiters "" ""))
+        (re-search-backward "\\\\\\[\\|\\\\(")
+        (+TeX--modify-math-delimiters "" ""))))
+  
   (defun +TeX-change-math-delimiter ()
     (interactive)
     (unless (texmathp) (user-error "Not in math expression"))
     (save-excursion
       (re-search-backward "\\\\\\[\\|\\\\(")
       (when (string-equal (match-string 0) "\\[")
-        (replace-match "\\\\(")
-        (re-search-forward "\\\\\\]")
-        (replace-match "\\\\)"))
+        (+TeX--modify-math-delimiters "\\\\(" "\\\\)"))
       (when (string-equal (match-string 0) "\\(")
-        (replace-match "\\\\[")
-        (re-search-forward "\\\\)")
-        (replace-match "\\\\]"))))
+        (+TeX--modify-math-delimiters "\\\\[" "\\\\]"))))
 
   (defun +Tex-mark-math-block ()
     (interactive)
@@ -130,7 +151,6 @@ input"
       (re-search-forward "\\\\\\]"))
     (when (string-equal (match-string 0) "\\(")
       (re-search-forward "\\\\)")))
-
   
   ;; Math block minor mode
   (defun +LaTeX-math-texmathp () t)
@@ -204,6 +224,9 @@ input"
       ("int3"
        "Insert a definite integral limits"
        "\\iiint" cdlatex-position-cursor nil nil t)
+      ("br"
+       "Insert an escaped pair of braquets"
+       "\\{ ? \\}" cdlatex-position-cursor nil nil t)
       ("sci"
        "Insert scientific notation"
        "\\times 10^{?}" cdlatex-position-cursor nil nil t))
