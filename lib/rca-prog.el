@@ -125,6 +125,8 @@
   (eldoc-echo-area-use-multiline-p nil)
   (eglot-ignored-server-capabilities '(:inlayHintProvider))
   :config
+  (fset #'jsonrpc--log-event #'ignore)
+  (eglot-events-buffer-size 0)
   (defun eglot-open-link ()
     "Open markdown link at point in the `eldoc-doc-buffer'."
     (interactive)
