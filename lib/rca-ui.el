@@ -147,32 +147,22 @@
 (use-package spacious-padding
   :ensure t
   :config
-  (setq-default header-line-format
-                '("%e" mode-line-front-space
-                  (:propertize
-                   display (min-width (6.0)))
-                  "%b" mode-line-end-spaces))
-
-  (setq-default mode-line-format
-                '("%e" mode-line-front-space
-                  (:propertize
-                   ("" mode-line-mule-info mode-line-client mode-line-modified mode-line-remote
-                    mode-line-window-dedicated)
-                   display (min-width (6.0)))
-                  mode-line-frame-identification "   "
-                  mode-line-position (project-mode-line project-mode-line-format)
-                  (vc-mode vc-mode) "  " mode-line-modes mode-line-misc-info mode-line-end-spaces))
-
-  (set-face-attribute 'header-line-active nil :inherit 'mode-line-active)
   
+  ;; (setq-default header-line-format
+  ;;               '("%e" mode-line-front-space
+  ;;                 (:propertize
+  ;;                  display (min-width (6.0)))
+  ;;                 "%b" mode-line-end-spaces))
+
   (setq spacious-padding-widths
-        '( :internal-border-width 6
+        '( :internal-border-width 3
            :header-line-width 3
            :mode-line-width 3
            :tab-width 3
-           :right-divider-width 20
-           :scroll-bar-width 4
-           :fringe-width 4))
+           :right-divider-width 10
+           :scroll-bar-width 2
+           :fringe-width 2))
+  
   ;; (setq spacious-padding-subtle-mode-line
   ;;       `( :mode-line-active 'default
   ;;          :mode-line-inactive vertical-border))
@@ -260,3 +250,23 @@ names an existing file."
   :ensure t
   :defer t)
 ;; Rainbow mode:1 ends here
+
+;; [[file:../dotemacs.org::*Breadcrumb][Breadcrumb:1]]
+(use-package breadcrumb
+  :ensure t
+  :config
+  
+  (setq-default mode-line-format
+                '("%e" mode-line-front-space
+                  (:propertize
+                   ("" mode-line-mule-info mode-line-client mode-line-modified mode-line-remote
+                    mode-line-window-dedicated)
+                   display (min-width (6.0)))
+                  mode-line-frame-identification "   "
+                  mode-line-position (project-mode-line project-mode-line-format)
+                  (vc-mode vc-mode) "  " mode-line-modes mode-line-misc-info mode-line-end-spaces))
+  
+  (set-face-attribute 'header-line-active nil :inherit 'mode-line-active)
+  
+  (breadcrumb-mode))
+;; Breadcrumb:1 ends here

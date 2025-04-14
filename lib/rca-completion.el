@@ -38,17 +38,24 @@
   (add-hook 'conf-mode-hook 'tempel-setup-capf)
   (add-hook 'prog-mode-hook 'tempel-setup-capf)
   (add-hook 'text-mode-hook 'tempel-setup-capf)
-
+  (add-hook 'eglot-managed-mode-hook 'tempel-setup-capf)
   ;; Optionally make the Tempel templates available to Abbrev,
   ;; either locally or globally. `expand-abbrev' is bound to C-x '.
   ;; (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
   ;; (global-tempel-abbrev-mode)
-)
+  )
 
 ;; Optional: Add tempel-collection.
 ;; The package is young and doesn't have comprehensive coverage.
 (use-package tempel-collection
   :ensure t)
+
+;; Optional: Add tempel-eglot bridge
+(use-package eglot-tempel
+  :ensure t
+  :preface (eglot-tempel-mode)
+  :init
+  (eglot-tempel-mode t))
 ;; ~tempel~:1 ends here
 
 ;; [[file:../dotemacs.org::*~corfu~][~corfu~:1]]

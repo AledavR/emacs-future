@@ -582,32 +582,22 @@ This file recreates the Emacs configuration
   (use-package spacious-padding
     :ensure t
     :config
-    (setq-default header-line-format
-                  '("%e" mode-line-front-space
-                    (:propertize
-                     display (min-width (6.0)))
-                    "%b" mode-line-end-spaces))
-
-    (setq-default mode-line-format
-                  '("%e" mode-line-front-space
-                    (:propertize
-                     ("" mode-line-mule-info mode-line-client mode-line-modified mode-line-remote
-                      mode-line-window-dedicated)
-                     display (min-width (6.0)))
-                    mode-line-frame-identification "   "
-                    mode-line-position (project-mode-line project-mode-line-format)
-                    (vc-mode vc-mode) "  " mode-line-modes mode-line-misc-info mode-line-end-spaces))
-
-    (set-face-attribute 'header-line-active nil :inherit 'mode-line-active)
     
+    ;; (setq-default header-line-format
+    ;;               '("%e" mode-line-front-space
+    ;;                 (:propertize
+    ;;                  display (min-width (6.0)))
+    ;;                 "%b" mode-line-end-spaces))
+
     (setq spacious-padding-widths
-          '( :internal-border-width 6
+          '( :internal-border-width 3
              :header-line-width 3
              :mode-line-width 3
              :tab-width 3
-             :right-divider-width 20
-             :scroll-bar-width 4
-             :fringe-width 4))
+             :right-divider-width 10
+             :scroll-bar-width 2
+             :fringe-width 2))
+    
     ;; (setq spacious-padding-subtle-mode-line
     ;;       `( :mode-line-active 'default
     ;;          :mode-line-inactive vertical-border))
@@ -698,6 +688,28 @@ This file recreates the Emacs configuration
   (use-package rainbow-mode
     :ensure t
     :defer t)
+#+end_src
+
+** Breadcrumb
+
+#+begin_src emacs-lisp
+  (use-package breadcrumb
+    :ensure t
+    :config
+    
+    (setq-default mode-line-format
+                  '("%e" mode-line-front-space
+                    (:propertize
+                     ("" mode-line-mule-info mode-line-client mode-line-modified mode-line-remote
+                      mode-line-window-dedicated)
+                     display (min-width (6.0)))
+                    mode-line-frame-identification "   "
+                    mode-line-position (project-mode-line project-mode-line-format)
+                    (vc-mode vc-mode) "  " mode-line-modes mode-line-misc-info mode-line-end-spaces))
+    
+    (set-face-attribute 'header-line-active nil :inherit 'mode-line-active)
+    
+    (breadcrumb-mode))
 #+end_src
 
 * Org-mode
@@ -1249,7 +1261,7 @@ This file recreates the Emacs configuration
     (eglot-ignored-server-capabilities '(:inlayHintProvider))
     :config
     (fset #'jsonrpc--log-event #'ignore)
-    (eglot-events-buffer-size 0)
+    (setq eglot-events-buffer-config '(:size 0))
     (defun eglot-open-link ()
       "Open markdown link at point in the `eldoc-doc-buffer'."
       (interactive)
@@ -1322,17 +1334,27 @@ This file recreates the Emacs configuration
     (add-hook 'conf-mode-hook 'tempel-setup-capf)
     (add-hook 'prog-mode-hook 'tempel-setup-capf)
     (add-hook 'text-mode-hook 'tempel-setup-capf)
-
+    (add-hook 'eglot-managed-mode-hook 'tempel-setup-capf)
     ;; Optionally make the Tempel templates available to Abbrev,
     ;; either locally or globally. `expand-abbrev' is bound to C-x '.
     ;; (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
     ;; (global-tempel-abbrev-mode)
-  )
+    )
 
   ;; Optional: Add tempel-collection.
   ;; The package is young and doesn't have comprehensive coverage.
   (use-package tempel-collection
     :ensure t)
+
+  ;; Optional: Add tempel-eglot bridge
+  (use-package eglot-tempel
+    :ensure t
+    :preface (eglot-tempel-mode)
+    :init
+    (eglot-tempel-mode t))
+
+
+
 #+end_src
 
 ** ~corfu~

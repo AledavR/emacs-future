@@ -28,7 +28,7 @@ Returns a `string'."
   (let ((file-subdir (sectex--latex-file-directory filetype)))
     (concat file-subdir
             (replace-regexp-in-string (expand-file-name file-subdir) ""
-             (expand-file-name (read-file-name "File: " file-subdir "" t))))))
+                                      (expand-file-name (read-file-name "File: " file-subdir "" t))))))
 
 (defun sectex-insert-file (&optional filetype)
   (interactive "P")
