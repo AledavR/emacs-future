@@ -210,3 +210,33 @@
   :ensure t
   :bind (:map dired-mode-map ("\/" . dired-narrow)))
 ;; ~dired~:1 ends here
+
+;; [[file:../dotemacs.org::*0x0][0x0:1]]
+(use-package 0x0
+  :ensure t
+  :config
+  (defun +htmlize-buffer-with-theme (theme)
+    (load-theme theme t)
+    (write-file (buffer-name (htmlize-buffer (current-buffer) t)) nil)
+    (when (car (cdr custom-enabled-themes))
+      (load-theme (car (cdr custom-enabled-themes)) t)
+      (disable-theme theme))
+    (kill-buffer))
+
+  (defun +htmlize-buffer-dark-theme ()
+    (interactive)
+    (+htmlize-buffer-with-theme (car (cdr (cdr (assoc theme-character themes))))))
+
+  (defun +htmlize-buffer-light-theme ()
+    (interactive)
+    (+htmlize-buffer-with-theme (car (cdr (assoc theme-character themes)))))
+
+  (defun +0x0-htmlize-and-send ()
+    (interactive)
+    (+htmlize-buffer-dark-theme)
+    (let* ((server (0x0--choose-server))
+           (file-name (expand-file-name (concat (buffer-name) ".html")))
+           (size (file-attribute-size (file-attributes file-name)))
+           (resp (0x0--send server file-name)))
+      (0x0--handle-resp server size resp))))
+;; 0x0:1 ends here
