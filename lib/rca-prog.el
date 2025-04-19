@@ -5,7 +5,20 @@
 ;; [[file:../dotemacs.org::*Terminal][Terminal:1]]
 (use-package vterm
   :ensure t
-  :defer t)
+  :defer t
+  :bind (("C-x t V" . vterm)
+         ("C-x t v" . vterm-other-tab))
+  :preface
+  (defun vterm-other-tab ()
+    (interactive)
+    (let* ((dir (file-name-nondirectory (directory-file-name default-directory)))
+           (buffer (concat "*" dir "-shell*")))
+      (if (get-buffer buffer)
+          (if (tab-bar-get-buffer-tab buffer)
+              (tab-switch buffer)
+            (switch-to-buffer-other-tab buffer))
+        (other-tab-prefix)
+        (vterm buffer)))))
 ;; Terminal:1 ends here
 
 ;; [[file:../dotemacs.org::*FORTRAN][FORTRAN:1]]

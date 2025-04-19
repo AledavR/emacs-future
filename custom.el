@@ -21,6 +21,22 @@
      (note . "Notas sobre ${author editor:%etal}, ${title}")))
  '(doc-view-resolution 300)
  '(fortran-line-length 500)
+ '(ibuffer-saved-filter-groups
+   '(("Groups" ("system" (starred-name)) ("erc" (used-mode . erc-mode)))))
+ '(ibuffer-saved-filters
+   '(("programming"
+      (or (derived-mode . prog-mode) (mode . ess-mode) (mode . compilation-mode)))
+     ("text document" (and (derived-mode . text-mode) (not (starred-name))))
+     ("TeX"
+      (or (derived-mode . tex-mode) (mode . latex-mode) (mode . context-mode)
+          (mode . ams-tex-mode) (mode . bibtex-mode)))
+     ("web"
+      (or (derived-mode . sgml-mode) (derived-mode . css-base-mode)
+          (derived-mode . js-base-mode) (derived-mode . typescript-ts-base-mode)
+          (mode . js2-mode) (derived-mode . haml-mode) (mode . sass-mode)))
+     ("gnus"
+      (or (mode . message-mode) (mode . mail-mode) (mode . gnus-group-mode)
+          (mode . gnus-summary-mode) (mode . gnus-article-mode)))))
  '(imagemagick-enabled-types
    '(3FR ARW AVS BMP BMP2 BMP3 CAL CALS CMYK CMYKA CR2 CRW CUR CUT DCM DCR DCX DDS
          DJVU DNG DPX EXR FAX FITS GBR GIF GIF87 GRB HRZ ICB ICO ICON J2C JNG

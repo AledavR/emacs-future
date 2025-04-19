@@ -67,6 +67,7 @@
   (server-client-instructions nil)
   (savehist-additional-variables (list 'register-alist))
   (register-use-preview t)
+  (vc-follow-symlinks nil)
   :config
   (setq emacs-config-files
         (rc/list-merge-sublists

@@ -204,7 +204,8 @@
 ;; [[file:../dotemacs.org::*~dired~][~dired~:1]]
 (use-package dired
   :ensure nil
-  :hook (dired-mode . dired-hide-details-mode))
+  :hook (dired-mode . dired-hide-details-mode)
+  :custom (dired-dwim-target t))
 
 (use-package dired-narrow
   :ensure t
@@ -240,3 +241,62 @@
            (resp (0x0--send server file-name)))
       (0x0--handle-resp server size resp))))
 ;; 0x0:1 ends here
+
+;; [[file:../dotemacs.org::*~erc~][~erc~:1]]
+(use-package erc
+  :ensure nil
+  :defer t
+  :hook (erc-join . erc-give-me-more-irc-history)
+  :custom
+  (erc-hide-list '("JOIN" "PART" "QUIT"))
+  (erc-lurker-hide-list '("JOIN" "PART" "QUIT"))
+  (erc-track-exclude-types '("JOIN" "MODE" "NICK" "PART" "QUIT"
+                             "324" "329" "332" "333" "353" "477"))
+  (erc-fill-column 120)
+  (erc-fill-function 'erc-fill-static)
+  (erc-fill-static-center 20)
+  (erc-track-shorten-start 5)
+  :preface
+  (defun erc-libera ()
+    "Connect to Libera.Chat IRC server."
+    (interactive)
+    (erc-tls
+     :nick "rcaled"
+     :server "rcaled.mooo.com"
+     :port "6697"
+     :user "rcaled/irc.libera.chat@emacs"
+     :password (cadr (auth-source-user-and-password "rcaled.mooo.com" "rcaled"))))
+  :config
+  (defun erc-give-me-more-irc-history ()
+    "Get more history for current IRC buffer (IRCv3 only).
+
+Defaults to 100 lines of history; when C-u prefixed, asks user for
+number of lines to fetch.
+
+If using an IRCv3 capable server/bouncer (like chat.sr.ht), fetch the
+chat history via the IRCv3 chathistory extension. (Currently, only
+soju-based servers implement this feature; see:
+https://ircv3.net/software/clients)
+
+For more on chathistory, see:
+ - https://man.sr.ht/chat.sr.ht/bouncer-usage.md#chat-history-logs
+ - https://ircv3.net/specs/extensions/chathistory
+ - https://soju.im/doc/soju.1.html"
+    (interactive)
+    (if (not (member
+              (with-current-buffer (current-buffer)
+                major-mode)
+              '(erc-mode
+                circe-mode
+                rcirc-mode)))
+        (message "not an IRC buffer; ignoring")
+      (let ((lines 100)
+            (channel (buffer-name)))
+        (when current-prefix-arg
+          (progn
+            (setq lines
+                  (read-number (format "How many lines to fetch: ") lines))))
+        (erc-send-input
+         (concat "/quote CHATHISTORY LATEST " channel " * " (number-to-string lines))
+         t)))))
+;; ~erc~:1 ends here

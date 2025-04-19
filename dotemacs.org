@@ -356,6 +356,7 @@ This file recreates the Emacs configuration
     (server-client-instructions nil)
     (savehist-additional-variables (list 'register-alist))
     (register-use-preview t)
+    (vc-follow-symlinks nil)
     :config
     (setq emacs-config-files
           (rc/list-merge-sublists
@@ -1091,7 +1092,20 @@ This file recreates the Emacs configuration
 #+begin_src emacs-lisp
   (use-package vterm
     :ensure t
-    :defer t)
+    :defer t
+    :bind (("C-x t V" . vterm)
+           ("C-x t v" . vterm-other-tab))
+    :preface
+    (defun vterm-other-tab ()
+      (interactive)
+      (let* ((dir (file-name-nondirectory (directory-file-name default-directory)))
+             (buffer (concat "*" dir "-shell*")))
+        (if (get-buffer buffer)
+            (if (tab-bar-get-buffer-tab buffer)
+                (tab-switch buffer)
+              (switch-to-buffer-other-tab buffer))
+          (other-tab-prefix)
+          (vterm buffer)))))
 #+end_src
 
 ** FORTRAN
@@ -2323,7 +2337,8 @@ This file recreates the Emacs configuration
 #+begin_src emacs-lisp
   (use-package dired
     :ensure nil
-    :hook (dired-mode . dired-hide-details-mode))
+    :hook (dired-mode . dired-hide-details-mode)
+    :custom (dired-dwim-target t))
 
   (use-package dired-narrow
     :ensure t
@@ -2360,6 +2375,84 @@ This file recreates the Emacs configuration
              (size (file-attribute-size (file-attributes file-name)))
              (resp (0x0--send server file-name)))
         (0x0--handle-resp server size resp))))
+#+end_src
+
+** ~erc~
+
+#+begin_src emacs-lisp
+  (use-package erc
+    :ensure nil
+    :defer t
+    :hook (erc-join . erc-give-me-more-irc-history)
+    :custom
+    (erc-hide-list '("JOIN" "PART" "QUIT"))
+    (erc-lurker-hide-list '("JOIN" "PART" "QUIT"))
+    (erc-track-exclude-types '("JOIN" "MODE" "NICK" "PART" "QUIT"
+                               "324" "329" "332" "333" "353" "477"))
+    (erc-fill-column 120)
+    (erc-fill-function 'erc-fill-static)
+    (erc-fill-static-center 20)
+    (erc-track-shorten-start 5)
+    :preface
+    (defun erc-libera ()
+      "Connect to Libera.Chat IRC server."
+      (interactive)
+      (erc-tls
+       :nick "rcaled"
+       :server "rcaled.mooo.com"
+       :port "6697"
+       :user "rcaled/irc.libera.chat@emacs"
+       :password (cadr (auth-source-user-and-password "rcaled.mooo.com" "rcaled"))))
+    :config
+    (defun erc-give-me-more-irc-history ()
+      "Get more history for current IRC buffer (IRCv3 only).
+
+  Defaults to 100 lines of history; when C-u prefixed, asks user for
+  number of lines to fetch.
+
+  If using an IRCv3 capable server/bouncer (like chat.sr.ht), fetch the
+  chat history via the IRCv3 chathistory extension. (Currently, only
+  soju-based servers implement this feature; see:
+  https://ircv3.net/software/clients)
+
+  For more on chathistory, see:
+   - https://man.sr.ht/chat.sr.ht/bouncer-usage.md#chat-history-logs
+   - https://ircv3.net/specs/extensions/chathistory
+   - https://soju.im/doc/soju.1.html"
+      (interactive)
+      (if (not (member
+                (with-current-buffer (current-buffer)
+                  major-mode)
+                '(erc-mode
+                  circe-mode
+                  rcirc-mode)))
+          (message "not an IRC buffer; ignoring")
+        (let ((lines 100)
+              (channel (buffer-name)))
+          (when current-prefix-arg
+            (progn
+              (setq lines
+                    (read-number (format "How many lines to fetch: ") lines))))
+          (erc-send-input
+           (concat "/quote CHATHISTORY LATEST " channel " * " (number-to-string lines))
+           t)))))
+#+end_src
+
+** shell
+
+#+begin_src emacs-lisp :tangle no
+  (use-package shell
+    :ensure nil
+    :bind (("C-x t SPC" . shell-other-tab))
+    :config
+    (defun shell-other-tab ()
+      (interactive)
+      (let* ((dir (file-name-nondirectory (directory-file-name default-directory)))
+             (buffer (concat "*" dir "*")))
+            (tab-switch buffer)
+          (tab-new)
+        (if (tab-bar-get-buffer-tab buffer)
+          (shell buffer)))))
 #+end_src
 
 * Local variables
