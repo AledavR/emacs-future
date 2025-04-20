@@ -39,9 +39,17 @@
          ("M-s f" . consult-recent-file)
          ("M-s b" . consult-bookmark)
          ("M-s l" . consult-line)
+         ("M-s i" . consult-idea)
          :map org-mode-map
          ("M-s s" . consult-org-heading))
   :config
+  (defun consult-idea (&optional match scope)
+    (interactive)
+    (unless my/org-idea-notebook
+      (user-error "No ideas file"))
+    (consult-org-heading match (list my/org-idea-notebook)))
+
+  (consult-customize consult-idea :preview-key nil)
   (consult-customize consult-recent-file :preview-key nil)
   (consult-customize consult-bookmark :preview-key nil))
 ;; ~consult~:1 ends here

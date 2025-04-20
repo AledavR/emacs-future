@@ -68,6 +68,8 @@
   (savehist-additional-variables (list 'register-alist))
   (register-use-preview t)
   (vc-follow-symlinks nil)
+  (auth-sources
+   '("~/.sync/.authinfo.gpg" "~/.authinfo.gpg" "~/.authinfo"))
   :config
   (setq emacs-config-files
         (rc/list-merge-sublists

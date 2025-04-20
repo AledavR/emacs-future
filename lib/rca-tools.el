@@ -246,7 +246,7 @@
 (use-package erc
   :ensure nil
   :defer t
-  :hook (erc-join . erc-give-me-more-irc-history)
+  ;; :hook (erc-join . erc-give-me-more-irc-history)
   :custom
   (erc-hide-list '("JOIN" "PART" "QUIT"))
   (erc-lurker-hide-list '("JOIN" "PART" "QUIT"))
@@ -256,7 +256,10 @@
   (erc-fill-function 'erc-fill-static)
   (erc-fill-static-center 20)
   (erc-track-shorten-start 5)
+  (erc-keywords
+    '(("'\\([^\n]+\\)' \\[\\([0-9:]+\\)\\]" . erc-keyword-face)))
   :preface
+  
   (defun erc-libera ()
     "Connect to Libera.Chat IRC server."
     (interactive)
@@ -266,6 +269,7 @@
      :port "6697"
      :user "rcaled/irc.libera.chat@emacs"
      :password (cadr (auth-source-user-and-password "rcaled.mooo.com" "rcaled"))))
+  
   :config
   (defun erc-give-me-more-irc-history ()
     "Get more history for current IRC buffer (IRCv3 only).
@@ -287,10 +291,10 @@ For more on chathistory, see:
               (with-current-buffer (current-buffer)
                 major-mode)
               '(erc-mode
-                circe-mode
+                circe-channel-mode
                 rcirc-mode)))
         (message "not an IRC buffer; ignoring")
-      (let ((lines 100)
+      (let ((lines 200)
             (channel (buffer-name)))
         (when current-prefix-arg
           (progn
@@ -299,4 +303,15 @@ For more on chathistory, see:
         (erc-send-input
          (concat "/quote CHATHISTORY LATEST " channel " * " (number-to-string lines))
          t)))))
+
+(use-package erc-hl-nicks
+  :ensure t
+  :after erc
+  :custom
+  (erc-hl-nicks-minimum-contrast-ratio 4.5))
+
+(use-package consult-erc
+  :ensure (:host codeberg :repo "mekeor/consult-erc")
+  :bind (("M-s e" . consult-erc-dwim))
+  :after erc)
 ;; ~erc~:1 ends here

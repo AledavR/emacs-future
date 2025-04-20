@@ -357,6 +357,8 @@ This file recreates the Emacs configuration
     (savehist-additional-variables (list 'register-alist))
     (register-use-preview t)
     (vc-follow-symlinks nil)
+    (auth-sources
+     '("~/.sync/.authinfo.gpg" "~/.authinfo.gpg" "~/.authinfo"))
     :config
     (setq emacs-config-files
           (rc/list-merge-sublists
@@ -1572,9 +1574,17 @@ This file recreates the Emacs configuration
            ("M-s f" . consult-recent-file)
            ("M-s b" . consult-bookmark)
            ("M-s l" . consult-line)
+           ("M-s i" . consult-idea)
            :map org-mode-map
            ("M-s s" . consult-org-heading))
     :config
+    (defun consult-idea (&optional match scope)
+      (interactive)
+      (unless my/org-idea-notebook
+        (user-error "No ideas file"))
+      (consult-org-heading match (list my/org-idea-notebook)))
+
+    (consult-customize consult-idea :preview-key nil)
     (consult-customize consult-recent-file :preview-key nil)
     (consult-customize consult-bookmark :preview-key nil))
 #+end_src
@@ -2383,7 +2393,7 @@ This file recreates the Emacs configuration
   (use-package erc
     :ensure nil
     :defer t
-    :hook (erc-join . erc-give-me-more-irc-history)
+    ;; :hook (erc-join . erc-give-me-more-irc-history)
     :custom
     (erc-hide-list '("JOIN" "PART" "QUIT"))
     (erc-lurker-hide-list '("JOIN" "PART" "QUIT"))
@@ -2393,7 +2403,10 @@ This file recreates the Emacs configuration
     (erc-fill-function 'erc-fill-static)
     (erc-fill-static-center 20)
     (erc-track-shorten-start 5)
+    (erc-keywords
+      '(("'\\([^\n]+\\)' \\[\\([0-9:]+\\)\\]" . erc-keyword-face)))
     :preface
+    
     (defun erc-libera ()
       "Connect to Libera.Chat IRC server."
       (interactive)
@@ -2403,6 +2416,7 @@ This file recreates the Emacs configuration
        :port "6697"
        :user "rcaled/irc.libera.chat@emacs"
        :password (cadr (auth-source-user-and-password "rcaled.mooo.com" "rcaled"))))
+    
     :config
     (defun erc-give-me-more-irc-history ()
       "Get more history for current IRC buffer (IRCv3 only).
@@ -2424,10 +2438,10 @@ This file recreates the Emacs configuration
                 (with-current-buffer (current-buffer)
                   major-mode)
                 '(erc-mode
-                  circe-mode
+                  circe-channel-mode
                   rcirc-mode)))
           (message "not an IRC buffer; ignoring")
-        (let ((lines 100)
+        (let ((lines 200)
               (channel (buffer-name)))
           (when current-prefix-arg
             (progn
@@ -2436,6 +2450,17 @@ This file recreates the Emacs configuration
           (erc-send-input
            (concat "/quote CHATHISTORY LATEST " channel " * " (number-to-string lines))
            t)))))
+
+  (use-package erc-hl-nicks
+    :ensure t
+    :after erc
+    :custom
+    (erc-hl-nicks-minimum-contrast-ratio 4.5))
+
+  (use-package consult-erc
+    :ensure (:host codeberg :repo "mekeor/consult-erc")
+    :bind (("M-s e" . consult-erc-dwim))
+    :after erc)
 #+end_src
 
 ** shell
