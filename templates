@@ -1,3 +1,9 @@
+fundamental-mode
+(yo (insert (plist-get (car (auth-source-search :host "info")) :realname)))
+(mail (insert (plist-get (car (auth-source-search :host "info")) :email)))
+(hoy (format-time-string "%d-%m-%Y"))
+(hoyf (format-time-string-es "%d de %B del %Y"))
+
 org-mode
 
 (ttl "#+title: " q)

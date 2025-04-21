@@ -220,6 +220,23 @@ This file recreates the Emacs configuration
          8 18)
         t nil))
 
+  (defun rc/format-time-string-es (format &optional time)
+    "Formatea la hora en español, capitalizando solo los nombres de días y meses."
+    (let* ((system-time-locale "es_ES.UTF-8")
+           (raw (format-time-string format time))
+           ;; Lista de días y meses en español
+           (dias '("lunes" "martes" "miércoles" "jueves" "viernes" "sábado" "domingo"))
+           (meses '("enero" "febrero" "marzo" "abril" "mayo" "junio"
+                    "julio" "agosto" "septiembre" "octubre" "noviembre" "diciembre")))
+      ;; Capitalizar si palabra coincide con día o mes
+      (replace-regexp-in-string
+       "\\b\\w+\\b"
+       (lambda (word)
+         (if (member word (append dias meses))
+             (capitalize word)
+           word))
+       raw)))
+
   (defun rc/truncate-lines-off ()
     "Command to set truncate-lines to t in mode hooks"
     (setq truncate-lines t))
