@@ -315,3 +315,12 @@ For more on chathistory, see:
   :bind (("M-s e" . consult-erc-dwim))
   :after erc)
 ;; ~erc~:1 ends here
+
+;; [[file:../dotemacs.org::*~elfeed~][~elfeed~:1]]
+(use-package elfeed
+  :ensure t
+  :defer t
+  :custom
+  (elfeed-db-directory "~/.elfeed/")
+  (elfeed-feeds '("https://planet.emacslife.com/atom.xml")))
+;; ~elfeed~:1 ends here

@@ -139,38 +139,33 @@
 (use-package olivetti
   :ensure t
   :hook (Info-mode . olivetti-mode)
-  :config
-  (setq-default olivetti-body-width 110))
+  :custom (olivetti-body-width 110))
 ;; Olivetti:1 ends here
 
 ;; [[file:../dotemacs.org::*Spacious-Padding][Spacious-Padding:1]]
 (use-package spacious-padding
   :ensure t
+  :custom
+  (spacious-padding-widths
+   '( :internal-border-width 3
+      :header-line-width 3
+      :mode-line-width 3
+      :tab-width 3
+      :right-divider-width 10
+      :scroll-bar-width 2
+      :fringe-width 2))
   :config
-  
   ;; (setq-default header-line-format
   ;;               '("%e" mode-line-front-space
   ;;                 (:propertize
   ;;                  display (min-width (6.0)))
   ;;                 "%b" mode-line-end-spaces))
-
-  (setq spacious-padding-widths
-        '( :internal-border-width 3
-           :header-line-width 3
-           :mode-line-width 3
-           :tab-width 3
-           :right-divider-width 10
-           :scroll-bar-width 2
-           :fringe-width 2))
   
   ;; (setq spacious-padding-subtle-mode-line
   ;;       `( :mode-line-active 'default
   ;;          :mode-line-inactive vertical-border))
 
-  (spacious-padding-mode 1)
-
-  ;; Set a key binding if you need to toggle spacious padding.
-  (define-key global-map (kbd "<f8>") #'spacious-padding-mode))
+  (spacious-padding-mode 1))
 ;; Spacious-Padding:1 ends here
 
 ;; [[file:../dotemacs.org::*Dashboard][Dashboard:1]]

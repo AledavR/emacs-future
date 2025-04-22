@@ -4,9 +4,9 @@
 
 ;; [[file:../dotemacs.org::*Completion general options][Completion general options:1]]
 (use-package emacs
-  :init
-  (setq tab-always-indent 'complete)
-  (setq text-mode-ispell-word-completion nil))
+  :custom
+  (tab-always-indent 'complete)
+  (text-mode-ispell-word-completion nil))
 ;; Completion general options:1 ends here
 
 ;; [[file:../dotemacs.org::*~tempel~][~tempel~:1]]
@@ -155,8 +155,7 @@
   :hook (org-mode . jinx-mode)
   :bind (("M-$" . jinx-correct)
          ("C-M-$" . jinx-languages))
-  :config
-  (setq jinx-languages "es estec en_US"))
+  :custom (jinx-languages "es estec en_US"))
 ;; ~jinx~:1 ends here
 
 ;; [[file:../dotemacs.org::*~vundo~][~vundo~:1]]

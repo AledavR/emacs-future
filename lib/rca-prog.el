@@ -21,16 +21,6 @@
         (vterm buffer)))))
 ;; Terminal:1 ends here
 
-;; [[file:../dotemacs.org::*FORTRAN][FORTRAN:1]]
-(use-package fortran
-  :ensure nil
-  :config
-  (add-hook 'f90-mode-hook
-            (lambda ()
-              (set (make-local-variable 'compile-command)
-                   (format "gfortran %s && ./a.out" (file-name-nondirectory buffer-file-name))))))
-;; FORTRAN:1 ends here
-
 ;; [[file:../dotemacs.org::*Gnu plot][Gnu plot:1]]
 (use-package gnuplot
   :ensure t
@@ -42,27 +32,20 @@
   :ensure t
   :defer t)
 
-(use-package lua-ts-mode
-  :ensure nil
-  ;; :defer t
-  :mode "\\.lua\\'"
-  :bind (:map lua-ts-mode-map ("C-c C-c" . lua-send-buffer)))
+;; (use-package lua-ts-mode
+;;   :ensure nil
+;;   :mode "\\.lua\\'"
+;;   :bind-keymap (("C-c C-c" . lua-send-buffer)))
 ;; LUA:1 ends here
 
 ;; [[file:../dotemacs.org::*Julia][Julia:1]]
 (use-package julia-mode
   :ensure t
-  :defer t
-  :bind (:map julia-mode-map ("`" . julia-insert-unicode-symbol))
+  :bind-keymap  (("`" . julia-insert-unicode-symbol))
   :init  
   (defvar julia-unicode-symbols-alist
-    '((?a . "α") (?b . "β")
-      (?\C-a . "ₐ")
-      (?0 . "₀")
-      (?1 . "₁")
-      (?2 . "₂")
-      (?3 . "₃")
-      (?4 . "₄"))
+    '((?a . "α") (?b . "β") (?\C-a . "ₐ")
+      (?0 . "₀") (?1 . "₁") (?2 . "₂") (?3 . "₃") (?4 . "₄"))
     "List of unicode symbols to be inserted in julia-mode")
 
   (defun julia-insert-unicode-symbol ()
@@ -84,8 +67,7 @@
 (use-package python-mode
   :ensure nil
   :defer t
-  :bind (:map python-mode-map
-              ("C-c v" . python-set-venv))
+  :bind-keymap (("C-c v" . python-set-venv))
   :init
   (defun python-set-venv (interpreter)
     (interactive "fPython interpreter:")
@@ -97,7 +79,8 @@
 
 ;; [[file:../dotemacs.org::*Markdown][Markdown:1]]
 (use-package markdown-mode
-  :ensure t)
+  :ensure t
+  :defer t)
 ;; Markdown:1 ends here
 
 ;; [[file:../dotemacs.org::*HTML][HTML:1]]
@@ -137,9 +120,9 @@
   :custom
   (eldoc-echo-area-use-multiline-p nil)
   (eglot-ignored-server-capabilities '(:inlayHintProvider))
+  (eglot-events-buffer-config '(:size 0))
   :config
   (fset #'jsonrpc--log-event #'ignore)
-  (setq eglot-events-buffer-config '(:size 0))
   (defun eglot-open-link ()
     "Open markdown link at point in the `eldoc-doc-buffer'."
     (interactive)

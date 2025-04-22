@@ -4,24 +4,27 @@
 
 ;; [[file:../dotemacs.org::*~transient~][~transient~:1]]
 (use-package transient
-  :ensure t)
+  :ensure t
+  :defer t)
 ;; ~transient~:1 ends here
 
 ;; [[file:../dotemacs.org::*~llama~][~llama~:1]]
 (use-package llama
-  :ensure t)
+  :ensure t
+  :defer t)
 ;; ~llama~:1 ends here
 
 ;; [[file:../dotemacs.org::*~magit~][~magit~:1]]
 (use-package magit
   :ensure t
-  :requires transient llama
-  :defer 1)
+  :requires transient llama)
+  ;; :defer t)
 ;; ~magit~:1 ends here
 
 ;; [[file:../dotemacs.org::*~skeletor~][~skeletor~:1]]
 (use-package skeletor
   :ensure t
+  :defer t
   :custom
   (skeletor-user-directory "~/.sync/skeletons/")
   (skeletor-project-directory "~/Files/Documents/workspace/")

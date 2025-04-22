@@ -592,8 +592,7 @@ This file recreates the Emacs configuration
   (use-package olivetti
     :ensure t
     :hook (Info-mode . olivetti-mode)
-    :config
-    (setq-default olivetti-body-width 110))
+    :custom (olivetti-body-width 110))
 #+end_src
 
 ** Spacious-Padding
@@ -601,31 +600,27 @@ This file recreates the Emacs configuration
 #+begin_src emacs-lisp
   (use-package spacious-padding
     :ensure t
+    :custom
+    (spacious-padding-widths
+     '( :internal-border-width 3
+        :header-line-width 3
+        :mode-line-width 3
+        :tab-width 3
+        :right-divider-width 10
+        :scroll-bar-width 2
+        :fringe-width 2))
     :config
-    
     ;; (setq-default header-line-format
     ;;               '("%e" mode-line-front-space
     ;;                 (:propertize
     ;;                  display (min-width (6.0)))
     ;;                 "%b" mode-line-end-spaces))
-
-    (setq spacious-padding-widths
-          '( :internal-border-width 3
-             :header-line-width 3
-             :mode-line-width 3
-             :tab-width 3
-             :right-divider-width 10
-             :scroll-bar-width 2
-             :fringe-width 2))
     
     ;; (setq spacious-padding-subtle-mode-line
     ;;       `( :mode-line-active 'default
     ;;          :mode-line-inactive vertical-border))
 
-    (spacious-padding-mode 1)
-
-    ;; Set a key binding if you need to toggle spacious padding.
-    (define-key global-map (kbd "<f8>") #'spacious-padding-mode))
+    (spacious-padding-mode 1))
 #+end_src
 
 ** Dashboard
@@ -1127,19 +1122,6 @@ This file recreates the Emacs configuration
           (vterm buffer)))))
 #+end_src
 
-** FORTRAN
-
-
-#+begin_src emacs-lisp
-  (use-package fortran
-    :ensure nil
-    :config
-    (add-hook 'f90-mode-hook
-              (lambda ()
-                (set (make-local-variable 'compile-command)
-                     (format "gfortran %s && ./a.out" (file-name-nondirectory buffer-file-name))))))
-#+end_src
-
 ** Gnu plot
 
 #+begin_src emacs-lisp
@@ -1155,11 +1137,10 @@ This file recreates the Emacs configuration
     :ensure t
     :defer t)
 
-  (use-package lua-ts-mode
-    :ensure nil
-    ;; :defer t
-    :mode "\\.lua\\'"
-    :bind (:map lua-ts-mode-map ("C-c C-c" . lua-send-buffer)))
+  ;; (use-package lua-ts-mode
+  ;;   :ensure nil
+  ;;   :mode "\\.lua\\'"
+  ;;   :bind-keymap (("C-c C-c" . lua-send-buffer)))
 #+end_src
 
 ** Julia
@@ -1167,17 +1148,11 @@ This file recreates the Emacs configuration
 #+begin_src emacs-lisp
   (use-package julia-mode
     :ensure t
-    :defer t
-    :bind (:map julia-mode-map ("`" . julia-insert-unicode-symbol))
+    :bind-keymap  (("`" . julia-insert-unicode-symbol))
     :init  
     (defvar julia-unicode-symbols-alist
-      '((?a . "α") (?b . "β")
-        (?\C-a . "ₐ")
-        (?0 . "₀")
-        (?1 . "₁")
-        (?2 . "₂")
-        (?3 . "₃")
-        (?4 . "₄"))
+      '((?a . "α") (?b . "β") (?\C-a . "ₐ")
+        (?0 . "₀") (?1 . "₁") (?2 . "₂") (?3 . "₃") (?4 . "₄"))
       "List of unicode symbols to be inserted in julia-mode")
 
     (defun julia-insert-unicode-symbol ()
@@ -1201,8 +1176,7 @@ This file recreates the Emacs configuration
   (use-package python-mode
     :ensure nil
     :defer t
-    :bind (:map python-mode-map
-                ("C-c v" . python-set-venv))
+    :bind-keymap (("C-c v" . python-set-venv))
     :init
     (defun python-set-venv (interpreter)
       (interactive "fPython interpreter:")
@@ -1216,7 +1190,8 @@ This file recreates the Emacs configuration
 
 #+begin_src emacs-lisp
   (use-package markdown-mode
-    :ensure t)
+    :ensure t
+    :defer t)
 #+end_src
 
 ** Java
@@ -1225,12 +1200,11 @@ This file recreates the Emacs configuration
   (use-package eglot-java
     :ensure t
     :defer t
-    :config
-    (setq eglot-java-eclipse-jdt-args `("-Xmx1G" "--add-modules=ALL-SYSTEM" "--add-opens"
-                                        "java.base/java.util=ALL-UNNAMED" "--add-opens"
-                                        "java.base/java.lang=ALL-UNNAMED"
-                                        ,(concat "-javaagent:" (expand-file-name user-emacs-directory) "share/eclipse.jdt.ls/plugins/lombok.jar")
-                                        ,(concat "-Xbootclasspath/a:" (expand-file-name user-emacs-directory) "share/eclips.jdtls/plugins/lombok.jar"))))
+    :custom (eglot-java-eclipse-jdt-args `("-Xmx1G" "--add-modules=ALL-SYSTEM" "--add-opens"
+                                           "java.base/java.util=ALL-UNNAMED" "--add-opens"
+                                           "java.base/java.lang=ALL-UNNAMED"
+                                           ,(concat "-javaagent:" (expand-file-name user-emacs-directory) "share/eclipse.jdt.ls/plugins/lombok.jar")
+                                           ,(concat "-Xbootclasspath/a:" (expand-file-name user-emacs-directory) "share/eclips.jdtls/plugins/lombok.jar"))))
 
   (use-package java
     :ensure nil
@@ -1292,9 +1266,9 @@ This file recreates the Emacs configuration
     :custom
     (eldoc-echo-area-use-multiline-p nil)
     (eglot-ignored-server-capabilities '(:inlayHintProvider))
+    (eglot-events-buffer-config '(:size 0))
     :config
     (fset #'jsonrpc--log-event #'ignore)
-    (setq eglot-events-buffer-config '(:size 0))
     (defun eglot-open-link ()
       "Open markdown link at point in the `eldoc-doc-buffer'."
       (interactive)
@@ -1317,9 +1291,9 @@ This file recreates the Emacs configuration
 
 #+begin_src emacs-lisp
   (use-package emacs
-    :init
-    (setq tab-always-indent 'complete)
-    (setq text-mode-ispell-word-completion nil))
+    :custom
+    (tab-always-indent 'complete)
+    (text-mode-ispell-word-completion nil))
 #+end_src
 
 ** ~yasnippet~
@@ -1494,14 +1468,14 @@ This file recreates the Emacs configuration
 ** ~flyspell~
 
 #+begin_src emacs-lisp :tangle no
-    (use-package flyspell
-      :bind (:map flyspell-mode-map
-                  ("C-." . nil))
-      :config
-      (setq ispell-program-name "aspell"
-    	ispell-personal-dictionary "~/.sync/dict/aspell_es"
-    	ispell-dictionary "es")
-      :hook (org-mode . flyspell-mode))
+  (use-package flyspell
+    :bind (:map flyspell-mode-map
+                ("C-." . nil))
+    :config
+    (setq ispell-program-name "aspell"
+  	ispell-personal-dictionary "~/.sync/dict/aspell_es"
+  	ispell-dictionary "es")
+    :hook (org-mode . flyspell-mode))
 #+end_src
 
 ** ~jinx~
@@ -1512,8 +1486,7 @@ This file recreates the Emacs configuration
     :hook (org-mode . jinx-mode)
     :bind (("M-$" . jinx-correct)
            ("C-M-$" . jinx-languages))
-    :config
-    (setq jinx-languages "es estec en_US"))
+    :custom (jinx-languages "es estec en_US"))
 #+end_src
 
 ** ~vundo~
@@ -1619,14 +1592,16 @@ This file recreates the Emacs configuration
 
 #+begin_src emacs-lisp
   (use-package transient
-    :ensure t)
+    :ensure t
+    :defer t)
 #+end_src
 
 ** ~llama~
 
 #+begin_src emacs-lisp
   (use-package llama
-    :ensure t)
+    :ensure t
+    :defer t)
 #+end_src
 
 ** ~magit~
@@ -1634,8 +1609,8 @@ This file recreates the Emacs configuration
 #+begin_src emacs-lisp
   (use-package magit
     :ensure t
-    :requires transient llama
-    :defer 1)
+    :requires transient llama)
+    ;; :defer t)
 #+end_src
 
 ** ~skeletor~
@@ -1643,6 +1618,7 @@ This file recreates the Emacs configuration
 #+begin_src emacs-lisp
   (use-package skeletor
     :ensure t
+    :defer t
     :custom
     (skeletor-user-directory "~/.sync/skeletons/")
     (skeletor-project-directory "~/Files/Documents/workspace/")
@@ -2495,6 +2471,17 @@ This file recreates the Emacs configuration
           (tab-new)
         (if (tab-bar-get-buffer-tab buffer)
           (shell buffer)))))
+#+end_src
+
+** ~elfeed~
+
+#+begin_src emacs-lisp
+  (use-package elfeed
+    :ensure t
+    :defer t
+    :custom
+    (elfeed-db-directory "~/.elfeed/")
+    (elfeed-feeds '("https://planet.emacslife.com/atom.xml")))
 #+end_src
 
 * Local variables
