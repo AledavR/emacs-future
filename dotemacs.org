@@ -783,21 +783,23 @@ This file recreates the Emacs configuration
        (shell . t)
        (calc . t)
        (octave . t)))
+    
+    (add-to-list 'org-structure-template-alist '("p" . "proof"))
 
     ;; Org link extensions
     (defun +org-link-mpv-complete-file ()
       (let ((file (read-file-name "File: "))
-    	  (pwd (file-name-as-directory (expand-file-name ".")))
-    	  (pwd1 (file-name-as-directory (abbreviate-file-name
-    				         (expand-file-name ".")))))
+      	  (pwd (file-name-as-directory (expand-file-name ".")))
+      	  (pwd1 (file-name-as-directory (abbreviate-file-name
+      				         (expand-file-name ".")))))
         (cond ((string-match
                 (concat "^" (regexp-quote pwd1) "\\(.+\\)") file)
                (concat "mpv:" (match-string 1 file)))
-    	    ((string-match
+      	    ((string-match
                 (concat "^" (regexp-quote pwd) "\\(.+\\)")
                 (expand-file-name file))
                (concat "mpv:" (match-string 1 (expand-file-name file))))
-    	    (t (concat "mpv:" file)))))
+      	    (t (concat "mpv:" file)))))
 
     (defun +org-link-open-in-mpv (file)
       "Opens linked file in an new mpv process"
@@ -841,7 +843,7 @@ This file recreates the Emacs configuration
         ("<>" . "\\\\xrightleftharpoons")
         ("q" . "\\\\quad"))
       "List of values replaced in org-table custom export
-  commands")
+    commands")
 
     (defun +org-table-to-commutative-diagram ()
       (interactive)
@@ -1356,7 +1358,8 @@ This file recreates the Emacs configuration
   ;; Optional: Add tempel-eglot bridge
   (use-package eglot-tempel
     :ensure t
-    :preface (eglot-tempel-mode)
+    :defer t
+    ;; :preface (eglot-tempel-mode)
     :init
     (eglot-tempel-mode t))
 
@@ -2481,7 +2484,10 @@ This file recreates the Emacs configuration
     :defer t
     :custom
     (elfeed-db-directory "~/.elfeed/")
-    (elfeed-feeds '("https://planet.emacslife.com/atom.xml")))
+    (elfeed-feeds '(("https://planet.emacslife.com/atom.xml" emacs)
+                    ("https://emacsredux.com/atom.xml" emacs)
+                    ("https://linmob.net/feed.xml" linux)
+                    "https://blog.lx.oliva.nom.br/index.en.atom")))
 #+end_src
 
 * Local variables

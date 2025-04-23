@@ -48,21 +48,23 @@
      (shell . t)
      (calc . t)
      (octave . t)))
+  
+  (add-to-list 'org-structure-template-alist '("p" . "proof"))
 
   ;; Org link extensions
   (defun +org-link-mpv-complete-file ()
     (let ((file (read-file-name "File: "))
-  	  (pwd (file-name-as-directory (expand-file-name ".")))
-  	  (pwd1 (file-name-as-directory (abbreviate-file-name
-  				         (expand-file-name ".")))))
+    	  (pwd (file-name-as-directory (expand-file-name ".")))
+    	  (pwd1 (file-name-as-directory (abbreviate-file-name
+    				         (expand-file-name ".")))))
       (cond ((string-match
               (concat "^" (regexp-quote pwd1) "\\(.+\\)") file)
              (concat "mpv:" (match-string 1 file)))
-  	    ((string-match
+    	    ((string-match
               (concat "^" (regexp-quote pwd) "\\(.+\\)")
               (expand-file-name file))
              (concat "mpv:" (match-string 1 (expand-file-name file))))
-  	    (t (concat "mpv:" file)))))
+    	    (t (concat "mpv:" file)))))
 
   (defun +org-link-open-in-mpv (file)
     "Opens linked file in an new mpv process"
@@ -106,7 +108,7 @@
       ("<>" . "\\\\xrightleftharpoons")
       ("q" . "\\\\quad"))
     "List of values replaced in org-table custom export
-commands")
+  commands")
 
   (defun +org-table-to-commutative-diagram ()
     (interactive)

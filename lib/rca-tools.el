@@ -322,5 +322,8 @@ For more on chathistory, see:
   :defer t
   :custom
   (elfeed-db-directory "~/.elfeed/")
-  (elfeed-feeds '("https://planet.emacslife.com/atom.xml")))
+  (elfeed-feeds '(("https://planet.emacslife.com/atom.xml" emacs)
+                  ("https://emacsredux.com/atom.xml" emacs)
+                  ("https://linmob.net/feed.xml" linux)
+                  "https://blog.lx.oliva.nom.br/index.en.atom")))
 ;; ~elfeed~:1 ends here
