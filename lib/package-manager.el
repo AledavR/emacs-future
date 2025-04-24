@@ -1,7 +1,7 @@
 ;; [[file:../dotemacs.org::*Package management][Package management:1]]
 (provide 'package-manager)
 
-(defvar elpaca-installer-version 0.10)
+(defvar elpaca-installer-version 0.11)
 
 (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
 

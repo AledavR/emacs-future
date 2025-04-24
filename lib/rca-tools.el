@@ -325,5 +325,10 @@ For more on chathistory, see:
   (elfeed-feeds '(("https://planet.emacslife.com/atom.xml" emacs)
                   ("https://emacsredux.com/atom.xml" emacs)
                   ("https://linmob.net/feed.xml" linux)
-                  "https://blog.lx.oliva.nom.br/index.en.atom")))
+                  "https://blog.lx.oliva.nom.br/index.en.atom"
+                  ("https://xkcd.com/rss.xml" comic)
+                  ("https://samwho.dev/rss.xml" programming)
+                  ("https://www.localfirstnews.com/rss/" programming)
+                  ("https://www.youtube.com/feeds/videos.xml?channel_id=UCiiTssXxklIDeDBWq0tPHUA" youtube music)
+                  )))
 ;; ~elfeed~:1 ends here
