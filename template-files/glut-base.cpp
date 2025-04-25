@@ -1,9 +1,8 @@
 /*
- *
- %%(file-name-base).cpp
- Autor: %%(plist-get (car (auth-source-search :host "info")) :realname)
- Fecha: %%(format-time-string "%d-%m-%Y")
- */
+  %%(file-name-base).cpp
+  Autor: %%(plist-get (car (auth-source-search :host "info")) :realname)
+  Fecha: %%(format-time-string "%d-%m-%Y")
+*/
 
 
 // Libreria de windows
@@ -52,7 +51,7 @@ int main (int argc, char *argv[])
     
     //Nombre que se le da a la ventana
     glutCreateWindow("%%(read-from-minibuffer "Nombre de la ventana: ")");
-    inicio();
+    init();
     glutDisplayFunc(display);// nombre de la funcion
     glutMainLoop();// hace que aparezca la ventana
 
