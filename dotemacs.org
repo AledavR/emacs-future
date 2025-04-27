@@ -10,12 +10,16 @@ This file recreates the Emacs configuration
 :header-args: :tangle early-init.el
 :END:
 #+begin_src emacs-lisp
-  (setq package-enable-at-startup nil)
+  (setopt package-enable-at-startup nil)
 
-  (setq gc-cons-threshold most-positive-fixnum)
+  (setopt gc-cons-threshold most-positive-fixnum)
   (add-hook 'emacs-startup-hook
             (lambda ()
               (setq gc-cons-threshold (* 16 1024 1024))))
+  
+  (scroll-bar-mode -1)
+  (tool-bar-mode -1)
+  (menu-bar-mode -1)
 #+end_src
 
 * Package management
@@ -455,15 +459,11 @@ This file recreates the Emacs configuration
     :custom
     (frame-resize-pixelwise t)
     (modus-themes-italic-constructs t)
-    :config
-    (scroll-bar-mode -1)
-    (tool-bar-mode -1)
-    (menu-bar-mode -1)
-    (setq-default fill-column 80)
-    (setq-default indent-tabs-mode nil)
-    (setq-default display-line-numbers-width 3)
-    (setq-default display-line-numbers-grow-only t)
-    (setq tab-bar-format '(tab-bar-format-history
+    (fill-column 80)
+    (indent-tabs-mode nil)
+    (display-line-numbers-width 3)
+    (display-line-numbers-grow-only t)
+    (tab-bar-format '(tab-bar-format-history
                            tab-bar-format-tabs-groups
                            tab-bar-separator
                            tab-bar-format-add-tab

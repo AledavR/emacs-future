@@ -14,15 +14,11 @@
   :custom
   (frame-resize-pixelwise t)
   (modus-themes-italic-constructs t)
-  :config
-  (scroll-bar-mode -1)
-  (tool-bar-mode -1)
-  (menu-bar-mode -1)
-  (setq-default fill-column 80)
-  (setq-default indent-tabs-mode nil)
-  (setq-default display-line-numbers-width 3)
-  (setq-default display-line-numbers-grow-only t)
-  (setq tab-bar-format '(tab-bar-format-history
+  (fill-column 80)
+  (indent-tabs-mode nil)
+  (display-line-numbers-width 3)
+  (display-line-numbers-grow-only t)
+  (tab-bar-format '(tab-bar-format-history
                          tab-bar-format-tabs-groups
                          tab-bar-separator
                          tab-bar-format-add-tab
