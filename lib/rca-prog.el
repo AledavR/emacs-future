@@ -8,6 +8,8 @@
   :defer t
   :bind (("C-x t V" . vterm)
          ("C-x t v" . vterm-other-tab))
+  :custom
+  (vterm-shell "/usr/bin/zsh")
   :preface
   (defun vterm-other-tab ()
     (interactive)
@@ -41,7 +43,7 @@
 ;; [[file:../dotemacs.org::*Julia][Julia:1]]
 (use-package julia-mode
   :ensure t
-  :bind-keymap  (("`" . julia-insert-unicode-symbol))
+  ;; :bind-keymap  (("`" . julia-insert-unicode-symbol))
   :init  
   (defvar julia-unicode-symbols-alist
     '((?a . "α") (?b . "β") (?\C-a . "ₐ")
@@ -171,3 +173,28 @@
   :defer t
   :hook (LaTeX-mode . flycheck-mode))
 ;; ~flycheck~:1 ends here
+
+;; [[file:../dotemacs.org::*Typst][Typst:1]]
+(use-package typst-ts-mode
+  :ensure t
+  :custom
+  (typst-ts-preview-function 'find-file-other-window)
+  ;; (typst-ts-watch-options (list "--open"))
+  :config
+  (setq-default eglot-workspace-configuration
+                 '(:projectResolution "lockDatabase" :typstExtraArgs ["main.typ"]))
+  (add-to-list 'treesit-language-source-alist
+               '(typst "https://github.com/uben0/tree-sitter-typst")))
+
+(with-eval-after-load 'eglot
+  (add-to-list 'eglot-server-programs '(typst-ts-mode "tinymist")))
+
+(use-package websocket
+  :ensure t)
+
+(use-package typst-preview
+  :ensure (:host github :repo "havarddj/typst-preview.el")
+  :config
+  (setq typst-preview-browser "chromium")
+  (define-key typst-preview-mode-map (kbd "C-c C-j") 'typst-preview-send-position))
+;; Typst:1 ends here
