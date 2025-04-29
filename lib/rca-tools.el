@@ -316,6 +316,19 @@ For more on chathistory, see:
   :after erc)
 ;; ~erc~:1 ends here
 
+;; [[file:../dotemacs.org::*~gpt.el~][~gpt.el~:1]]
+(use-package gptel
+  :ensure t
+  :config
+  (defun +gptel-get-key (model)
+    (cadr (auth-source-user-and-password model)))
+  (setq gptel-model 'deepseek-reasoner
+        gptel-backend (gptel-make-deepseek
+                       "Deepseek"
+                       :stream t
+                       :key (+gptel-get-key "api.deepseek.com"))))
+;; ~gpt.el~:1 ends here
+
 ;; [[file:../dotemacs.org::*~elfeed~][~elfeed~:1]]
 (use-package elfeed
   :ensure t

@@ -2572,6 +2572,21 @@ This file recreates the Emacs configuration
           (shell buffer)))))
 #+end_src
 
+** ~gpt.el~
+
+#+begin_src emacs-lisp
+  (use-package gptel
+    :ensure t
+    :config
+    (defun +gptel-get-key (model)
+      (cadr (auth-source-user-and-password model)))
+    (setq gptel-model 'deepseek-reasoner
+          gptel-backend (gptel-make-deepseek
+                         "Deepseek"
+                         :stream t
+                         :key (+gptel-get-key "api.deepseek.com"))))
+#+end_src
+
 ** ~elfeed~
 
 #+begin_src emacs-lisp
