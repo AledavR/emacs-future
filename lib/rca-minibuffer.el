@@ -40,8 +40,14 @@
          ("M-s b" . consult-bookmark)
          ("M-s l" . consult-line)
          ("M-s i" . consult-idea)
+         ("M-s r" . consult-ripgrep)
          :map org-mode-map
          ("M-s s" . consult-org-heading))
+  :custom
+  (consult-ripgrep-args (concat "rg --null --line-buffered --color=never "
+                                "--max-columns=1000 --path-separator / "
+                                "--smart-case --no-heading --with-filename "
+                                "--line-number --search-zip  -. -g !.git "))
   :config
   (defun consult-idea (&optional match scope)
     (interactive)
