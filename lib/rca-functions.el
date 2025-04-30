@@ -27,6 +27,9 @@
   (let ((ffap-file-finder #'find-file-other-window))
     (find-file-at-point)))
 
+(defun load-secrets ()
+  (interactive)
+  (load-file (concat user-emacs-directory "secrets.el.gpg")))
 
 (defun rc/insert-wallpaper-file ()
   (interactive)
@@ -40,8 +43,8 @@
 (defun rc/locate-or-create-directory (dir)
   "Search for a directory and create it if doesn't exists"
   (let ((dir_ (locate-user-emacs-file dir)))
-     (when (not (file-directory-p dir_))
-       (make-directory dir_)) dir_))
+    (when (not (file-directory-p dir_))
+      (make-directory dir_)) dir_))
 
 (defun rc/config-insert-footer ()
   (let ((inhibit-message t))

@@ -159,6 +159,9 @@ This file recreates the Emacs configuration
     (let ((ffap-file-finder #'find-file-other-window))
       (find-file-at-point)))
 
+  (defun load-secrets ()
+    (interactive)
+    (load-file (concat user-emacs-directory "secrets.el.gpg")))
 
   (defun rc/insert-wallpaper-file ()
     (interactive)
@@ -172,8 +175,8 @@ This file recreates the Emacs configuration
   (defun rc/locate-or-create-directory (dir)
     "Search for a directory and create it if doesn't exists"
     (let ((dir_ (locate-user-emacs-file dir)))
-       (when (not (file-directory-p dir_))
-         (make-directory dir_)) dir_))
+      (when (not (file-directory-p dir_))
+        (make-directory dir_)) dir_))
 
   (defun rc/config-insert-footer ()
     (let ((inhibit-message t))
@@ -609,6 +612,9 @@ This file recreates the Emacs configuration
         :right-divider-width 10
         :scroll-bar-width 2
         :fringe-width 2))
+    (spacious-padding-subtle-mode-line
+     '( :mode-line-active spacious-padding-subtle-mode-line-active
+        :mode-line-inactive spacious-padding-subtle-mode-line-inactive))
     :config
     ;; (setq-default header-line-format
     ;;               '("%e" mode-line-front-space
@@ -619,7 +625,6 @@ This file recreates the Emacs configuration
     ;; (setq spacious-padding-subtle-mode-line
     ;;       `( :mode-line-active 'default
     ;;          :mode-line-inactive vertical-border))
-
     (spacious-padding-mode 1))
 #+end_src
 
@@ -712,17 +717,17 @@ This file recreates the Emacs configuration
     :ensure t
     :config
     
-    (setq-default mode-line-format
-                  '("%e" mode-line-front-space
-                    (:propertize
-                     ("" mode-line-mule-info mode-line-client mode-line-modified mode-line-remote
-                      mode-line-window-dedicated)
-                     display (min-width (6.0)))
-                    mode-line-frame-identification "   "
-                    mode-line-position (project-mode-line project-mode-line-format)
-                    (vc-mode vc-mode) "  " mode-line-modes mode-line-misc-info mode-line-end-spaces))
+    ;; (setq-default mode-line-format
+    ;;               '("%e" mode-line-front-space
+    ;;                 (:propertize
+    ;;                  ("" mode-line-mule-info mode-line-client mode-line-modified mode-line-remote
+    ;;                   mode-line-window-dedicated)
+    ;;                  display (min-width (6.0)))
+    ;;                 mode-line-frame-identification "   "
+    ;;                 mode-line-position (project-mode-line project-mode-line-format)
+    ;;                 (vc-mode vc-mode) "  " mode-line-modes mode-line-misc-info mode-line-end-spaces))
     
-    (set-face-attribute 'header-line-active nil :inherit 'mode-line-active)
+    ;; (set-face-attribute 'header-line-active nil :inherit 'mode-line-active)
     
     (breadcrumb-mode))
 #+end_src
@@ -2497,18 +2502,6 @@ This file recreates the Emacs configuration
     (erc-track-shorten-start 5)
     (erc-keywords
       '(("'\\([^\n]+\\)' \\[\\([0-9:]+\\)\\]" . erc-keyword-face)))
-    :preface
-    
-    (defun erc-libera ()
-      "Connect to Libera.Chat IRC server."
-      (interactive)
-      (erc-tls
-       :nick "rcaled"
-       :server "rcaled.mooo.com"
-       :port "6697"
-       :user "rcaled/irc.libera.chat@emacs"
-       :password (cadr (auth-source-user-and-password "rcaled.mooo.com" "rcaled"))))
-    
     :config
     (defun erc-give-me-more-irc-history ()
       "Get more history for current IRC buffer (IRCv3 only).
@@ -2577,14 +2570,27 @@ This file recreates the Emacs configuration
 #+begin_src emacs-lisp
   (use-package gptel
     :ensure t
+    :defer t
+    :commands (gptel gptel-send)
+    :custom
+    (gptel-default-mode 'org-mode)
+    (gptel-model 'deepseek-chat)
+    :bind (("M-s g" . rc/find-gptel-file))
     :config
-    (defun +gptel-get-key (model)
-      (cadr (auth-source-user-and-password model)))
-    (setq gptel-model 'deepseek-reasoner
-          gptel-backend (gptel-make-deepseek
-                         "Deepseek"
-                         :stream t
-                         :key (+gptel-get-key "api.deepseek.com"))))
+    (defun rc/find-gptel-file ()
+      "Find config file interactively"
+      (interactive)
+      (find-file (locate-user-emacs-file
+                  (completing-read "Select config file: "
+                                   (directory-files-recursively "~/.sync/archive/llm/" ".*" nil)))))
+    (dolist (directive
+             '((Asistente . "Eres un modelo de lenguaje asistente especializado en programación el cual esta contenido en el editor de texto Emacs. Debes explicar tu respuesta de manera concisa.")
+               (Generador . "Eres un modelo de lenguaje y un programador eficiente. Solo genera código y solo código como única salida sin ningún tipo de texto adicional.")
+               (Matematico . "Eres un modelo de lenguaje y un instructor de matemática. Define de manera concisa los pasos usados en la resolución de problemas. Usa notación Latex con los símbolos \( y \) cuando sea necesario.")))
+      (add-to-list 'gptel-directives directive))
+    (setq gptel-backend (gptel-make-deepseek "Deepseek"
+                          :stream t
+                          :key #'gptel-api-key-from-auth-source)))
 #+end_src
 
 ** ~elfeed~

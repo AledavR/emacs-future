@@ -150,6 +150,9 @@
       :right-divider-width 10
       :scroll-bar-width 2
       :fringe-width 2))
+  (spacious-padding-subtle-mode-line
+   '( :mode-line-active spacious-padding-subtle-mode-line-active
+      :mode-line-inactive spacious-padding-subtle-mode-line-inactive))
   :config
   ;; (setq-default header-line-format
   ;;               '("%e" mode-line-front-space
@@ -160,7 +163,6 @@
   ;; (setq spacious-padding-subtle-mode-line
   ;;       `( :mode-line-active 'default
   ;;          :mode-line-inactive vertical-border))
-
   (spacious-padding-mode 1))
 ;; Spacious-Padding:1 ends here
 
@@ -247,17 +249,17 @@ names an existing file."
   :ensure t
   :config
   
-  (setq-default mode-line-format
-                '("%e" mode-line-front-space
-                  (:propertize
-                   ("" mode-line-mule-info mode-line-client mode-line-modified mode-line-remote
-                    mode-line-window-dedicated)
-                   display (min-width (6.0)))
-                  mode-line-frame-identification "   "
-                  mode-line-position (project-mode-line project-mode-line-format)
-                  (vc-mode vc-mode) "  " mode-line-modes mode-line-misc-info mode-line-end-spaces))
+  ;; (setq-default mode-line-format
+  ;;               '("%e" mode-line-front-space
+  ;;                 (:propertize
+  ;;                  ("" mode-line-mule-info mode-line-client mode-line-modified mode-line-remote
+  ;;                   mode-line-window-dedicated)
+  ;;                  display (min-width (6.0)))
+  ;;                 mode-line-frame-identification "   "
+  ;;                 mode-line-position (project-mode-line project-mode-line-format)
+  ;;                 (vc-mode vc-mode) "  " mode-line-modes mode-line-misc-info mode-line-end-spaces))
   
-  (set-face-attribute 'header-line-active nil :inherit 'mode-line-active)
+  ;; (set-face-attribute 'header-line-active nil :inherit 'mode-line-active)
   
   (breadcrumb-mode))
 ;; Breadcrumb:1 ends here

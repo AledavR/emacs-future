@@ -258,18 +258,6 @@
   (erc-track-shorten-start 5)
   (erc-keywords
     '(("'\\([^\n]+\\)' \\[\\([0-9:]+\\)\\]" . erc-keyword-face)))
-  :preface
-  
-  (defun erc-libera ()
-    "Connect to Libera.Chat IRC server."
-    (interactive)
-    (erc-tls
-     :nick "rcaled"
-     :server "rcaled.mooo.com"
-     :port "6697"
-     :user "rcaled/irc.libera.chat@emacs"
-     :password (cadr (auth-source-user-and-password "rcaled.mooo.com" "rcaled"))))
-  
   :config
   (defun erc-give-me-more-irc-history ()
     "Get more history for current IRC buffer (IRCv3 only).
@@ -319,14 +307,27 @@ For more on chathistory, see:
 ;; [[file:../dotemacs.org::*~gpt.el~][~gpt.el~:1]]
 (use-package gptel
   :ensure t
+  :defer t
+  :commands (gptel gptel-send)
+  :custom
+  (gptel-default-mode 'org-mode)
+  (gptel-model 'deepseek-chat)
+  :bind (("M-s g" . rc/find-gptel-file))
   :config
-  (defun +gptel-get-key (model)
-    (cadr (auth-source-user-and-password model)))
-  (setq gptel-model 'deepseek-reasoner
-        gptel-backend (gptel-make-deepseek
-                       "Deepseek"
-                       :stream t
-                       :key (+gptel-get-key "api.deepseek.com"))))
+  (defun rc/find-gptel-file ()
+    "Find config file interactively"
+    (interactive)
+    (find-file (locate-user-emacs-file
+                (completing-read "Select config file: "
+                                 (directory-files-recursively "~/.sync/archive/llm/" ".*" nil)))))
+  (dolist (directive
+           '((Asistente . "Eres un modelo de lenguaje asistente especializado en programación el cual esta contenido en el editor de texto Emacs. Debes explicar tu respuesta de manera concisa.")
+             (Generador . "Eres un modelo de lenguaje y un programador eficiente. Solo genera código y solo código como única salida sin ningún tipo de texto adicional.")
+             (Matematico . "Eres un modelo de lenguaje y un instructor de matemática. Define de manera concisa los pasos usados en la resolución de problemas. Usa notación Latex con los símbolos \( y \) cuando sea necesario.")))
+    (add-to-list 'gptel-directives directive))
+  (setq gptel-backend (gptel-make-deepseek "Deepseek"
+                        :stream t
+                        :key #'gptel-api-key-from-auth-source)))
 ;; ~gpt.el~:1 ends here
 
 ;; [[file:../dotemacs.org::*~elfeed~][~elfeed~:1]]
