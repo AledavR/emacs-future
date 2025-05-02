@@ -307,7 +307,6 @@ For more on chathistory, see:
 ;; [[file:../dotemacs.org::*~gpt.el~][~gpt.el~:1]]
 (use-package gptel
   :ensure t
-  :defer t
   :commands (gptel gptel-send)
   :custom
   (gptel-default-mode 'org-mode)

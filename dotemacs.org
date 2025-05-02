@@ -2570,7 +2570,6 @@ This file recreates the Emacs configuration
 #+begin_src emacs-lisp
   (use-package gptel
     :ensure t
-    :defer t
     :commands (gptel gptel-send)
     :custom
     (gptel-default-mode 'org-mode)

@@ -170,3 +170,25 @@ commands")
 (defun org-table-test-2 ()
   (interactive)
   (org-table-to-lisp))
+
+
+;;; REGION FORMATING
+
+(defun rc/act-on-region-or-line ()
+  (if mark-active (list (region-beginning) (region-end))
+    (list (line-beginning-position) (line-beginning-position 2))))
+
+(defun rc/delete-whitespace-and-indent (start end)
+  (interactive (rc/act-on-region-or-line))
+  (replace-regexp-in-region "[[:space:]]+" " " start end)
+  (indent-region start end))
+
+(defun rc/fix-semicolon-and-commas (start end)
+  (interactive (rc/act-on-region-or-line))
+  (replace-regexp-in-region "[[:space:]]*\\([,;]\\)" "\\1" start end)
+  (replace-regexp-in-region "\\([,;]\\)\\([[:graph:]]\\)" "\\1 \\2" start end))
+
+(defun rc/format-region-or-line (start end)
+  (interactive (rc/act-on-region-or-line))
+  (rc/delete-whitespace-and-indent start end)
+  (rc/fix-semicolon-and-commas start end))
