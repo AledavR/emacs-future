@@ -94,6 +94,12 @@
   (diminish 'eldoc-mode nil))
 ;; Diminish:1 ends here
 
+;; [[file:../dotemacs.org::*auto-dim][auto-dim:1]]
+(use-package auto-dim-other-buffers
+  :ensure t
+  :init (auto-dim-other-buffers-mode))
+;; auto-dim:1 ends here
+
 ;; [[file:../dotemacs.org::*Themes][Themes:1]]
 (use-package ef-themes
   :ensure t
@@ -103,6 +109,7 @@
           (yuuma ef-tritanopia-light ef-rosa)
           (nazrin2 ef-light ef-owl)
           (youmu ef-elea-light ef-elea-dark)
+          (tsukasa ef-eagle ef-dream)
           (satori ef-trio-light ef-trio-dark)))
   (setq theme-character 'youmu)
   :config
@@ -119,7 +126,7 @@
 ;; [[file:../dotemacs.org::*Circadian][Circadian:1]]
 (use-package circadian
   :ensure t
-  :after (:all ef-themes emacs calendar)
+  :after (:all ef-themes emacs calendar auto-dim-other-buffers)
   :hook
   (server-after-make-frame . (lambda () (enable-theme (car custom-enabled-themes))))
   :config

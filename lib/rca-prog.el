@@ -9,7 +9,7 @@
   :bind (("C-x t V" . vterm)
          ("C-x t v" . vterm-other-tab))
   :custom
-  (vterm-shell "/usr/bin/zsh")
+  (vterm-shell "/usr/bin/fish")
   :preface
   (defun vterm-other-tab ()
     (interactive)

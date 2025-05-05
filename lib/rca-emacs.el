@@ -11,6 +11,7 @@
          ("C-x r v" . view-register)
          ("C-z C-j" . rc/file-find-config)
          ("C-z j" . rc/find-stow-file)
+         ("<f5>" . recompile)
          ("C-x C-z" . nil)
          ("C-x t h" . tab-bar-mode)
          ("M-o" . other-window)

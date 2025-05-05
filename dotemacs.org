@@ -324,6 +324,7 @@ This file recreates the Emacs configuration
            ("C-x r v" . view-register)
            ("C-z C-j" . rc/file-find-config)
            ("C-z j" . rc/find-stow-file)
+           ("<f5>" . recompile)
            ("C-x C-z" . nil)
            ("C-x t h" . tab-bar-mode)
            ("M-o" . other-window)
@@ -547,6 +548,13 @@ This file recreates the Emacs configuration
     (diminish 'which-key-mode nil)
     (diminish 'eldoc-mode nil))
 #+end_src
+** auto-dim
+
+#+begin_src emacs-lisp
+  (use-package auto-dim-other-buffers
+    :ensure t
+    :init (auto-dim-other-buffers-mode))
+#+end_src
 
 ** Themes
 
@@ -559,6 +567,7 @@ This file recreates the Emacs configuration
             (yuuma ef-tritanopia-light ef-rosa)
             (nazrin2 ef-light ef-owl)
             (youmu ef-elea-light ef-elea-dark)
+            (tsukasa ef-eagle ef-dream)
             (satori ef-trio-light ef-trio-dark)))
     (setq theme-character 'youmu)
     :config
@@ -577,7 +586,7 @@ This file recreates the Emacs configuration
 #+begin_src emacs-lisp
   (use-package circadian
     :ensure t
-    :after (:all ef-themes emacs calendar)
+    :after (:all ef-themes emacs calendar auto-dim-other-buffers)
     :hook
     (server-after-make-frame . (lambda () (enable-theme (car custom-enabled-themes))))
     :config
@@ -1117,7 +1126,7 @@ This file recreates the Emacs configuration
     :bind (("C-x t V" . vterm)
            ("C-x t v" . vterm-other-tab))
     :custom
-    (vterm-shell "/usr/bin/zsh")
+    (vterm-shell "/usr/bin/fish")
     :preface
     (defun vterm-other-tab ()
       (interactive)
