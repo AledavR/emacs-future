@@ -179,7 +179,7 @@
 ;; [[file:../dotemacs.org::*~lite~][~lite~:1]]
 (use-package lite
   :ensure (:host github :repo "amno1/lite")
-  :custom (lite-template-dirs (list (expand-file-name "template-files/" user-emacs-directory)))
+  :custom (lite-template-dirs (list (expand-file-name "~/.sync/templates/files/")))
   :config
   (defun lite-insert-template-in-current-file (template-file-name)
     "Insert contents of TEMPLATE-FILE-NAME into `current-buffer'"

@@ -569,7 +569,7 @@ This file recreates the Emacs configuration
             (youmu ef-elea-light ef-elea-dark)
             (tsukasa ef-eagle ef-dream)
             (satori ef-trio-light ef-trio-dark)))
-    (setq theme-character 'youmu)
+    (setq theme-character 'tsukasa)
     :config
     (setq ef-themes-mixed-fonts t)
     (setq ef-themes-headings
@@ -1602,7 +1602,7 @@ This file recreates the Emacs configuration
 #+begin_src emacs-lisp
   (use-package lite
     :ensure (:host github :repo "amno1/lite")
-    :custom (lite-template-dirs (list (expand-file-name "template-files/" user-emacs-directory)))
+    :custom (lite-template-dirs (list (expand-file-name "~/.sync/templates/files/")))
     :config
     (defun lite-insert-template-in-current-file (template-file-name)
       "Insert contents of TEMPLATE-FILE-NAME into `current-buffer'"
@@ -1733,7 +1733,7 @@ This file recreates the Emacs configuration
     :ensure t
     :defer t
     :custom
-    (skeletor-user-directory "~/.sync/skeletons/")
+    (skeletor-user-directory "~/.sync/templates/skeletons/")
     (skeletor-project-directory "~/Files/Documents/workspace/")
     (skeletor-completing-read-function 'completing-read)
     :config

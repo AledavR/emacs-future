@@ -26,7 +26,7 @@
   :ensure t
   :defer t
   :custom
-  (skeletor-user-directory "~/.sync/skeletons/")
+  (skeletor-user-directory "~/.sync/templates/skeletons/")
   (skeletor-project-directory "~/Files/Documents/workspace/")
   (skeletor-completing-read-function 'completing-read)
   :config
