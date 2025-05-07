@@ -169,4 +169,15 @@
                                  (car lite-template-dirs))
                                ".*"))))
     (lite-generate-from-template (file-name-nondirectory template-file-name) (buffer-file-name))
-    (revert-buffer t t)))
+    (revert-buffer t t))
+
+  (defun lite-insert-template-at-point (template-file-name)
+    "Insert contents of TEMPLATE-FILE-NAME at point"
+    (interactive
+     (list (completing-read
+            "Template file: " (directory-files-recursively
+                               (if (length> lite-template-dirs 1)
+                                   (completing-read "Select directory: " lite-template-dirs)
+                                 (car lite-template-dirs))
+                               ".*"))))
+    (lite-insert-template (file-name-nondirectory template-file-name))))
