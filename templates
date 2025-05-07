@@ -3,6 +3,9 @@ fundamental-mode
 (mail (insert (plist-get (car (auth-source-search :host "info")) :email)))
 (hoy (format-time-string "%d-%m-%Y"))
 (hoyf (rc/format-time-string-es "%d de %B del %Y"))
+(box (make-string 2  (string-to-char comment-start)) " ┌─" (make-string (length str) ?─) "─┐" n
+     (make-string 2  (string-to-char comment-start)) " │ " (s str)                       " │" n
+     (make-string 2  (string-to-char comment-start)) " └─" (make-string (length str) ?─) "─┘" n)
 
 org-mode
 
@@ -32,3 +35,7 @@ typst-ts-mode :when (not (texmathp))
 
 (mm "$" q "$")
 (dm "$ " q " $")
+
+LaTeX-mode
+(frame "% ↓8<--------------- frame start -------------->8↓" n n r n n
+       "% ↑8<--------------- frame end ---------------->8↑" n)
