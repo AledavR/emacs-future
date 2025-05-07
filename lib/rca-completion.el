@@ -1,15 +1,11 @@
-;; [[file:../dotemacs.org::*Completion][Completion:1]]
+;; -*- lexical-binding: t; -*-
 (provide 'rca-completion)
-;; Completion:1 ends here
 
-;; [[file:../dotemacs.org::*Completion general options][Completion general options:1]]
 (use-package emacs
   :custom
   (tab-always-indent 'complete)
   (text-mode-ispell-word-completion nil))
-;; Completion general options:1 ends here
 
-;; [[file:../dotemacs.org::*~tempel~][~tempel~:1]]
 ;; Configure Tempel
 (use-package tempel
   :ensure t
@@ -57,9 +53,7 @@
   ;; :preface (eglot-tempel-mode)
   :init
   (eglot-tempel-mode t))
-;; ~tempel~:1 ends here
 
-;; [[file:../dotemacs.org::*~corfu~][~corfu~:1]]
 (use-package corfu
   :ensure t
   :bind
@@ -82,9 +76,7 @@
   (corfu-auto t)
   (corfu-cycle t)
   (corfu-quit-no-match 'separator))
-;; ~corfu~:1 ends here
 
-;; [[file:../dotemacs.org::*Icons][Icons:1]]
 (use-package kind-icon
   :ensure t
   :after corfu
@@ -95,9 +87,7 @@
   :config
   (add-hook 'after-enable-theme-hook  #'kind-icon-reset-cache)
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
-;; Icons:1 ends here
 
-;; [[file:../dotemacs.org::*~cape~][~cape~:1]]
 (use-package cape
   :ensure t
   :init
@@ -128,9 +118,7 @@
   (add-to-list 'completion-at-point-functions #'cape-keyword)
   (add-to-list 'completion-at-point-functions #'cape-file)
   (add-to-list 'completion-at-point-functions #'cape-elisp-block))
-;; ~cape~:1 ends here
 
-;; [[file:../dotemacs.org::*~dabbrev~][~dabbrev~:1]]
 (use-package dabbrev
   :bind (("C-." . dabbrev-expand)
          ("C-:" . dabbrev-completion))
@@ -140,32 +128,24 @@
   (add-to-list 'dabbrev-ignored-buffer-modes 'doc-view-mode)
   (add-to-list 'dabbrev-ignored-buffer-modes 'pdf-view-mode)
   (add-to-list 'dabbrev-ignored-buffer-modes 'tags-table-mode))
-;; ~dabbrev~:1 ends here
 
-;; [[file:../dotemacs.org::*~smartparens~][~smartparens~:1]]
 (use-package smartparens
   :ensure t
   :hook (prog-mode org-mode)
   :config
   (require 'smartparens-config))
-;; ~smartparens~:1 ends here
 
-;; [[file:../dotemacs.org::*~jinx~][~jinx~:1]]
 (use-package jinx
   :ensure t
   :hook (org-mode . jinx-mode)
   :bind (("M-$" . jinx-correct)
          ("C-M-$" . jinx-languages))
   :custom (jinx-languages "es estec en_US"))
-;; ~jinx~:1 ends here
 
-;; [[file:../dotemacs.org::*~vundo~][~vundo~:1]]
 (use-package vundo
   :ensure t
   :bind ("C-x u" . vundo))
-;; ~vundo~:1 ends here
 
-;; [[file:../dotemacs.org::*~eldoc~][~eldoc~:1]]
 (use-package eldoc-box
   :ensure t
   :custom
@@ -174,12 +154,10 @@
   :bind (("M-ñ" . eldoc-box-help-at-point)
          ("M-n" . eldoc-box-scroll-up)
          ("M-p" . eldoc-box-scroll-down)))
-;; ~eldoc~:1 ends here
 
-;; [[file:../dotemacs.org::*~lite~][~lite~:1]]
 (use-package lite
   :ensure (:host github :repo "amno1/lite")
-  :custom (lite-template-dirs (list (expand-file-name "~/.sync/templates/files/")))
+  :custom (lite-template-dirs (list  (concat sync-directory "templates/files/")))
   :config
   (defun lite-insert-template-in-current-file (template-file-name)
     "Insert contents of TEMPLATE-FILE-NAME into `current-buffer'"
@@ -192,4 +170,3 @@
                                ".*"))))
     (lite-generate-from-template (file-name-nondirectory template-file-name) (buffer-file-name))
     (revert-buffer t t)))
-;; ~lite~:1 ends here

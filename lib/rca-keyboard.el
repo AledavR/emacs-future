@@ -1,8 +1,6 @@
-;; [[file:../dotemacs.org::*Input][Input:1]]
+;; -*- lexical-binding: t; -*-
 (provide 'rca-keyboard)
-;; Input:1 ends here
 
-;; [[file:../dotemacs.org::*~meow~][~meow~:1]]
 (use-package meow
   :ensure t
   :config
@@ -178,4 +176,3 @@
   ;; (when (featurep 'corfu)
   ;;   (add-hook 'meow-insert-exit-hook 'corfu-quit))
   (meow-global-mode 1))
-;; ~meow~:1 ends here

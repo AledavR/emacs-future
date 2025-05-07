@@ -1,8 +1,6 @@
-;; [[file:../dotemacs.org::*Programming environment][Programming environment:1]]
+;; -*- lexical-binding: t; -*-
 (provide 'rca-prog)
-;; Programming environment:1 ends here
 
-;; [[file:../dotemacs.org::*Terminal][Terminal:1]]
 (use-package vterm
   :ensure t
   :defer t
@@ -21,15 +19,11 @@
             (switch-to-buffer-other-tab buffer))
         (other-tab-prefix)
         (vterm buffer)))))
-;; Terminal:1 ends here
 
-;; [[file:../dotemacs.org::*Gnu plot][Gnu plot:1]]
 (use-package gnuplot
   :ensure t
   :defer t)
-;; Gnu plot:1 ends here
 
-;; [[file:../dotemacs.org::*LUA][LUA:1]]
 (use-package lua-mode
   :ensure t
   :defer t)
@@ -38,12 +32,12 @@
 ;;   :ensure nil
 ;;   :mode "\\.lua\\'"
 ;;   :bind-keymap (("C-c C-c" . lua-send-buffer)))
-;; LUA:1 ends here
 
-;; [[file:../dotemacs.org::*Julia][Julia:1]]
 (use-package julia-mode
   :ensure t
-  ;; :bind-keymap  (("`" . julia-insert-unicode-symbol))
+  :bind  (:map
+          julia-mode-map
+          ("`" . julia-insert-unicode-symbol))
   :init  
   (defvar julia-unicode-symbols-alist
     '((?a . "α") (?b . "β") (?\C-a . "ₐ")
@@ -63,9 +57,7 @@
   :ensure t
   :defer t
   :hook (julia-mode . julia-snail-mode))
-;; Julia:1 ends here
 
-;; [[file:../dotemacs.org::*Python][Python:1]]
 (use-package python-mode
   :ensure nil
   :defer t
@@ -77,15 +69,11 @@
           python-shell-interpreter interpreter))
   :config
   (setq-default python-eldoc-get-doc nil))
-;; Python:1 ends here
 
-;; [[file:../dotemacs.org::*Markdown][Markdown:1]]
 (use-package markdown-mode
   :ensure t
   :defer t)
-;; Markdown:1 ends here
 
-;; [[file:../dotemacs.org::*HTML][HTML:1]]
 (use-package mhtml-mode
   :ensure nil
   :defer t
@@ -108,9 +96,7 @@
               ("M-o" . nil)
               ("C-c f" . facemenu-keymap)
               ("C-c d" . sgml-delete-tagged-text)))
-;; HTML:1 ends here
 
-;; [[file:../dotemacs.org::*Tree-sitter][Tree-sitter:1]]
 (use-package treesit
   :ensure nil
   :custom
@@ -146,9 +132,7 @@
 (use-package yaml-ts-mode
   :ensure nil
   :mode "\\.yml\\'")
-;; Tree-sitter:1 ends here
 
-;; [[file:../dotemacs.org::*~eglot~][~eglot~:1]]
 (use-package eglot
   :ensure nil
   :defer t
@@ -165,16 +149,12 @@
       (if url
           (browse-url-xdg-open url)
         (message "No URL found at point")))))
-;; ~eglot~:1 ends here
 
-;; [[file:../dotemacs.org::*~flycheck~][~flycheck~:1]]
 (use-package flycheck
   :ensure t
   :defer t
   :hook (LaTeX-mode . flycheck-mode))
-;; ~flycheck~:1 ends here
 
-;; [[file:../dotemacs.org::*Typst][Typst:1]]
 (use-package typst-ts-mode
   :ensure t
   :custom
@@ -197,4 +177,3 @@
   :config
   (setq typst-preview-browser "chromium")
   (define-key typst-preview-mode-map (kbd "C-c C-j") 'typst-preview-send-position))
-;; Typst:1 ends here

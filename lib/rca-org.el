@@ -1,8 +1,6 @@
-;; [[file:../dotemacs.org::*Org-mode][Org-mode:1]]
+;; -*- lexical-binding: t; -*-
 (provide 'rca-org)
-;; Org-mode:1 ends here
 
-;; [[file:../dotemacs.org::*Org general options][Org general options:1]]
 (use-package org
   :ensure nil
   :bind (("C-z C-a" . org-agenda)
@@ -16,14 +14,13 @@
          (org-babel-after-execute . org-redisplay-inline-images)
          (org-babel-after-execute . org-toggle-inline-images))
   :custom
-  (org-agenda-files '("~/.sync/archive/agenda/"))
+  (org-agenda-files `(,(concat sync-directory "archive/agenda/")))
   (org-log-done 'time)
   (org-confirm-babel-evaluate nil)
   (org-agenda-skip-deadline-if-done t)
   (org-src-window-setup 'other-frame)
   (org-agenda-skip-scheduled-if-done t)
   (org-agenda-skip-scheduled-repeats-after-deadline t)
-  ;; (org-highlight-latex-and-related '(latex script entities))
   (org-highlight-latex-and-related '(native))
   (org-image-actual-width nil)
   (org-fold-catch-invisible-edits 'show-and-error)
@@ -146,19 +143,17 @@
       (org-table-next-field)))
 
   )
-;; Org general options:1 ends here
 
-;; [[file:../dotemacs.org::*Org-capture][Org-capture:1]]
 (use-package org-capture
   :ensure nil
   :after org
   :bind (("C-z C-c" . org-capture)
          ("C-z C-l" . org-store-link))
-  :preface
-  (defvar my/org-academic-agenda "~/.sync/archive/agenda/academic.org")
-  (defvar my/org-personal-agenda "~/.sync/archive/agenda/personal.org")
-  (defvar my/org-idea-notebook "~/.sync/archive/notebooks/ideas.org")
-  (defvar my/org-dream-diary "~/.sync/archive/notebooks/dreams.org")
+  :init
+  (defvar my/org-academic-agenda  (concat (car org-agenda-files) "academic.org"))
+  (defvar my/org-personal-agenda (concat (car org-agenda-files) "personal.org"))
+  (defvar my/org-idea-notebook (concat sync-directory "archive/notebooks/ideas.org"))
+  (defvar my/org-dream-diary (concat sync-directory "archive/notebooks/dreams.org"))
   
   (defvar my/org-created-property
     "\n:PROPERTIES:\n:CREATED: [%<%Y-%m-%d %a %H:%M>]\n:END:")
@@ -185,23 +180,21 @@
   :custom
   (org-capture-templates `(
                            ("a" "academic task")
-                           ("ae" "exam" entry (file+headline my/org-academic-agenda "Exam"), (concat "* TODO %^{Exam} %^g\nSCHEDULED: %^T" my/org-created-property) :empty-lines 1)
-                           ("ap" "project" entry (file+headline my/org-academic-agenda "Project"), (concat "* TODO %^{Project} %^g\nDEADLINE:%^T" my/org-created-property) :empty-lines 1)
-                           ("ah" "homework" entry (file+headline my/org-academic-agenda "Homework"), (concat "* TODO %^{Homework} %^g\nDEADLINE:%^T" my/org-created-property) :empty-lines 1)
+                           ("ae" "exam" entry (file+headline my/org-academic-agenda "Exam") ,(concat "* TODO %^{Exam} %^g\nSCHEDULED: %^T" my/org-created-property) :empty-lines 1)
+                           ("ap" "project" entry (file+headline my/org-academic-agenda "Project") ,(concat "* TODO %^{Project} %^g\nDEADLINE:%^T" my/org-created-property) :empty-lines 1)
+                           ("ah" "homework" entry (file+headline my/org-academic-agenda "Homework") ,(concat "* TODO %^{Homework} %^g\nDEADLINE:%^T" my/org-created-property) :empty-lines 1)
                            ("p" "personal task")
-                           ("pc" "constructive" entry (file+headline my/org-personal-agenda "Constructive"), (concat "* TODO %^{Task}\nDEADLINE: %^T" my/org-created-property) :empty-lines 1)
-                           ("pm" "mundane" entry (file+headline my/org-personal-agenda "Mundane"), (concat "* TODO %^{Task}\nDEADLINE: %^T" my/org-created-property) :empty-lines 1)
+                           ("pc" "constructive" entry (file+headline my/org-personal-agenda "Constructive") ,(concat "* TODO %^{Task}\nDEADLINE: %^T" my/org-created-property) :empty-lines 1)
+                           ("pm" "mundane" entry (file+headline my/org-personal-agenda "Mundane") ,(concat "* TODO %^{Task}\nDEADLINE: %^T" my/org-created-property) :empty-lines 1)
                            ("n" "note")
-                           ("ni" "idea" entry (file my/org-idea-notebook), (concat "* %^{Idea}" my/org-created-property "\n%?") :empty-lines 1)
-                           ("nd" "dream" entry (file my/org-dream-diary), (concat"* %^{Dream}" my/org-created-property "\n%?") :empty-lines 1)
+                           ("ni" "idea" entry (file my/org-idea-notebook) ,(concat "* %^{Idea}" my/org-created-property "\n%?") :empty-lines 1)
+                           ("nd" "dream" entry (file my/org-dream-diary) ,(concat"* %^{Dream}" my/org-created-property "\n%?") :empty-lines 1)
                            ("i" "ideas management")
-                           ("ic" "make constructive task from idea" entry (file+headline my/org-personal-agenda "Constructive"), (concat "* TODO %a \nDEADLINE %^T" my/org-created-property "\n%?") :empty-lines 1)
-                           ("im" "make mundane task from idea" entry (file+headline my/org-personal-agenda "Mundane"), (concat "* TODO %a \nDEADLINE %^T" my/org-created-property "\n%?") :empty-lines 1)
+                           ("ic" "make constructive task from idea" entry (file+headline my/org-personal-agenda "Constructive") ,(concat "* TODO %a \nDEADLINE %^T" my/org-created-property "\n%?") :empty-lines 1)
+                           ("im" "make mundane task from idea" entry (file+headline my/org-personal-agenda "Mundane") ,(concat "* TODO %a \nDEADLINE %^T" my/org-created-property "\n%?") :empty-lines 1)
                            ))
   )
-;; Org-capture:1 ends here
 
-;; [[file:../dotemacs.org::*Org export options][Org export options:1]]
 (use-package org
   :ensure nil
   :config
@@ -233,9 +226,7 @@ are exported to a filename derived from the headline text."
              (unless export-file (org-delete-property "EXPORT_FILE_NAME"))
              (set-buffer-modified-p modifiedp)))
          "-noexport" 'region-start-level)))))
-;; Org export options:1 ends here
 
-;; [[file:../dotemacs.org::*Org export packages][Org export packages:1]]
 (use-package htmlize
   :ensure t)
 
@@ -246,9 +237,7 @@ are exported to a filename derived from the headline text."
    '((lua-filter . "pagebreak.lua")
      (standalone . t)
      (highlight-style . "tango"))))
-;; Org export packages:1 ends here
 
-;; [[file:../dotemacs.org::*Org latex preview][Org latex preview:1]]
 (use-package org-latex-preview
   :config
   ;; Increase preview width
@@ -323,4 +312,3 @@ are exported to a filename derived from the headline text."
                    #'my/org-latex-preview-center)
       (remove-hook 'org-latex-preview-overlay-open-functions
                    #'my/org-latex-preview-uncenter))))
-;; Org latex preview:1 ends here

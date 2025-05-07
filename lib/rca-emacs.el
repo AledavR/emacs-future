@@ -1,4 +1,4 @@
-;; [[file:../dotemacs.org::*Emacs module][Emacs module:1]]
+;; -*- lexical-binding: t; -*-
 (provide 'rca-emacs)
 
 (use-package emacs
@@ -23,36 +23,14 @@
          ("M-`" . nil)
          ("<insert>" . nil)
          ("<menu>" . nil))
-
-  :preface
-  (setq history-excluded-filetypes '(".*gz" ".*pdf" "bookmarks" "recentf"
-    			             "init.el" ".*gitignore" "early-init.el"
-    			             ".*log" ".*png" ".*jpg" ".*mp4" ".*gif" ".*tmp/lua.*"
-    			             ".*agenda/.*" ".*mod/.*" ".*lib/.*" ".*ext/.*" ".*_db"))
-  (setq temporal-directory
-        (locate-user-emacs-file "temporal/"))
-  (setq snippets-directory
-        (locate-user-emacs-file "snippets/"))
-  (setq backup-directory
-        (rc/locate-or-create-directory  "saves/"))
-  (setq undo-history-directory
-        (rc/locate-or-create-directory  "undohist/"))
-  (setq recentf-file
-        (locate-user-emacs-file  "recentf"))
-  (setq emacs-config-files-dirs
-        '("" "lib/"))
-  (setq stow-files
-        (concat (getenv "HOME") "/dotfiles/"))
-  (put 'eval 'safe-local-variable #'booleanp)
   :custom
-  ;; (initial-buffer-choice t)
-  (recentf-save-file recentf-file)
   (initial-scratch-message nil)
   (inhibit-initial-startup-message t)
   (ring-bell-function 'ignore)
   (dired-listing-switches "-alh")
   (column-number-mode t)
   (blink-cursor-mode nil)
+  (which-key-mode t)
   (help-window-select t)
   (use-dialog-box nil)
   (auto-save-default nil)
@@ -61,36 +39,40 @@
   (history-length 25)
   (auto-save-list-file-prefix nil)
   (backup-directory-alist `(("." . ,backup-directory)))
+  (recentf-save-file (concat user-cache-directory "recentf"))
   (recentf-exclude history-excluded-filetypes)
+  (tramp-persistency-file-name (concat user-cache-directory "tramp"))
+  (project-list-file (concat user-cache-directory "projects"))
+  (bookmark-default-file (concat user-cache-directory "bookmarks"))
+  (savehist-file (concat user-cache-directory "history"))
+  (savehist-additional-variables (list 'register-alist))
   (x-select-enable-clipboard t)
-  (read-file-name-completion-ignore-case t)
+  ;; (read-file-name-completion-ignore-case t)
   (async-shell-command-buffer 'confirm-kill-process)
   (server-client-instructions nil)
-  (savehist-additional-variables (list 'register-alist))
   (register-use-preview t)
   (vc-follow-symlinks nil)
-  (auth-sources
-   '("~/.sync/.authinfo.gpg" "~/.authinfo.gpg" "~/.authinfo"))
+  (auth-sources `(,(concat sync-directory ".authinfo.gpg") "~/.authinfo.gpg" "~/.authinfo"))
+  (custom-file (expand-file-name "custom.el" user-emacs-directory))
   :config
-  (setq emacs-config-files
-        (rc/list-merge-sublists
-         (mapcar (lambda (dir)
-                   (rc/list-append-str
-                    dir (rc/file-get-el
-                         (concat user-emacs-directory dir))))
-                 emacs-config-files-dirs)))
+  (setq history-excluded-filetypes '(".*gz" ".*pdf" "bookmarks" "recentf" "init.el"
+                                     ".*gitignore" "early-init.el" ".*log" ".*png"
+                                     ".*jpg" ".*mp4" ".*gif" ".*tmp/lua.*"
+                                     ".*agenda/.*" ".*mod/.*" ".*lib/.*" ".*ext/.*"
+                                     ".*_db"))
+  (defalias 'yes-or-no-p 'y-or-n-p)
   (recentf-mode 1)
   (savehist-mode 1)
   (global-auto-revert-mode 1)
-  (defalias 'yes-or-no-p 'y-or-n-p)
   (add-hook 'prog-mode-hook 'display-line-numbers-mode)
   (add-hook 'shell-mode-hook 'rc/truncate-lines-off)
-  (setq-default custom-file
-                (expand-file-name "custom.el" user-emacs-directory))
+  
   (when (file-exists-p custom-file)
     (load custom-file))
-  (when (not (file-exists-p temporal-directory))
-    (make-directory temporal-directory))
+  (when (not (file-exists-p user-cache-directory))
+    (make-directory user-cache-directory))
+  (when (not (file-exists-p backup-directory))
+    (make-directory backup-directory))
   
   (defun +save-n-kill-buffer-delete-frame ()
     (interactive)
@@ -106,8 +88,6 @@
     "Major mode for display faces in greentext stories. Derived from `text-mode'."
     (setq font-lock-defaults '(greentext-font-lock))
     (olivetti-mode))
-
-  ;; (add-to-list 'default-frame-alist '(height . 37))
   )
 
 (use-package calendar
@@ -115,7 +95,6 @@
   :bind (("<f6> c" . calendar))
   :mode ("diary" . diary-mode)
   :custom
-  (diary-file "~/.sync/archive/agenda/diary")
   (calendar-latitude -12.0)
   (calendar-longitude -77.1)
   (calendar-mark-diary-entries-flag t)
@@ -124,4 +103,3 @@
   (holiday-bahai-holidays nil)
   (holiday-hebrew-holidays nil)
   (holiday-islamic-holidays nil))
-;; Emacs module:1 ends here

@@ -1,4 +1,4 @@
-;; [[file:../dotemacs.org::*Tex][Tex:1]]
+;; -*- lexical-binding: t; -*-
 (provide 'rca-tex)
 
 (defvar rc/latex-subdir-plural
@@ -60,9 +60,7 @@ input"
       (left-char 1))))
 
 (advice-add 'LaTeX-insert-item :after #'rc/latex-array-separation)
-;; Tex:1 ends here
 
-;; [[file:../dotemacs.org::*~auctex~][~auctex~:1]]
 (use-package tex
   :ensure auctex
   :after pdf-tools
@@ -166,9 +164,7 @@ input"
               (,(kbd "C-x C-s") . +save-n-kill-buffer-delete-frame)
               )
     (advice-add 'texmathp :around #'+LaTeX-math-texmathp-advice)))
-;; ~auctex~:1 ends here
 
-;; [[file:../dotemacs.org::*~cdlatex~][~cdlatex~:1]]
 (use-package cdlatex
   :ensure t
   :defer t
@@ -242,9 +238,7 @@ input"
           ("C-<return>" . nil)
           ("´" . cdlatex-math-symbol)
           ("<tab>" . cdlatex-tab)))
-;; ~cdlatex~:1 ends here
 
-;; [[file:../dotemacs.org::*~pdf-tools~][~pdf-tools~:1]]
 (use-package pdf-tools
   :ensure t
   ;; :defer t
@@ -276,4 +270,3 @@ when deactivating presentation-mode")
   (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
   (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
   (define-key pdf-view-mode-map (kbd "C-r") 'isearch-backward))
-;; ~pdf-tools~:1 ends here

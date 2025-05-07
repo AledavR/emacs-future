@@ -1,8 +1,6 @@
-;; [[file:../dotemacs.org::*User interface][User interface:1]]
+;; -*- lexical-binding: t; -*-
 (provide 'rca-ui)
-;; User interface:1 ends here
 
-;; [[file:../dotemacs.org::*User interface general options][User interface general options:1]]
 (use-package emacs
   :ensure nil
   :init
@@ -19,14 +17,12 @@
   (display-line-numbers-width 3)
   (display-line-numbers-grow-only t)
   (tab-bar-format '(tab-bar-format-history
-                         tab-bar-format-tabs-groups
-                         tab-bar-separator
-                         tab-bar-format-add-tab
-                         tab-bar-format-align-right
-                         tab-bar-format-global)))
-;; User interface general options:1 ends here
+                    tab-bar-format-tabs-groups
+                    tab-bar-separator
+                    tab-bar-format-add-tab
+                    tab-bar-format-align-right
+                    tab-bar-format-global)))
 
-;; [[file:../dotemacs.org::*Buffer display options][Buffer display options:1]]
 (use-package emacs
   :ensure nil
   :config
@@ -37,8 +33,7 @@
         (apply orig-fun args))))
   (advice-add 'org-babel-detangle :around #'org-babel-detangle-no-buffer-pop-up)
   (setq display-buffer-alist
-        '(
-          ((derived-mode . shell-mode)
+        '(((derived-mode . shell-mode)
            (display-buffer-reuse-mode-window
             display-buffer-below-selected)
            (window-height . 12)
@@ -74,33 +69,24 @@
            (side . right)
            (dedicated . t)
            (window-width . 0.25)))))
-;; Buffer display options:1 ends here
 
-;; [[file:../dotemacs.org::*User interface variables][User interface variables:1]]
 (use-package emacs
   :ensure nil
   :init
-  (defcustom wallpaper-files
-    (concat (getenv "HOME") "/.sync/pix/wallpaper/")
+  (defcustom wallpaper-files (concat sync-directory "pix/wallpaper")
     "Folder where wallpaper files are stored."
     :type 'directory))
-;; User interface variables:1 ends here
 
-;; [[file:../dotemacs.org::*Diminish][Diminish:1]]
 (use-package diminish
   :ensure t
   :config
   (diminish 'which-key-mode nil)
   (diminish 'eldoc-mode nil))
-;; Diminish:1 ends here
 
-;; [[file:../dotemacs.org::*auto-dim][auto-dim:1]]
 (use-package auto-dim-other-buffers
   :ensure t
   :init (auto-dim-other-buffers-mode))
-;; auto-dim:1 ends here
 
-;; [[file:../dotemacs.org::*Themes][Themes:1]]
 (use-package ef-themes
   :ensure t
   :init
@@ -121,9 +107,7 @@
           (agenda-date . (1.3))
           (agenda-structure . (1.8))
           (t . (1.1)))))
-;; Themes:1 ends here
 
-;; [[file:../dotemacs.org::*Circadian][Circadian:1]]
 (use-package circadian
   :ensure t
   :after (:all ef-themes emacs calendar auto-dim-other-buffers)
@@ -136,16 +120,12 @@
     (setq circadian-themes `((:sunrise . ,sunrise)
                              (:sunset . ,sunset))))
   (circadian-setup))
-;; Circadian:1 ends here
 
-;; [[file:../dotemacs.org::*Olivetti][Olivetti:1]]
 (use-package olivetti
   :ensure t
   :hook (Info-mode . olivetti-mode)
   :custom (olivetti-body-width 110))
-;; Olivetti:1 ends here
 
-;; [[file:../dotemacs.org::*Spacious-Padding][Spacious-Padding:1]]
 (use-package spacious-padding
   :ensure t
   :custom
@@ -171,9 +151,7 @@
   ;;       `( :mode-line-active 'default
   ;;          :mode-line-inactive vertical-border))
   (spacious-padding-mode 1))
-;; Spacious-Padding:1 ends here
 
-;; [[file:../dotemacs.org::*Dashboard][Dashboard:1]]
 (defun my-inhibit-startup-screen-file ()
   "Startup screen inhibitor for `command-line-functions`.
 Inhibits startup screen on the first unrecognised option which
@@ -243,15 +221,11 @@ names an existing file."
         (lambda () (get-buffer-create "*dashboard*"))))
   ;; :config
   ;; (add-hook server-after-make-frame-hook 'revert-buffer))
-;; Dashboard:1 ends here
 
-;; [[file:../dotemacs.org::*Rainbow mode][Rainbow mode:1]]
 (use-package rainbow-mode
   :ensure t
   :defer t)
-;; Rainbow mode:1 ends here
 
-;; [[file:../dotemacs.org::*Breadcrumb][Breadcrumb:1]]
 (use-package breadcrumb
   :ensure t
   :config
@@ -269,4 +243,3 @@ names an existing file."
   ;; (set-face-attribute 'header-line-active nil :inherit 'mode-line-active)
   
   (breadcrumb-mode))
-;; Breadcrumb:1 ends here

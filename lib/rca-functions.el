@@ -1,24 +1,48 @@
-;; [[file:../dotemacs.org::*Custom functions][Custom functions:1]]
+;; -*- lexical-binding: t; -*-
 (provide 'rca-functions)
-;; Custom functions:1 ends here
 
-;; [[file:../dotemacs.org::*File manipulation][File manipulation:1]]
-(defun rc/file-find-config ()
-  "Find config file interactively"
-  (interactive)
-  (find-file (locate-user-emacs-file
-              (completing-read "Select config file: " emacs-config-files))))
+(defun rc/list-append-str (string list &optional position)
+  "Appends a string to each element of a list.
+If POSITION is nil appends to the beginning of each element."
+  (mapcar (lambda (element)
+            (if position
+                (concat element string)
+              (concat string element)))
+          list))
+
+(defun rc/list-merge-sublists (list)
+  "Merge all the sublists in a list"
+  (let (value)
+    (dolist (elt list value)
+      (setq value (append value elt)))))
+
+(defun rc/list-select-random (items)
+  "Selects a random element from a list"
+  (let* ((size (length items))
+         (index (random size)))
+    (nth index items)))
 
 (defun rc/file-get-el (dir)
   "Get all elisp files from a directory"
   (directory-files dir nil "^[^.].*el$"))
+
+(defun rc/file-find-config ()
+  "Find config file interactively"
+  (interactive)
+  (find-file
+   (locate-user-emacs-file
+    (completing-read
+     "Select config file: "
+     (rc/list-merge-sublists
+      (mapcar (lambda (dir) (rc/list-append-str dir (rc/file-get-el (concat user-emacs-directory dir))))
+              emacs-config-dirs))))))
 
 (defun rc/find-stow-file ()
   (interactive)
   (find-file
    (completing-read "Select config file: "
                     (directory-files-recursively
-                     stow-files ".*" nil
+                     dotfiles-dirs ".*" nil
                      (lambda (dir)
                        (not (string-match-p ".*git.*" dir)))))))
 
@@ -51,32 +75,7 @@
     (goto-char (point-max))
     (insert "\n;; Local Variables:\n;; eval: (add-hook 'after-save-hook (lambda ()(org-babel-detangle)) nil t)\n;; End:")
     (save-buffer)))
-;; File manipulation:1 ends here
 
-;; [[file:../dotemacs.org::*List manipulation][List manipulation:1]]
-(defun rc/list-append-str (string list &optional position)
-  "Appends a string to each element of a list.
-If POSITION is nil appends to the beginning of each element."
-  (mapcar (lambda (element)
-            (if position
-                (concat element string)
-              (concat string element)))
-          list))
-
-(defun rc/list-merge-sublists (list)
-  "Merge all the sublists in a list"
-  (let (value)
-    (dolist (elt list value)
-      (setq value (append value elt)))))
-
-(defun rc/list-select-random (items)
-  "Selects a random element from a list"
-  (let* ((size (length items))
-         (index (random size)))
-    (nth index items)))
-;; List manipulation:1 ends here
-
-;; [[file:../dotemacs.org::*Miscellaneous][Miscellaneous:1]]
 (defun rc/number-between (number bot top)
   "Determines if a number is within a range"
   (if (< number top)
@@ -168,4 +167,3 @@ If POSITION is nil appends to the beginning of each element."
                     end-month end-day year)
        (or (cl-some (lambda (p) (= p (calendar-day-of-week date)))
                     days-of-week))))
-;; Miscellaneous:1 ends here

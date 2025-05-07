@@ -1,4 +1,4 @@
-;; [[file:../dotemacs.org::*Package management][Package management:1]]
+;; -*- lexical-binding: t; -*-
 (provide 'package-manager)
 
 (defvar elpaca-installer-version 0.11)
@@ -52,4 +52,3 @@
 
 (unless (equal system-type 'gnu/linux)
   (elpaca-no-symlink-mode))
-;; Package management:1 ends here

@@ -1,8 +1,6 @@
-;; [[file:../dotemacs.org::*Tools][Tools:1]]
+;; -*- lexical-binding: t; -*-
 (provide 'rca-tools)
-;; Tools:1 ends here
 
-;; [[file:../dotemacs.org::*~ebuku~][~ebuku~:1]]
 (use-package ebuku
   :ensure t
   :defer t
@@ -12,27 +10,25 @@
   (ebuku-title-face ((t (:inherit font-lock-constant-face))))
   :custom
   (ebuku-results-limit 25))
-;; ~ebuku~:1 ends here
 
-;; [[file:../dotemacs.org::*~denote~][~denote~:1]]
 (use-package denote
-    :ensure t
-    :custom
-    (denote-known-keywords '("matematica" "informatica"))
-    (denote-directory "~/.sync/archive/notes")
-    (denote-dired-directories '("~/.sync/archive/notes" "~/.sync/archive/journal" "~/.sync/archive/posts"))
-    :init
-    (defvar-keymap denote-prefix-map
-      :doc "Denote commands"
-      "n" #'denote
-      "o" #'denote-open-or-create
-      "l" #'denote-link
-      "L" #'denote-link-or-create
-      "s" #'denote-grep)
-    (defalias 'denote-prefix denote-prefix-map)
-    :config
-    (setq denote-org-front-matter
-          "#+title:      %s
+  :ensure t
+  :custom
+  (denote-known-keywords '("matematica" "informatica"))
+  (denote-directory (concat sync-directory "archive/notes"))
+  (denote-dired-directories (mapcar (lambda (dir) (concat sync-directory "archive/" dir )) '("notes" "journal" "posts")))
+  :init
+  (defvar-keymap denote-prefix-map
+    :doc "Denote commands"
+    "n" #'denote
+    "o" #'denote-open-or-create
+    "l" #'denote-link
+    "L" #'denote-link-or-create
+    "s" #'denote-grep)
+  (defalias 'denote-prefix denote-prefix-map)
+  :config
+  (setq denote-org-front-matter
+        "#+title:      %s
 #+date:       %s
 #+filetags:   %s
 #+identifier: %s
@@ -40,19 +36,17 @@
 #+startup:    nofold
 #+startup:    hideblocks
 \n")
-    (add-hook 'dired-mode-hook 'denote-dired-mode-in-directories)
-    (global-set-key (kbd "C-z C-n") 'denote-prefix))
+  (add-hook 'dired-mode-hook 'denote-dired-mode-in-directories)
+  (global-set-key (kbd "C-z C-n") 'denote-prefix))
 
-  (use-package denote-journal
-    :ensure t
-    :defer t
-    :bind (:map denote-prefix-map ("j" . denote-journal-new-or-existing-entry))
-    :custom
-    (denote-journal-title-format 'day-date-month-year)
-    (denote-journal-directory "~/.sync/archive/journal"))
-;; ~denote~:1 ends here
+(use-package denote-journal
+  :ensure t
+  :defer t
+  :bind (:map denote-prefix-map ("j" . denote-journal-new-or-existing-entry))
+  :custom
+  (denote-journal-title-format 'day-date-month-year)
+  (denote-journal-directory  (concat sync-directory "archive/journal")))
 
-;; [[file:../dotemacs.org::*~embark~][~embark~:1]]
 (use-package embark
   :ensure t
   :bind (("C-c o" . embark-act)
@@ -71,9 +65,7 @@
 
 (use-package embark-consult
   :ensure t)
-;; ~embark~:1 ends here
 
-;; [[file:../dotemacs.org::*~citar~][~citar~:1]]
 (use-package citar
   :ensure t
   :bind (("C-z c o" . citar-open)
@@ -87,7 +79,7 @@
   (org-cite-activate-processor 'citar)
   :config
   (let ((documents-path (xdg-user-dir "DOCUMENTS"))
-        (archive-path "~/.sync/archive/bibliography/"))
+        (archive-path (concat sync-directory "archive/bibliography/")))
     (setq org-cite-global-bibliography
           (mapcar (lambda (entry) (concat archive-path entry)) '("articles.bib" "books.bib")))
     (setq citar-library-paths
@@ -134,15 +126,13 @@
               ("F" . +citar-open-file-externally))
   :config
   (citar-embark-mode))
-;; ~citar~:1 ends here
 
-;; [[file:../dotemacs.org::*~ebib~][~ebib~:1]]
 (use-package ebib
   :ensure t
   :defer t
   :bind (("C-z c b" . ebib))
   :custom
-  (ebib-preload-bib-files '("~/.sync/archive/bibliography/articles.bib" "~/.sync/archive/bibliography/books.bib"))
+  (ebib-preload-bib-files (mapcar (lambda (file) (concat sync-directory "archive/bibliography/" file)) '("articles.bib" "books.bib")))
   (ebib-file-search-dirs '("~/Files/Documents/library/articles" "~/Files/Documents/library/books"))
   (ebib-file-associations '(("ps" . "gv")))
   :config
@@ -160,9 +150,7 @@
     (interactive)
     (browse-url (format "https://scholar.google.com/scholar?q=%s"
                         (ebib-get-field-value "title" (ebib--get-key-at-point) ebib--cur-db nil t)))))
-;; ~ebib~:1 ends here
 
-;; [[file:../dotemacs.org::*~alert~][~alert~:1]]
 (use-package alert
   :ensure t
   :config
@@ -199,9 +187,7 @@
   (setq org-wild-notifier-alert-time '(4320 2880 1440 720 360 180 120 60 15 5 1))
   ;; (setq org-wild-notifier-keyword-whitelist nil)
   (org-wild-notifier-mode))
-;; ~alert~:1 ends here
 
-;; [[file:../dotemacs.org::*~dired~][~dired~:1]]
 (use-package dired
   :ensure nil
   :hook (dired-mode . dired-hide-details-mode)
@@ -210,9 +196,7 @@
 (use-package dired-narrow
   :ensure t
   :bind (:map dired-mode-map ("\/" . dired-narrow)))
-;; ~dired~:1 ends here
 
-;; [[file:../dotemacs.org::*0x0][0x0:1]]
 (use-package 0x0
   :ensure t
   :config
@@ -240,9 +224,7 @@
            (size (file-attribute-size (file-attributes file-name)))
            (resp (0x0--send server file-name)))
       (0x0--handle-resp server size resp))))
-;; 0x0:1 ends here
 
-;; [[file:../dotemacs.org::*~erc~][~erc~:1]]
 (use-package erc
   :ensure nil
   :defer t
@@ -302,9 +284,7 @@ For more on chathistory, see:
   :ensure (:host codeberg :repo "mekeor/consult-erc")
   :bind (("M-s e" . consult-erc-dwim))
   :after erc)
-;; ~erc~:1 ends here
 
-;; [[file:../dotemacs.org::*~gpt.el~][~gpt.el~:1]]
 (use-package gptel
   :ensure t
   :commands (gptel gptel-send)
@@ -318,7 +298,7 @@ For more on chathistory, see:
     (interactive)
     (find-file (locate-user-emacs-file
                 (completing-read "Select config file: "
-                                 (directory-files-recursively "~/.sync/archive/llm/" ".*" nil)))))
+                                 (directory-files-recursively (concat sync-directory "archive/llm/") ".*" nil)))))
   (dolist (directive
            '((Asistente . "Eres un modelo de lenguaje asistente especializado en programación el cual esta contenido en el editor de texto Emacs. Debes explicar tu respuesta de manera concisa.")
              (Generador . "Eres un modelo de lenguaje y un programador eficiente. Solo genera código y solo código como única salida sin ningún tipo de texto adicional.")
@@ -327,9 +307,7 @@ For more on chathistory, see:
   (setq gptel-backend (gptel-make-deepseek "Deepseek"
                         :stream t
                         :key #'gptel-api-key-from-auth-source)))
-;; ~gpt.el~:1 ends here
 
-;; [[file:../dotemacs.org::*~elfeed~][~elfeed~:1]]
 (use-package elfeed
   :ensure t
   :defer t
@@ -344,4 +322,3 @@ For more on chathistory, see:
                   ("https://www.localfirstnews.com/rss/" programming)
                   ("https://www.youtube.com/feeds/videos.xml?channel_id=UCiiTssXxklIDeDBWq0tPHUA" youtube music)
                   )))
-;; ~elfeed~:1 ends here

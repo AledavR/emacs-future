@@ -1,7 +1,7 @@
 # -*- ispell-dictionary: "en_US"; -*-
 #+TITLE: Emacs Config
 #+STARTUP: show3levels
-#+PROPERTY: header-args :comments link :tangle yes :mkdirp yes :results none :noweb yes
+#+PROPERTY: header-args :tangle yes :mkdirp yes :results none
 
 This file recreates the Emacs configuration
 
@@ -10,13 +10,14 @@ This file recreates the Emacs configuration
 :header-args: :tangle early-init.el
 :END:
 #+begin_src emacs-lisp
+  ;; -*- lexical-binding: t; -*-
   (setopt package-enable-at-startup nil)
 
   (setopt gc-cons-threshold most-positive-fixnum)
   (add-hook 'emacs-startup-hook
             (lambda ()
               (setq gc-cons-threshold (* 16 1024 1024))))
-  
+
   (scroll-bar-mode -1)
   (tool-bar-mode -1)
   (menu-bar-mode -1)
@@ -28,6 +29,7 @@ This file recreates the Emacs configuration
 :END:
 
 #+begin_src emacs-lisp
+  ;; -*- lexical-binding: t; -*-
   (provide 'package-manager)
 
   (defvar elpaca-installer-version 0.11)
@@ -76,7 +78,7 @@ This file recreates the Emacs configuration
     :defer
     :ensure `(org :repo "https://code.tecosaur.net/tec/org-mode.git/"
                   :branch "dev"))
-
+  
   (elpaca-wait)
 
   (unless (equal system-type 'gnu/linux)
@@ -89,13 +91,14 @@ This file recreates the Emacs configuration
 :END:
 
 #+begin_src emacs-lisp
+  ;; -*- lexical-binding: t; -*-
   (mapc (lambda(string)
           (add-to-list 'load-path (locate-user-emacs-file string)))
         '("ext" "lib"))
 
   (require 'package-manager)
 
-  (require 'rca-macros)
+  (require 'rca-variables)
   (require 'rca-functions)
   (require 'rca-ui)
   (require 'rca-emacs)
@@ -109,18 +112,33 @@ This file recreates the Emacs configuration
   (require 'rca-tools)
 #+end_src
 
-* Macros
+* Custom variables
 :PROPERTIES:
-:header-args+: :tangle lib/rca-macros.el
+:header-args+: :tangle lib/rca-variables.el
 :END:
 
 #+begin_src emacs-lisp
-  (provide 'rca-macros)
+  ;; -*- lexical-binding: t; -*-
+  (provide 'rca-variables)
+#+end_src
 
-  (defmacro toggle-p (var)
-    "Toggles a boolean variable"
-    `(if (booleanp ,var) 
-         (setq ,var (not ,var))))
+** Directories
+
+#+begin_src emacs-lisp
+  (defcustom sync-directory (expand-file-name "~/.sync/")
+    "Directory where synchonized files are stored")
+
+  (defcustom user-cache-directory (locate-user-emacs-file "cache/")
+    "Directory where temporal user files are stored")
+
+  (defcustom backup-directory (concat user-cache-directory "saves/")
+    "Directory where backup files are stored")
+
+  (defcustom emacs-config-dirs '("" "lib/" "ext/")
+    "Directories where emacs configuration files are stored")
+
+  (defcustom dotfiles-dirs (expand-file-name "~/dotfiles/")
+    "Directory where user configuration files are stored")
 #+end_src
 
 * Custom functions
@@ -129,28 +147,59 @@ This file recreates the Emacs configuration
 :END:
 
 #+begin_src emacs-lisp
+  ;; -*- lexical-binding: t; -*-
   (provide 'rca-functions)
+#+end_src
+
+** List manipulation
+
+#+begin_src emacs-lisp
+  (defun rc/list-append-str (string list &optional position)
+    "Appends a string to each element of a list.
+  If POSITION is nil appends to the beginning of each element."
+    (mapcar (lambda (element)
+              (if position
+                  (concat element string)
+                (concat string element)))
+            list))
+
+  (defun rc/list-merge-sublists (list)
+    "Merge all the sublists in a list"
+    (let (value)
+      (dolist (elt list value)
+        (setq value (append value elt)))))
+
+  (defun rc/list-select-random (items)
+    "Selects a random element from a list"
+    (let* ((size (length items))
+           (index (random size)))
+      (nth index items)))
 #+end_src
 
 ** File manipulation
 
 #+begin_src emacs-lisp
-  (defun rc/file-find-config ()
-    "Find config file interactively"
-    (interactive)
-    (find-file (locate-user-emacs-file
-                (completing-read "Select config file: " emacs-config-files))))
-
   (defun rc/file-get-el (dir)
     "Get all elisp files from a directory"
     (directory-files dir nil "^[^.].*el$"))
+
+  (defun rc/file-find-config ()
+    "Find config file interactively"
+    (interactive)
+    (find-file
+     (locate-user-emacs-file
+      (completing-read
+       "Select config file: "
+       (rc/list-merge-sublists
+        (mapcar (lambda (dir) (rc/list-append-str dir (rc/file-get-el (concat user-emacs-directory dir))))
+                emacs-config-dirs))))))
 
   (defun rc/find-stow-file ()
     (interactive)
     (find-file
      (completing-read "Select config file: "
                       (directory-files-recursively
-                       stow-files ".*" nil
+                       dotfiles-dirs ".*" nil
                        (lambda (dir)
                          (not (string-match-p ".*git.*" dir)))))))
 
@@ -183,31 +232,6 @@ This file recreates the Emacs configuration
       (goto-char (point-max))
       (insert "\n;; Local Variables:\n;; eval: (add-hook 'after-save-hook (lambda ()(org-babel-detangle)) nil t)\n;; End:")
       (save-buffer)))
-#+end_src
-
-** List manipulation
-
-#+begin_src emacs-lisp
-  (defun rc/list-append-str (string list &optional position)
-    "Appends a string to each element of a list.
-  If POSITION is nil appends to the beginning of each element."
-    (mapcar (lambda (element)
-              (if position
-                  (concat element string)
-                (concat string element)))
-            list))
-
-  (defun rc/list-merge-sublists (list)
-    "Merge all the sublists in a list"
-    (let (value)
-      (dolist (elt list value)
-        (setq value (append value elt)))))
-
-  (defun rc/list-select-random (items)
-    "Selects a random element from a list"
-    (let* ((size (length items))
-           (index (random size)))
-      (nth index items)))
 #+end_src
 
 ** Miscellaneous
@@ -312,6 +336,7 @@ This file recreates the Emacs configuration
 :END:
 
 #+begin_src emacs-lisp
+  ;; -*- lexical-binding: t; -*-
   (provide 'rca-emacs)
 
   (use-package emacs
@@ -336,36 +361,14 @@ This file recreates the Emacs configuration
            ("M-`" . nil)
            ("<insert>" . nil)
            ("<menu>" . nil))
-
-    :preface
-    (setq history-excluded-filetypes '(".*gz" ".*pdf" "bookmarks" "recentf"
-      			             "init.el" ".*gitignore" "early-init.el"
-      			             ".*log" ".*png" ".*jpg" ".*mp4" ".*gif" ".*tmp/lua.*"
-      			             ".*agenda/.*" ".*mod/.*" ".*lib/.*" ".*ext/.*" ".*_db"))
-    (setq temporal-directory
-          (locate-user-emacs-file "temporal/"))
-    (setq snippets-directory
-          (locate-user-emacs-file "snippets/"))
-    (setq backup-directory
-          (rc/locate-or-create-directory  "saves/"))
-    (setq undo-history-directory
-          (rc/locate-or-create-directory  "undohist/"))
-    (setq recentf-file
-          (locate-user-emacs-file  "recentf"))
-    (setq emacs-config-files-dirs
-          '("" "lib/"))
-    (setq stow-files
-          (concat (getenv "HOME") "/dotfiles/"))
-    (put 'eval 'safe-local-variable #'booleanp)
     :custom
-    ;; (initial-buffer-choice t)
-    (recentf-save-file recentf-file)
     (initial-scratch-message nil)
     (inhibit-initial-startup-message t)
     (ring-bell-function 'ignore)
     (dired-listing-switches "-alh")
     (column-number-mode t)
     (blink-cursor-mode nil)
+    (which-key-mode t)
     (help-window-select t)
     (use-dialog-box nil)
     (auto-save-default nil)
@@ -374,36 +377,40 @@ This file recreates the Emacs configuration
     (history-length 25)
     (auto-save-list-file-prefix nil)
     (backup-directory-alist `(("." . ,backup-directory)))
+    (recentf-save-file (concat user-cache-directory "recentf"))
     (recentf-exclude history-excluded-filetypes)
+    (tramp-persistency-file-name (concat user-cache-directory "tramp"))
+    (project-list-file (concat user-cache-directory "projects"))
+    (bookmark-default-file (concat user-cache-directory "bookmarks"))
+    (savehist-file (concat user-cache-directory "history"))
+    (savehist-additional-variables (list 'register-alist))
     (x-select-enable-clipboard t)
-    (read-file-name-completion-ignore-case t)
+    ;; (read-file-name-completion-ignore-case t)
     (async-shell-command-buffer 'confirm-kill-process)
     (server-client-instructions nil)
-    (savehist-additional-variables (list 'register-alist))
     (register-use-preview t)
     (vc-follow-symlinks nil)
-    (auth-sources
-     '("~/.sync/.authinfo.gpg" "~/.authinfo.gpg" "~/.authinfo"))
+    (auth-sources `(,(concat sync-directory ".authinfo.gpg") "~/.authinfo.gpg" "~/.authinfo"))
+    (custom-file (expand-file-name "custom.el" user-emacs-directory))
     :config
-    (setq emacs-config-files
-          (rc/list-merge-sublists
-           (mapcar (lambda (dir)
-                     (rc/list-append-str
-                      dir (rc/file-get-el
-                           (concat user-emacs-directory dir))))
-                   emacs-config-files-dirs)))
+    (setq history-excluded-filetypes '(".*gz" ".*pdf" "bookmarks" "recentf" "init.el"
+                                       ".*gitignore" "early-init.el" ".*log" ".*png"
+                                       ".*jpg" ".*mp4" ".*gif" ".*tmp/lua.*"
+                                       ".*agenda/.*" ".*mod/.*" ".*lib/.*" ".*ext/.*"
+                                       ".*_db"))
+    (defalias 'yes-or-no-p 'y-or-n-p)
     (recentf-mode 1)
     (savehist-mode 1)
     (global-auto-revert-mode 1)
-    (defalias 'yes-or-no-p 'y-or-n-p)
     (add-hook 'prog-mode-hook 'display-line-numbers-mode)
     (add-hook 'shell-mode-hook 'rc/truncate-lines-off)
-    (setq-default custom-file
-                  (expand-file-name "custom.el" user-emacs-directory))
+    
     (when (file-exists-p custom-file)
       (load custom-file))
-    (when (not (file-exists-p temporal-directory))
-      (make-directory temporal-directory))
+    (when (not (file-exists-p user-cache-directory))
+      (make-directory user-cache-directory))
+    (when (not (file-exists-p backup-directory))
+      (make-directory backup-directory))
     
     (defun +save-n-kill-buffer-delete-frame ()
       (interactive)
@@ -419,8 +426,6 @@ This file recreates the Emacs configuration
       "Major mode for display faces in greentext stories. Derived from `text-mode'."
       (setq font-lock-defaults '(greentext-font-lock))
       (olivetti-mode))
-
-    ;; (add-to-list 'default-frame-alist '(height . 37))
     )
 
   (use-package calendar
@@ -428,7 +433,6 @@ This file recreates the Emacs configuration
     :bind (("<f6> c" . calendar))
     :mode ("diary" . diary-mode)
     :custom
-    (diary-file "~/.sync/archive/agenda/diary")
     (calendar-latitude -12.0)
     (calendar-longitude -77.1)
     (calendar-mark-diary-entries-flag t)
@@ -446,6 +450,7 @@ This file recreates the Emacs configuration
 :END:
 
 #+begin_src emacs-lisp
+  ;; -*- lexical-binding: t; -*-
   (provide 'rca-ui)
 #+end_src
 
@@ -468,11 +473,11 @@ This file recreates the Emacs configuration
     (display-line-numbers-width 3)
     (display-line-numbers-grow-only t)
     (tab-bar-format '(tab-bar-format-history
-                           tab-bar-format-tabs-groups
-                           tab-bar-separator
-                           tab-bar-format-add-tab
-                           tab-bar-format-align-right
-                           tab-bar-format-global)))
+                      tab-bar-format-tabs-groups
+                      tab-bar-separator
+                      tab-bar-format-add-tab
+                      tab-bar-format-align-right
+                      tab-bar-format-global)))
 #+end_src
 
 ** Buffer display options
@@ -488,8 +493,7 @@ This file recreates the Emacs configuration
           (apply orig-fun args))))
     (advice-add 'org-babel-detangle :around #'org-babel-detangle-no-buffer-pop-up)
     (setq display-buffer-alist
-          '(
-            ((derived-mode . shell-mode)
+          '(((derived-mode . shell-mode)
              (display-buffer-reuse-mode-window
               display-buffer-below-selected)
              (window-height . 12)
@@ -533,8 +537,7 @@ This file recreates the Emacs configuration
   (use-package emacs
     :ensure nil
     :init
-    (defcustom wallpaper-files
-      (concat (getenv "HOME") "/.sync/pix/wallpaper/")
+    (defcustom wallpaper-files (concat sync-directory "pix/wallpaper")
       "Folder where wallpaper files are stored."
       :type 'directory))
 #+end_src
@@ -747,6 +750,7 @@ This file recreates the Emacs configuration
 :END:
 
 #+begin_src emacs-lisp
+  ;; -*- lexical-binding: t; -*-
   (provide 'rca-org)
 #+end_src
 
@@ -765,14 +769,13 @@ This file recreates the Emacs configuration
            (org-babel-after-execute . org-redisplay-inline-images)
            (org-babel-after-execute . org-toggle-inline-images))
     :custom
-    (org-agenda-files '("~/.sync/archive/agenda/"))
+    (org-agenda-files `(,(concat sync-directory "archive/agenda/")))
     (org-log-done 'time)
     (org-confirm-babel-evaluate nil)
     (org-agenda-skip-deadline-if-done t)
     (org-src-window-setup 'other-frame)
     (org-agenda-skip-scheduled-if-done t)
     (org-agenda-skip-scheduled-repeats-after-deadline t)
-    ;; (org-highlight-latex-and-related '(latex script entities))
     (org-highlight-latex-and-related '(native))
     (org-image-actual-width nil)
     (org-fold-catch-invisible-edits 'show-and-error)
@@ -904,11 +907,11 @@ This file recreates the Emacs configuration
     :after org
     :bind (("C-z C-c" . org-capture)
            ("C-z C-l" . org-store-link))
-    :preface
-    (defvar my/org-academic-agenda "~/.sync/archive/agenda/academic.org")
-    (defvar my/org-personal-agenda "~/.sync/archive/agenda/personal.org")
-    (defvar my/org-idea-notebook "~/.sync/archive/notebooks/ideas.org")
-    (defvar my/org-dream-diary "~/.sync/archive/notebooks/dreams.org")
+    :init
+    (defvar my/org-academic-agenda  (concat (car org-agenda-files) "academic.org"))
+    (defvar my/org-personal-agenda (concat (car org-agenda-files) "personal.org"))
+    (defvar my/org-idea-notebook (concat sync-directory "archive/notebooks/ideas.org"))
+    (defvar my/org-dream-diary (concat sync-directory "archive/notebooks/dreams.org"))
     
     (defvar my/org-created-property
       "\n:PROPERTIES:\n:CREATED: [%<%Y-%m-%d %a %H:%M>]\n:END:")
@@ -935,18 +938,18 @@ This file recreates the Emacs configuration
     :custom
     (org-capture-templates `(
                              ("a" "academic task")
-                             ("ae" "exam" entry (file+headline my/org-academic-agenda "Exam"), (concat "* TODO %^{Exam} %^g\nSCHEDULED: %^T" my/org-created-property) :empty-lines 1)
-                             ("ap" "project" entry (file+headline my/org-academic-agenda "Project"), (concat "* TODO %^{Project} %^g\nDEADLINE:%^T" my/org-created-property) :empty-lines 1)
-                             ("ah" "homework" entry (file+headline my/org-academic-agenda "Homework"), (concat "* TODO %^{Homework} %^g\nDEADLINE:%^T" my/org-created-property) :empty-lines 1)
+                             ("ae" "exam" entry (file+headline my/org-academic-agenda "Exam") ,(concat "* TODO %^{Exam} %^g\nSCHEDULED: %^T" my/org-created-property) :empty-lines 1)
+                             ("ap" "project" entry (file+headline my/org-academic-agenda "Project") ,(concat "* TODO %^{Project} %^g\nDEADLINE:%^T" my/org-created-property) :empty-lines 1)
+                             ("ah" "homework" entry (file+headline my/org-academic-agenda "Homework") ,(concat "* TODO %^{Homework} %^g\nDEADLINE:%^T" my/org-created-property) :empty-lines 1)
                              ("p" "personal task")
-                             ("pc" "constructive" entry (file+headline my/org-personal-agenda "Constructive"), (concat "* TODO %^{Task}\nDEADLINE: %^T" my/org-created-property) :empty-lines 1)
-                             ("pm" "mundane" entry (file+headline my/org-personal-agenda "Mundane"), (concat "* TODO %^{Task}\nDEADLINE: %^T" my/org-created-property) :empty-lines 1)
+                             ("pc" "constructive" entry (file+headline my/org-personal-agenda "Constructive") ,(concat "* TODO %^{Task}\nDEADLINE: %^T" my/org-created-property) :empty-lines 1)
+                             ("pm" "mundane" entry (file+headline my/org-personal-agenda "Mundane") ,(concat "* TODO %^{Task}\nDEADLINE: %^T" my/org-created-property) :empty-lines 1)
                              ("n" "note")
-                             ("ni" "idea" entry (file my/org-idea-notebook), (concat "* %^{Idea}" my/org-created-property "\n%?") :empty-lines 1)
-                             ("nd" "dream" entry (file my/org-dream-diary), (concat"* %^{Dream}" my/org-created-property "\n%?") :empty-lines 1)
+                             ("ni" "idea" entry (file my/org-idea-notebook) ,(concat "* %^{Idea}" my/org-created-property "\n%?") :empty-lines 1)
+                             ("nd" "dream" entry (file my/org-dream-diary) ,(concat"* %^{Dream}" my/org-created-property "\n%?") :empty-lines 1)
                              ("i" "ideas management")
-                             ("ic" "make constructive task from idea" entry (file+headline my/org-personal-agenda "Constructive"), (concat "* TODO %a \nDEADLINE %^T" my/org-created-property "\n%?") :empty-lines 1)
-                             ("im" "make mundane task from idea" entry (file+headline my/org-personal-agenda "Mundane"), (concat "* TODO %a \nDEADLINE %^T" my/org-created-property "\n%?") :empty-lines 1)
+                             ("ic" "make constructive task from idea" entry (file+headline my/org-personal-agenda "Constructive") ,(concat "* TODO %a \nDEADLINE %^T" my/org-created-property "\n%?") :empty-lines 1)
+                             ("im" "make mundane task from idea" entry (file+headline my/org-personal-agenda "Mundane") ,(concat "* TODO %a \nDEADLINE %^T" my/org-created-property "\n%?") :empty-lines 1)
                              ))
     )
 
@@ -1009,21 +1012,22 @@ This file recreates the Emacs configuration
     (org-highlight-latex-and-related '(latex script entities))
     (org-latex-compiler "lualatex")
     (org-pretty-entities-include-sub-superscripts nil)
+    (org-latex-listings 'minted)
+    (org-latex-packages-alist '(("" "minted")))
+    (org-latex-pdf-process
+     '("lualatex -shell-escape -interaction nonstopmode %f"
+       "lualatex -shell-escape -interaction nonstopmode %f"))
     :config
-    (setq org-latex-listings 'minted
-          org-latex-packages-alist '(("" "minted")))
-    (setq org-latex-pdf-process
-          '("lualatex -shell-escape -interaction nonstopmode %f"
-            "lualatex -shell-escape -interaction nonstopmode %f"))
-    (setq luamagick '(luamagick :programs ("lualatex" "magick")
-                                :description "pdf > png"
-                                :message "you need to install lualatex and imagemagick."
-                                :use-xcolor t
-                                :image-input-type "pdf"
-                                :image-output-type "png"
-                                :image-size-adjust (1.0 . 1.0)
-                                :latex-compiler ("lualatex -interaction nonstopmode -output-directory %o %f")
-                                :image-converter ("magick convert -density %D -trim -antialias %f -quality 100 %O")))
+    (setq luamagick '(luamagick
+                      :programs ("lualatex" "magick")
+                      :description "pdf > png"
+                      :message "you need to install lualatex and imagemagick."
+                      :use-xcolor t
+                      :image-input-type "pdf"
+                      :image-output-type "png"
+                      :image-size-adjust (1.0 . 1.0)
+                      :latex-compiler ("lualatex -interaction nonstopmode -output-directory %o %f")
+                      :image-converter ("magick convert -density %D -trim -antialias %f -quality 100 %O")))
     (add-to-list 'org-preview-latex-process-alist luamagick)
     (setq org-preview-latex-default-process 'luamagick)
     (setq org-preview-latex-default-process 'imagemagick)
@@ -1114,10 +1118,11 @@ This file recreates the Emacs configuration
 :END:
 
 #+begin_src emacs-lisp
+  ;; -*- lexical-binding: t; -*-
   (provide 'rca-prog)
 #+end_src
 
-** Terminal
+** ~vterm~
 
 #+begin_src emacs-lisp
   (use-package vterm
@@ -1140,7 +1145,7 @@ This file recreates the Emacs configuration
           (vterm buffer)))))
 #+end_src
 
-** Gnu plot
+** GNU plot
 
 #+begin_src emacs-lisp
   (use-package gnuplot
@@ -1166,7 +1171,9 @@ This file recreates the Emacs configuration
 #+begin_src emacs-lisp
   (use-package julia-mode
     :ensure t
-    ;; :bind-keymap  (("`" . julia-insert-unicode-symbol))
+    :bind  (:map
+            julia-mode-map
+            ("`" . julia-insert-unicode-symbol))
     :init  
     (defvar julia-unicode-symbols-alist
       '((?a . "α") (?b . "β") (?\C-a . "ₐ")
@@ -1370,6 +1377,7 @@ This file recreates the Emacs configuration
 :END:
 
 #+begin_src emacs-lisp
+  ;; -*- lexical-binding: t; -*-
   (provide 'rca-completion)
 #+end_src
 
@@ -1446,9 +1454,6 @@ This file recreates the Emacs configuration
     ;; :preface (eglot-tempel-mode)
     :init
     (eglot-tempel-mode t))
-
-
-
 #+end_src
 
 ** ~corfu~
@@ -1560,7 +1565,7 @@ This file recreates the Emacs configuration
                 ("C-." . nil))
     :config
     (setq ispell-program-name "aspell"
-  	ispell-personal-dictionary "~/.sync/dict/aspell_es"
+  	ispell-personal-dictionary  (concat sync-directory "dict/aspell_es")
   	ispell-dictionary "es")
     :hook (org-mode . flyspell-mode))
 #+end_src
@@ -1602,7 +1607,7 @@ This file recreates the Emacs configuration
 #+begin_src emacs-lisp
   (use-package lite
     :ensure (:host github :repo "amno1/lite")
-    :custom (lite-template-dirs (list (expand-file-name "~/.sync/templates/files/")))
+    :custom (lite-template-dirs (list  (concat sync-directory "templates/files/")))
     :config
     (defun lite-insert-template-in-current-file (template-file-name)
       "Insert contents of TEMPLATE-FILE-NAME into `current-buffer'"
@@ -1623,6 +1628,7 @@ This file recreates the Emacs configuration
 :END:
 
 #+begin_src emacs-lisp
+  ;; -*- lexical-binding: t; -*-
   (provide 'rca-minibuffer)
 #+end_src
 
@@ -1698,6 +1704,7 @@ This file recreates the Emacs configuration
 :END:
 
 #+begin_src emacs-lisp
+  ;; -*- lexical-binding: t; -*-
   (provide 'rca-project)
 #+end_src
 
@@ -1706,7 +1713,11 @@ This file recreates the Emacs configuration
 #+begin_src emacs-lisp
   (use-package transient
     :ensure t
-    :defer t)
+    :defer t
+    :custom
+    (transient-history-file (concat user-cache-directory "transient/history.el"))
+    (transient-levels-file (concat user-cache-directory "transient/levels.el"))
+    (transient-values-file (concat user-cache-directory "transient/values.el")))
 #+end_src
 
 ** ~llama~
@@ -1733,7 +1744,7 @@ This file recreates the Emacs configuration
     :ensure t
     :defer t
     :custom
-    (skeletor-user-directory "~/.sync/templates/skeletons/")
+    (skeletor-user-directory (concat sync-directory "templates/skeletons/"))
     (skeletor-project-directory "~/Files/Documents/workspace/")
     (skeletor-completing-read-function 'completing-read)
     :config
@@ -1754,6 +1765,7 @@ This file recreates the Emacs configuration
 :END:
 
 #+begin_src emacs-lisp
+  ;; -*- lexical-binding: t; -*-
   (provide 'rca-keyboard)
 #+end_src
 
@@ -1943,6 +1955,7 @@ This file recreates the Emacs configuration
 :END:
 
 #+begin_src emacs-lisp
+  ;; -*- lexical-binding: t; -*-
   (provide 'rca-tex)
 
   (defvar rc/latex-subdir-plural
@@ -2234,6 +2247,7 @@ This file recreates the Emacs configuration
 :END:
 
 #+begin_src emacs-lisp
+  ;; -*- lexical-binding: t; -*-
   (provide 'rca-tools)
 #+end_src
 
@@ -2254,24 +2268,24 @@ This file recreates the Emacs configuration
 ** ~denote~
 
 #+begin_src emacs-lisp
-    (use-package denote
-      :ensure t
-      :custom
-      (denote-known-keywords '("matematica" "informatica"))
-      (denote-directory "~/.sync/archive/notes")
-      (denote-dired-directories '("~/.sync/archive/notes" "~/.sync/archive/journal" "~/.sync/archive/posts"))
-      :init
-      (defvar-keymap denote-prefix-map
-        :doc "Denote commands"
-        "n" #'denote
-        "o" #'denote-open-or-create
-        "l" #'denote-link
-        "L" #'denote-link-or-create
-        "s" #'denote-grep)
-      (defalias 'denote-prefix denote-prefix-map)
-      :config
-      (setq denote-org-front-matter
-            "#+title:      %s
+  (use-package denote
+    :ensure t
+    :custom
+    (denote-known-keywords '("matematica" "informatica"))
+    (denote-directory (concat sync-directory "archive/notes"))
+    (denote-dired-directories (mapcar (lambda (dir) (concat sync-directory "archive/" dir )) '("notes" "journal" "posts")))
+    :init
+    (defvar-keymap denote-prefix-map
+      :doc "Denote commands"
+      "n" #'denote
+      "o" #'denote-open-or-create
+      "l" #'denote-link
+      "L" #'denote-link-or-create
+      "s" #'denote-grep)
+    (defalias 'denote-prefix denote-prefix-map)
+    :config
+    (setq denote-org-front-matter
+          "#+title:      %s
   ,#+date:       %s
   ,#+filetags:   %s
   ,#+identifier: %s
@@ -2279,16 +2293,16 @@ This file recreates the Emacs configuration
   ,#+startup:    nofold
   ,#+startup:    hideblocks
   \n")
-      (add-hook 'dired-mode-hook 'denote-dired-mode-in-directories)
-      (global-set-key (kbd "C-z C-n") 'denote-prefix))
+    (add-hook 'dired-mode-hook 'denote-dired-mode-in-directories)
+    (global-set-key (kbd "C-z C-n") 'denote-prefix))
 
-    (use-package denote-journal
-      :ensure t
-      :defer t
-      :bind (:map denote-prefix-map ("j" . denote-journal-new-or-existing-entry))
-      :custom
-      (denote-journal-title-format 'day-date-month-year)
-      (denote-journal-directory "~/.sync/archive/journal"))
+  (use-package denote-journal
+    :ensure t
+    :defer t
+    :bind (:map denote-prefix-map ("j" . denote-journal-new-or-existing-entry))
+    :custom
+    (denote-journal-title-format 'day-date-month-year)
+    (denote-journal-directory  (concat sync-directory "archive/journal")))
 #+end_src
 
 ** ~embark~
@@ -2330,7 +2344,7 @@ This file recreates the Emacs configuration
     (org-cite-activate-processor 'citar)
     :config
     (let ((documents-path (xdg-user-dir "DOCUMENTS"))
-          (archive-path "~/.sync/archive/bibliography/"))
+          (archive-path (concat sync-directory "archive/bibliography/")))
       (setq org-cite-global-bibliography
             (mapcar (lambda (entry) (concat archive-path entry)) '("articles.bib" "books.bib")))
       (setq citar-library-paths
@@ -2387,7 +2401,7 @@ This file recreates the Emacs configuration
     :defer t
     :bind (("C-z c b" . ebib))
     :custom
-    (ebib-preload-bib-files '("~/.sync/archive/bibliography/articles.bib" "~/.sync/archive/bibliography/books.bib"))
+    (ebib-preload-bib-files (mapcar (lambda (file) (concat sync-directory "archive/bibliography/" file)) '("articles.bib" "books.bib")))
     (ebib-file-search-dirs '("~/Files/Documents/library/articles" "~/Files/Documents/library/books"))
     (ebib-file-associations '(("ps" . "gv")))
     :config
@@ -2590,7 +2604,7 @@ This file recreates the Emacs configuration
       (interactive)
       (find-file (locate-user-emacs-file
                   (completing-read "Select config file: "
-                                   (directory-files-recursively "~/.sync/archive/llm/" ".*" nil)))))
+                                   (directory-files-recursively (concat sync-directory "archive/llm/") ".*" nil)))))
     (dolist (directive
              '((Asistente . "Eres un modelo de lenguaje asistente especializado en programación el cual esta contenido en el editor de texto Emacs. Debes explicar tu respuesta de manera concisa.")
                (Generador . "Eres un modelo de lenguaje y un programador eficiente. Solo genera código y solo código como única salida sin ningún tipo de texto adicional.")
