@@ -23,6 +23,9 @@
   (org-agenda-skip-scheduled-repeats-after-deadline t)
   (org-highlight-latex-and-related '(native))
   (org-image-actual-width nil)
+  (org-image-align 'center)
+  (org-image-max-width 250)
+  (org-yank-image-save-method "./images/")
   (org-fold-catch-invisible-edits 'show-and-error)
   (org-list-demote-modify-bullet '(("+" . "-") ("-" . "+")))
   (org-agenda-time-grid '((daily today require-timed)
@@ -51,17 +54,17 @@
   ;; Org link extensions
   (defun +org-link-mpv-complete-file ()
     (let ((file (read-file-name "File: "))
-    	  (pwd (file-name-as-directory (expand-file-name ".")))
-    	  (pwd1 (file-name-as-directory (abbreviate-file-name
-    				         (expand-file-name ".")))))
+      	  (pwd (file-name-as-directory (expand-file-name ".")))
+      	  (pwd1 (file-name-as-directory (abbreviate-file-name
+      				         (expand-file-name ".")))))
       (cond ((string-match
               (concat "^" (regexp-quote pwd1) "\\(.+\\)") file)
              (concat "mpv:" (match-string 1 file)))
-    	    ((string-match
+      	    ((string-match
               (concat "^" (regexp-quote pwd) "\\(.+\\)")
               (expand-file-name file))
              (concat "mpv:" (match-string 1 (expand-file-name file))))
-    	    (t (concat "mpv:" file)))))
+      	    (t (concat "mpv:" file)))))
 
   (defun +org-link-open-in-mpv (file)
     "Opens linked file in an new mpv process"
@@ -105,7 +108,7 @@
       ("<>" . "\\\\xrightleftharpoons")
       ("q" . "\\\\quad"))
     "List of values replaced in org-table custom export
-  commands")
+    commands")
 
   (defun +org-table-to-commutative-diagram ()
     (interactive)
@@ -141,7 +144,6 @@
       (replace-regexp-in-region "^\\|\\\\\\\\\\|&" "|" beg end)
       (goto-char beg)
       (org-table-next-field)))
-
   )
 
 (use-package org-capture

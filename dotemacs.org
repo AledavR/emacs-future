@@ -756,148 +756,150 @@ This file recreates the Emacs configuration
 
 ** Org general options
 #+begin_src emacs-lisp
-  (use-package org
-    :ensure nil
-    :bind (("C-z C-a" . org-agenda)
-           :map org-mode-map
-           ("C-c C-x 1" . rc/org-update-idea)
-           ("C-M-<return>" . +org-insert-math-subtree))
-    :hook ((org-capture-mode . org-align-tags)
-           (org-mode . variable-pitch-mode)
-           (org-mode . visual-line-mode)
-           (org-agenda-mode . hl-line-mode)
-           (org-babel-after-execute . org-redisplay-inline-images)
-           (org-babel-after-execute . org-toggle-inline-images))
-    :custom
-    (org-agenda-files `(,(concat sync-directory "archive/agenda/")))
-    (org-log-done 'time)
-    (org-confirm-babel-evaluate nil)
-    (org-agenda-skip-deadline-if-done t)
-    (org-src-window-setup 'other-frame)
-    (org-agenda-skip-scheduled-if-done t)
-    (org-agenda-skip-scheduled-repeats-after-deadline t)
-    (org-highlight-latex-and-related '(native))
-    (org-image-actual-width nil)
-    (org-fold-catch-invisible-edits 'show-and-error)
-    (org-list-demote-modify-bullet '(("+" . "-") ("-" . "+")))
-    (org-agenda-time-grid '((daily today require-timed)
-                            (800 1000 1200 1400 1600 1800 2000 2200)
-                            "......"
-                            "-----------------"))
-    (modus-themes-headings '((1 . (1.5)) (2 . (1.3))
-                             (agenda-date . (1.3))
-                             (agenda-structure . (1.8))
-                             (t . (1.1))))
-    (org-safe-remote-resources
-     '("\\`https://fniessen\\.github\\.io/org-html-themes/org/theme-readtheorg\\.setup\\'"))
-    :config
-    (setf (cdr (assoc 'file org-link-frame-setup)) 'find-file)
-    (set-face-attribute 'org-latex-and-related nil :family "Aporetic Sans Mono")
-    (org-babel-do-load-languages
-     'org-babel-load-languages
-     '((python . t)
-       (julia . t)
-       (shell . t)
-       (calc . t)
-       (octave . t)))
-    
-    (add-to-list 'org-structure-template-alist '("p" . "proof"))
+    (use-package org
+      :ensure nil
+      :bind (("C-z C-a" . org-agenda)
+             :map org-mode-map
+             ("C-c C-x 1" . rc/org-update-idea)
+             ("C-M-<return>" . +org-insert-math-subtree))
+      :hook ((org-capture-mode . org-align-tags)
+             (org-mode . variable-pitch-mode)
+             (org-mode . visual-line-mode)
+             (org-agenda-mode . hl-line-mode)
+             (org-babel-after-execute . org-redisplay-inline-images)
+             (org-babel-after-execute . org-toggle-inline-images))
+      :custom
+      (org-agenda-files `(,(concat sync-directory "archive/agenda/")))
+      (org-log-done 'time)
+      (org-confirm-babel-evaluate nil)
+      (org-agenda-skip-deadline-if-done t)
+      (org-src-window-setup 'other-frame)
+      (org-agenda-skip-scheduled-if-done t)
+      (org-agenda-skip-scheduled-repeats-after-deadline t)
+      (org-highlight-latex-and-related '(native))
+      (org-image-actual-width nil)
+      (org-image-align 'center)
+      (org-image-max-width 250)
+      (org-yank-image-save-method "./images/")
+      (org-fold-catch-invisible-edits 'show-and-error)
+      (org-list-demote-modify-bullet '(("+" . "-") ("-" . "+")))
+      (org-agenda-time-grid '((daily today require-timed)
+                              (800 1000 1200 1400 1600 1800 2000 2200)
+                              "......"
+                              "-----------------"))
+      (modus-themes-headings '((1 . (1.5)) (2 . (1.3))
+                               (agenda-date . (1.3))
+                               (agenda-structure . (1.8))
+                               (t . (1.1))))
+      (org-safe-remote-resources
+       '("\\`https://fniessen\\.github\\.io/org-html-themes/org/theme-readtheorg\\.setup\\'"))
+      :config
+      (setf (cdr (assoc 'file org-link-frame-setup)) 'find-file)
+      (set-face-attribute 'org-latex-and-related nil :family "Aporetic Sans Mono")
+      (org-babel-do-load-languages
+       'org-babel-load-languages
+       '((python . t)
+         (julia . t)
+         (shell . t)
+         (calc . t)
+         (octave . t)))
+      
+      (add-to-list 'org-structure-template-alist '("p" . "proof"))
 
-    ;; Org link extensions
-    (defun +org-link-mpv-complete-file ()
-      (let ((file (read-file-name "File: "))
-      	  (pwd (file-name-as-directory (expand-file-name ".")))
-      	  (pwd1 (file-name-as-directory (abbreviate-file-name
-      				         (expand-file-name ".")))))
-        (cond ((string-match
-                (concat "^" (regexp-quote pwd1) "\\(.+\\)") file)
-               (concat "mpv:" (match-string 1 file)))
-      	    ((string-match
-                (concat "^" (regexp-quote pwd) "\\(.+\\)")
-                (expand-file-name file))
-               (concat "mpv:" (match-string 1 (expand-file-name file))))
-      	    (t (concat "mpv:" file)))))
+      ;; Org link extensions
+      (defun +org-link-mpv-complete-file ()
+        (let ((file (read-file-name "File: "))
+          	  (pwd (file-name-as-directory (expand-file-name ".")))
+          	  (pwd1 (file-name-as-directory (abbreviate-file-name
+          				         (expand-file-name ".")))))
+          (cond ((string-match
+                  (concat "^" (regexp-quote pwd1) "\\(.+\\)") file)
+                 (concat "mpv:" (match-string 1 file)))
+          	    ((string-match
+                  (concat "^" (regexp-quote pwd) "\\(.+\\)")
+                  (expand-file-name file))
+                 (concat "mpv:" (match-string 1 (expand-file-name file))))
+          	    (t (concat "mpv:" file)))))
 
-    (defun +org-link-open-in-mpv (file)
-      "Opens linked file in an new mpv process"
-      (start-process "open file" nil "mpv" "--title=mpv_emacs" (expand-file-name file)))
-    
-    (defun +org-link-remote-open-in-mpv (url)
-      "Opens linked file in an new mpv process"
-      (start-process "open url" nil "mpv" "--title=mpv_emacs" url))
-    
-    (defun +browse-steam-page (steam-id)
-      (browse-url (concat "steam://advertise/" steam-id)))
-    
-    (org-link-set-parameters "steam" :follow 'browse-steam-page)
-    (org-link-set-parameters "mpv" :complete '+org-link-mpv-complete-file :follow '+org-link-open-in-mpv)
-    (org-link-set-parameters "mpv-url" :follow '+org-link-remote-open-in-mpv)
+      (defun +org-link-open-in-mpv (file)
+        "Opens linked file in an new mpv process"
+        (start-process "open file" nil "mpv" "--title=mpv_emacs" (expand-file-name file)))
+      
+      (defun +org-link-remote-open-in-mpv (url)
+        "Opens linked file in an new mpv process"
+        (start-process "open url" nil "mpv" "--title=mpv_emacs" url))
+      
+      (defun +browse-steam-page (steam-id)
+        (browse-url (concat "steam://advertise/" steam-id)))
+      
+      (org-link-set-parameters "steam" :follow 'browse-steam-page)
+      (org-link-set-parameters "mpv" :complete '+org-link-mpv-complete-file :follow '+org-link-open-in-mpv)
+      (org-link-set-parameters "mpv-url" :follow '+org-link-remote-open-in-mpv)
 
-    ;; Org notes functions
-    
-    (defvar +org-math-bodies '("Proposición" "Teorema" "Corolario" "Nota"))
-    
-    (defun +org-get-top-header-title ()
-      (let ((title (substring-no-properties
-                    (if (= (org-outline-level) 1)
-                        (org-get-heading) (org-display-outline-path)))))
-        (replace-regexp-in-string " - Definición" "" title)))
+      ;; Org notes functions
+      
+      (defvar +org-math-bodies '("Proposición" "Teorema" "Corolario" "Nota"))
+      
+      (defun +org-get-top-header-title ()
+        (let ((title (substring-no-properties
+                      (if (= (org-outline-level) 1)
+                          (org-get-heading) (org-display-outline-path)))))
+          (replace-regexp-in-string " - Definición" "" title)))
 
-    (defun +org-insert-math-subtree (type)
-      (interactive (list (completing-read "Tipo: " +org-math-bodies nil t)))
-      (let ((title (+org-get-top-header-title)))
-        (if (= (org-outline-level) 1)
-            (org-insert-subheading 4)
-          (org-insert-heading))
-        (insert (concat title " - " type " "))))
+      (defun +org-insert-math-subtree (type)
+        (interactive (list (completing-read "Tipo: " +org-math-bodies nil t)))
+        (let ((title (+org-get-top-header-title)))
+          (if (= (org-outline-level) 1)
+              (org-insert-subheading 4)
+            (org-insert-heading))
+          (insert (concat title " - " type " "))))
 
 
-    (defvar +org-table-replacement-alist
-      '(("v" . "\\\\downarrow")
-        ("^" . "\\\\uparrow")
-        (">" . "\\\\xrightarrow")
-        ("<" . "\\\\xleftarrow")
-        ("<>" . "\\\\xrightleftharpoons")
-        ("q" . "\\\\quad"))
-      "List of values replaced in org-table custom export
-    commands")
+      (defvar +org-table-replacement-alist
+        '(("v" . "\\\\downarrow")
+          ("^" . "\\\\uparrow")
+          (">" . "\\\\xrightarrow")
+          ("<" . "\\\\xleftarrow")
+          ("<>" . "\\\\xrightleftharpoons")
+          ("q" . "\\\\quad"))
+        "List of values replaced in org-table custom export
+        commands")
 
-    (defun +org-table-to-commutative-diagram ()
-      (interactive)
-      (unless (org-at-table-p) (user-error "Not at a table"))
-      (mapc (lambda (x)
-              (replace-regexp-in-region
-               (concat "~" (car x) "~") (cdr x) (org-table-begin) (org-table-end)))
-            +org-table-replacement-alist)
-      (let* ((table (org-table-to-lisp))
-             (params '(:backend latex :raw t :environment "array"))
-             (replacement-table
-              (replace-regexp-in-string
-               "  +" " "
-               (replace-regexp-in-string
-                "{array}{\\(l+\\)}"
-                (lambda (match) (concat "{array}{" (make-string (- (length match) 9) ?c) "}")) (orgtbl-to-latex table params)))))
-        (kill-region (org-table-begin) (org-table-end))
-        (open-line 1)
-        (push-mark)
-        (insert "\\[" replacement-table "\\]")))
+      (defun +org-table-to-commutative-diagram ()
+        (interactive)
+        (unless (org-at-table-p) (user-error "Not at a table"))
+        (mapc (lambda (x)
+                (replace-regexp-in-region
+                 (concat "~" (car x) "~") (cdr x) (org-table-begin) (org-table-end)))
+              +org-table-replacement-alist)
+        (let* ((table (org-table-to-lisp))
+               (params '(:backend latex :raw t :environment "array"))
+               (replacement-table
+                (replace-regexp-in-string
+                 "  +" " "
+                 (replace-regexp-in-string
+                  "{array}{\\(l+\\)}"
+                  (lambda (match) (concat "{array}{" (make-string (- (length match) 9) ?c) "}")) (orgtbl-to-latex table params)))))
+          (kill-region (org-table-begin) (org-table-end))
+          (open-line 1)
+          (push-mark)
+          (insert "\\[" replacement-table "\\]")))
 
-    (defun +org-table-from-latex-table ()
-      (interactive)
-      (search-backward "\[")
-      (kill-whole-line)
-      (set-mark (point))
-      (search-forward "\]")
-      (kill-whole-line)
-      (backward-char)
-      (activate-mark)
-      (let ((beg (region-beginning))
-            (end (region-end)))
-        (replace-regexp-in-region "^\\|\\\\\\\\\\|&" "|" beg end)
-        (goto-char beg)
-        (org-table-next-field)))
-
-    )
+      (defun +org-table-from-latex-table ()
+        (interactive)
+        (search-backward "\[")
+        (kill-whole-line)
+        (set-mark (point))
+        (search-forward "\]")
+        (kill-whole-line)
+        (backward-char)
+        (activate-mark)
+        (let ((beg (region-beginning))
+              (end (region-end)))
+          (replace-regexp-in-region "^\\|\\\\\\\\\\|&" "|" beg end)
+          (goto-char beg)
+          (org-table-next-field)))
+      )
 #+end_src
 
 ** Org-capture
@@ -2295,6 +2297,16 @@ This file recreates the Emacs configuration
       "s" #'denote-grep)
     (defalias 'denote-prefix denote-prefix-map)
     :config
+    (defun org-yank-image-denote-file-name-function ()
+      (if (y-or-n-p "Rename file? ")
+          (let ((title (denote-sluggify 'title (denote-title-prompt nil "File name: ")))
+                (keywords (denote-keywords-combine (denote-sluggify-keywords (denote-keywords-prompt "Keywords: "))))
+                (date (format-time-string "%Y%m%dT%H%M%S")))
+            (concat date "--" title "__" keywords))
+        (format-time-string "%Y%m%dT%H%M%S--clipboard")))
+
+    (setq org-yank-image-file-name-function 'org-yank-image-denote-file-name-function)
+
     (setq denote-org-front-matter
           "#+title:      %s
   ,#+date:       %s
@@ -2306,6 +2318,10 @@ This file recreates the Emacs configuration
   \n")
     (add-hook 'dired-mode-hook 'denote-dired-mode-in-directories)
     (global-set-key (kbd "C-z C-n") 'denote-prefix))
+
+  (use-package denote-org
+    :ensure t
+    :defer t)
 
   (use-package denote-journal
     :ensure t

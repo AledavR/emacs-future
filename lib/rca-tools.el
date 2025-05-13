@@ -27,6 +27,16 @@
     "s" #'denote-grep)
   (defalias 'denote-prefix denote-prefix-map)
   :config
+  (defun org-yank-image-denote-file-name-function ()
+    (if (y-or-n-p "Rename file? ")
+        (let ((title (denote-sluggify 'title (denote-title-prompt nil "File name: ")))
+              (keywords (denote-keywords-combine (denote-sluggify-keywords (denote-keywords-prompt "Keywords: "))))
+              (date (format-time-string "%Y%m%dT%H%M%S")))
+          (concat date "--" title "__" keywords))
+      (format-time-string "%Y%m%dT%H%M%S--clipboard")))
+
+  (setq org-yank-image-file-name-function 'org-yank-image-denote-file-name-function)
+
   (setq denote-org-front-matter
         "#+title:      %s
 #+date:       %s
@@ -38,6 +48,10 @@
 \n")
   (add-hook 'dired-mode-hook 'denote-dired-mode-in-directories)
   (global-set-key (kbd "C-z C-n") 'denote-prefix))
+
+(use-package denote-org
+  :ensure t
+  :defer t)
 
 (use-package denote-journal
   :ensure t
