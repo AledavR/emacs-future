@@ -254,8 +254,10 @@ input"
   :config
   (defvar mode-line-format--old nil
     "Variable to store last mode line format to restore it
-when deactivating presentation-mode")
+    when deactivating presentation-mode")
 
+  (add-to-list 'revert-without-query ".pdf")
+  
   (define-minor-mode presentation-mode
     "Remove visual elements for presentation"
     :global nil
@@ -270,3 +272,10 @@ when deactivating presentation-mode")
   (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
   (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
   (define-key pdf-view-mode-map (kbd "C-r") 'isearch-backward))
+
+(use-package org-pdftools
+  :ensure t
+  :hook (org-mode . org-pdftools-setup-link)
+  :preface
+  (defalias 'find-if 'cl-find-if)
+  (defalias 'getf 'cl-getf))

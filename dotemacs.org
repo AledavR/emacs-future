@@ -2236,8 +2236,10 @@ This file recreates the Emacs configuration
     :config
     (defvar mode-line-format--old nil
       "Variable to store last mode line format to restore it
-  when deactivating presentation-mode")
+      when deactivating presentation-mode")
 
+    (add-to-list 'revert-without-query ".pdf")
+    
     (define-minor-mode presentation-mode
       "Remove visual elements for presentation"
       :global nil
@@ -2252,6 +2254,13 @@ This file recreates the Emacs configuration
     (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
     (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
     (define-key pdf-view-mode-map (kbd "C-r") 'isearch-backward))
+
+  (use-package org-pdftools
+    :ensure t
+    :hook (org-mode . org-pdftools-setup-link)
+    :preface
+    (defalias 'find-if 'cl-find-if)
+    (defalias 'getf 'cl-getf))
 #+end_src
 
 * Tools
@@ -2307,15 +2316,57 @@ This file recreates the Emacs configuration
 
     (setq org-yank-image-file-name-function 'org-yank-image-denote-file-name-function)
 
+    
+    (defun my-remove-accents (text)
+      (let ((slug-trim-chars '(;; Combining Diacritical Marks https://www.unicode.org/charts/PDF/U0300.pdf
+                               768 ; U+0300 COMBINING GRAVE ACCENT
+                               769 ; U+0301 COMBINING ACUTE ACCENT
+                               770 ; U+0302 COMBINING CIRCUMFLEX ACCENT
+                               771 ; U+0303 COMBINING TILDE
+                               772 ; U+0304 COMBINING MACRON
+                               774 ; U+0306 COMBINING BREVE
+                               775 ; U+0307 COMBINING DOT ABOVE
+                               776 ; U+0308 COMBINING DIAERESIS
+                               777 ; U+0309 COMBINING HOOK ABOVE
+                               778 ; U+030A COMBINING RING ABOVE
+                               779 ; U+030B COMBINING DOUBLE ACUTE ACCENT
+                               780 ; U+030C COMBINING CARON
+                               795 ; U+031B COMBINING HORN
+                               803 ; U+0323 COMBINING DOT BELOW
+                               804 ; U+0324 COMBINING DIAERESIS BELOW
+                               805 ; U+0325 COMBINING RING BELOW
+                               807 ; U+0327 COMBINING CEDILLA
+                               813 ; U+032D COMBINING CIRCUMFLEX ACCENT BELOW
+                               814 ; U+032E COMBINING BREVE BELOW
+                               816 ; U+0330 COMBINING TILDE BELOW
+                               817 ; U+0331 COMBINING MACRON BELOW
+                               )))
+        (cl-flet* ((nonspacing-mark-p (char) (memq char slug-trim-chars)))
+          (string-glyph-compose
+           (apply #'string
+                  (seq-remove #'nonspacing-mark-p
+                              (string-glyph-decompose text)))))))
+
+    (defun my/denote-sluggify-title (str)
+      (downcase
+       (denote-slug-hyphenate
+        (my-remove-accents
+         (replace-regexp-in-string "[][{}!@#$%^&*()+'\"?,.\|;:~`‘’“”/=]*" "" str)))))
+
+    (setq denote-file-name-slug-functions
+          '((title . my/denote-sluggify-title)
+            (signature . denote-sluggify-signature)
+            (keywords . denote-sluggify-keywords)))
+
     (setq denote-org-front-matter
           "#+title:      %s
-  ,#+date:       %s
-  ,#+filetags:   %s
-  ,#+identifier: %s
-  ,#+signature:  %s
-  ,#+startup:    nofold
-  ,#+startup:    hideblocks
-  \n")
+    ,#+date:       %s
+    ,#+filetags:   %s
+    ,#+identifier: %s
+    ,#+signature:  %s
+    ,#+startup:    nofold
+    ,#+startup:    hideblocks
+    \n")
     (add-hook 'dired-mode-hook 'denote-dired-mode-in-directories)
     (global-set-key (kbd "C-z C-n") 'denote-prefix))
 
