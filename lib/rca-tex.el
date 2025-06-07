@@ -274,8 +274,5 @@ input"
   (define-key pdf-view-mode-map (kbd "C-r") 'isearch-backward))
 
 (use-package org-pdftools
-  :ensure t
-  :hook (org-mode . org-pdftools-setup-link)
-  :preface
-  (defalias 'find-if 'cl-find-if)
-  (defalias 'getf 'cl-getf))
+  :load-path "ext/org-pdftools.el"
+  :hook (org-mode . org-pdftools-setup-link))
