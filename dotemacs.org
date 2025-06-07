@@ -1922,7 +1922,7 @@ This file recreates the Emacs configuration
     ;; (add-to-list 'meow-char-thing-table '(?t . html-tag))
     (add-to-list 'meow-char-thing-table '(?a . angles))
     (add-to-list 'meow-char-thing-table '(?\" . double-quotes))
-    (add-to-list 'meow-char-thing-table '(?x . latex))
+    ;; (add-to-list 'meow-char-thing-table '(?x . latex))
     (add-to-list 'meow-char-thing-table '(?\' . single-quotes))
     (add-to-list 'meow-char-thing-table '(?m . inline-math))
     (add-to-list 'meow-char-thing-table '(?M . display-math))
@@ -2359,14 +2359,7 @@ This file recreates the Emacs configuration
             (keywords . denote-sluggify-keywords)))
 
     (setq denote-org-front-matter
-          "#+title:      %s
-    ,#+date:       %s
-    ,#+filetags:   %s
-    ,#+identifier: %s
-    ,#+signature:  %s
-    ,#+startup:    nofold
-    ,#+startup:    hideblocks
-    \n")
+          "#+title:      %s\n#+date:       %s\n#+filetags:   %s\n#+identifier: %s\n#+startup:    nofold\n#+startup:    hideblocks\n")
     (add-hook 'dired-mode-hook 'denote-dired-mode-in-directories)
     (global-set-key (kbd "C-z C-n") 'denote-prefix))
 

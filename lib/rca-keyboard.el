@@ -138,7 +138,7 @@
   ;; (add-to-list 'meow-char-thing-table '(?t . html-tag))
   (add-to-list 'meow-char-thing-table '(?a . angles))
   (add-to-list 'meow-char-thing-table '(?\" . double-quotes))
-  (add-to-list 'meow-char-thing-table '(?x . latex))
+  ;; (add-to-list 'meow-char-thing-table '(?x . latex))
   (add-to-list 'meow-char-thing-table '(?\' . single-quotes))
   (add-to-list 'meow-char-thing-table '(?m . inline-math))
   (add-to-list 'meow-char-thing-table '(?M . display-math))

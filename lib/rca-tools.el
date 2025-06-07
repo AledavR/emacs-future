@@ -80,14 +80,7 @@
           (keywords . denote-sluggify-keywords)))
 
   (setq denote-org-front-matter
-        "#+title:      %s
-  #+date:       %s
-  #+filetags:   %s
-  #+identifier: %s
-  #+signature:  %s
-  #+startup:    nofold
-  #+startup:    hideblocks
-  \n")
+        "#+title:      %s\n#+date:       %s\n#+filetags:   %s\n#+identifier: %s\n#+startup:    nofold\n#+startup:    hideblocks\n")
   (add-hook 'dired-mode-hook 'denote-dired-mode-in-directories)
   (global-set-key (kbd "C-z C-n") 'denote-prefix))
 
