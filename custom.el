@@ -46,6 +46,7 @@
          SGI SR2 SRF SUN SVG SVGZ TGA TIFF TIFF64 TILE TIM TTF UYVY VDA VICAR
          VID VIFF VST WBMP WPG X3F XBM XC XCF XPM XV XWD YCbCr YCbCrA YUV))
  '(imagemagick-render-type 1)
+ '(large-file-warning-threshold 100000000)
  '(org-latex-preview-appearance-options
    '(:foreground auto :background "Transparent" :scale 1.0 :zoom 1.2 :page-width
                  0.8 :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
@@ -70,6 +71,8 @@
    '(("part" . 0) ("chapter" . 1) ("section" . 2) ("subsection" . 3)
      ("subsubsection" . 4) ("paragraph" . 5) ("subparagraph" . 6)
      ("addchap" . -1) ("addsec" . -2) ("frametitle" . -2)))
+ '(safe-local-variable-directories
+   '("/home/rcaled/Files/Documents/college/computacion-grafica/opengl-examples/"))
  '(safe-local-variable-values
    '((org-cdlatex-mode . t) (TeX-command-extra-options . "-shell-escape")
      (eval add-hook 'after-save-hook (lambda nil (org-babel-tangle)) nil t)

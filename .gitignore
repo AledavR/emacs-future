@@ -1,0 +1,15 @@
+/calc.el
+/.cache/
+/cache/
+/eshell/
+/.org-id-locations
+/auctex/
+/tramp
+/diary
+/url/
+/persist/
+/transient/
+/tree-sitter/
+/nov-places
+/elpaca/
+/eln-cache/
