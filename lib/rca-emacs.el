@@ -63,6 +63,7 @@
   (defalias 'yes-or-no-p 'y-or-n-p)
   (recentf-mode 1)
   (savehist-mode 1)
+  (run-at-time nil (* 5 60) 'recentf-save-list)
   (global-auto-revert-mode 1)
   (add-hook 'prog-mode-hook 'display-line-numbers-mode)
   (add-hook 'shell-mode-hook 'rc/truncate-lines-off)

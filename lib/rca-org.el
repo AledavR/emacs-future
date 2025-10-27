@@ -182,9 +182,9 @@
   :custom
   (org-capture-templates `(
                            ("a" "academic task")
-                           ("ae" "exam" entry (file+headline my/org-academic-agenda "Exam") ,(concat "* TODO %^{Exam} %^g\nSCHEDULED: %^T" my/org-created-property) :empty-lines 1)
-                           ("ap" "project" entry (file+headline my/org-academic-agenda "Project") ,(concat "* TODO %^{Project} %^g\nDEADLINE:%^T" my/org-created-property) :empty-lines 1)
-                           ("ah" "homework" entry (file+headline my/org-academic-agenda "Homework") ,(concat "* TODO %^{Homework} %^g\nDEADLINE:%^T" my/org-created-property) :empty-lines 1)
+                           ("ae" "exam" entry (file+headline my/org-academic-agenda "Exam") ,(concat "* TODO %^{Exam} :exam:\nSCHEDULED: %^T" my/org-created-property) :empty-lines 1)
+                           ("ap" "project" entry (file+headline my/org-academic-agenda "Project") ,(concat "* TODO %^{Project} :project:\nDEADLINE:%^T" my/org-created-property) :empty-lines 1)
+                           ("ah" "homework" entry (file+headline my/org-academic-agenda "Homework") ,(concat "* TODO %^{Homework} :homework:\nDEADLINE:%^T" my/org-created-property) :empty-lines 1)
                            ("p" "personal task")
                            ("pc" "constructive" entry (file+headline my/org-personal-agenda "Constructive") ,(concat "* TODO %^{Task}\nDEADLINE: %^T" my/org-created-property) :empty-lines 1)
                            ("pm" "mundane" entry (file+headline my/org-personal-agenda "Mundane") ,(concat "* TODO %^{Task}\nDEADLINE: %^T" my/org-created-property) :empty-lines 1)

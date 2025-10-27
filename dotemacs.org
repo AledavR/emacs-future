@@ -401,6 +401,7 @@ This file recreates the Emacs configuration
     (defalias 'yes-or-no-p 'y-or-n-p)
     (recentf-mode 1)
     (savehist-mode 1)
+    (run-at-time nil (* 5 60) 'recentf-save-list)
     (global-auto-revert-mode 1)
     (add-hook 'prog-mode-hook 'display-line-numbers-mode)
     (add-hook 'shell-mode-hook 'rc/truncate-lines-off)
@@ -1003,9 +1004,9 @@ This file recreates the Emacs configuration
     :custom
     (org-capture-templates `(
                              ("a" "academic task")
-                             ("ae" "exam" entry (file+headline my/org-academic-agenda "Exam") ,(concat "* TODO %^{Exam} %^g\nSCHEDULED: %^T" my/org-created-property) :empty-lines 1)
-                             ("ap" "project" entry (file+headline my/org-academic-agenda "Project") ,(concat "* TODO %^{Project} %^g\nDEADLINE:%^T" my/org-created-property) :empty-lines 1)
-                             ("ah" "homework" entry (file+headline my/org-academic-agenda "Homework") ,(concat "* TODO %^{Homework} %^g\nDEADLINE:%^T" my/org-created-property) :empty-lines 1)
+                             ("ae" "exam" entry (file+headline my/org-academic-agenda "Exam") ,(concat "* TODO %^{Exam} :exam:\nSCHEDULED: %^T" my/org-created-property) :empty-lines 1)
+                             ("ap" "project" entry (file+headline my/org-academic-agenda "Project") ,(concat "* TODO %^{Project} :project:\nDEADLINE:%^T" my/org-created-property) :empty-lines 1)
+                             ("ah" "homework" entry (file+headline my/org-academic-agenda "Homework") ,(concat "* TODO %^{Homework} :homework:\nDEADLINE:%^T" my/org-created-property) :empty-lines 1)
                              ("p" "personal task")
                              ("pc" "constructive" entry (file+headline my/org-personal-agenda "Constructive") ,(concat "* TODO %^{Task}\nDEADLINE: %^T" my/org-created-property) :empty-lines 1)
                              ("pm" "mundane" entry (file+headline my/org-personal-agenda "Mundane") ,(concat "* TODO %^{Task}\nDEADLINE: %^T" my/org-created-property) :empty-lines 1)
@@ -1216,6 +1217,22 @@ This file recreates the Emacs configuration
   (use-package gnuplot
     :ensure t
     :defer t)
+#+end_src
+
+** Prolog
+#+begin_src emacs-lisp
+  (use-package prolog
+    :ensure nil
+    :config
+    (setq auto-mode-alist (cons '("\\.pl$" . prolog-mode) auto-mode-alist))
+    (setq load-path (cons "/usr/sbin/swipl" load-path))
+    ;; (autoload 'run-prolog "prolog" "Start a Prolog sub-process." t)
+    ;; (autoload 'prolog-mode "prolog" "Major mode for editing Prolog programs." t)
+    (setq prolog-system 'swi)
+    ;; (add-hook 'prolog-mode-hook 'turn-on-font-lock)
+    ;; (autoload 'prolog-menu-hook-function "prolog-menu" t)
+    ;; (add-hook 'prolog-mode-hook 'prolog-menu-hook-function)
+    )
 #+end_src
 
 ** LUA
@@ -2492,6 +2509,9 @@ This file recreates the Emacs configuration
       :type '(string))
     (defcustom +citar-local-library-path nil "Local path that contains the library"
       :type '(string))
+    (defun +citar-insert-title (citekey)
+      "Inserts the title of the currently selected entry to the buffer"
+      (insert (citar-get-value "title" citekey)))
     (defun +citar-open-file-externally (citekey)
       "Opens associated file in the default system reader"
       (let ((file (car (car (hash-table-values (citar-get-files citekey))))))
@@ -2515,6 +2535,7 @@ This file recreates the Emacs configuration
     :bind (:map citar-embark-map
                 ("g" . +citar-scholar-search)
                 ("d" . +citar-download-file)
+                ("i" . +citar-insert-title)
                 ("F" . +citar-open-file-externally)
                 :map citar-embark-citation-map
                 ("g" . +citar-scholar-search)
@@ -2532,7 +2553,7 @@ This file recreates the Emacs configuration
     :defer t
     :bind (("C-z c b" . ebib))
     :custom
-    (ebib-preload-bib-files (mapcar (lambda (file) (concat sync-directory "archive/bibliography/" file)) '("articles.bib" "books.bib")))
+    (ebib-preload-bib-files (mapcar (lambda (file) (concat sync-directory "archive/bibliography/" file)) '("articles.bib" "books.bib" "discarded.bib")))
     (ebib-file-search-dirs '("~/Files/Documents/library/articles" "~/Files/Documents/library/books"))
     (ebib-file-associations '(("ps" . "gv")))
     :config

@@ -145,6 +145,9 @@
     :type '(string))
   (defcustom +citar-local-library-path nil "Local path that contains the library"
     :type '(string))
+  (defun +citar-insert-title (citekey)
+    "Inserts the title of the currently selected entry to the buffer"
+    (insert (citar-get-value "title" citekey)))
   (defun +citar-open-file-externally (citekey)
     "Opens associated file in the default system reader"
     (let ((file (car (car (hash-table-values (citar-get-files citekey))))))
@@ -168,6 +171,7 @@
   :bind (:map citar-embark-map
               ("g" . +citar-scholar-search)
               ("d" . +citar-download-file)
+              ("i" . +citar-insert-title)
               ("F" . +citar-open-file-externally)
               :map citar-embark-citation-map
               ("g" . +citar-scholar-search)
@@ -181,7 +185,7 @@
   :defer t
   :bind (("C-z c b" . ebib))
   :custom
-  (ebib-preload-bib-files (mapcar (lambda (file) (concat sync-directory "archive/bibliography/" file)) '("articles.bib" "books.bib")))
+  (ebib-preload-bib-files (mapcar (lambda (file) (concat sync-directory "archive/bibliography/" file)) '("articles.bib" "books.bib" "discarded.bib")))
   (ebib-file-search-dirs '("~/Files/Documents/library/articles" "~/Files/Documents/library/books"))
   (ebib-file-associations '(("ps" . "gv")))
   :config
