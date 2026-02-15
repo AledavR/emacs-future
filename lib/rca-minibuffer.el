@@ -31,6 +31,7 @@
          ("M-s f" . consult-recent-file)
          ("M-s b" . consult-bookmark)
          ("M-s l" . consult-line)
+         ("M-s O" . consult-outline)
          ("M-s i" . consult-idea)
          ("M-s r" . consult-ripgrep)
          :map org-mode-map
@@ -50,3 +51,4 @@
   (consult-customize consult-idea :preview-key nil)
   (consult-customize consult-recent-file :preview-key nil)
   (consult-customize consult-bookmark :preview-key nil))
+

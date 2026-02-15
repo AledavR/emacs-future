@@ -97,7 +97,7 @@
           (youmu ef-elea-light ef-elea-dark)
           (tsukasa ef-eagle ef-dream)
           (satori ef-trio-light ef-trio-dark)))
-  (setq theme-character 'tsukasa)
+  (setq theme-character 'yuuma)
   :config
   (setq ef-themes-mixed-fonts t)
   (setq ef-themes-headings

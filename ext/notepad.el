@@ -192,3 +192,25 @@ commands")
   (interactive (rc/act-on-region-or-line))
   (rc/delete-whitespace-and-indent start end)
   (rc/fix-semicolon-and-commas start end))
+
+
+;; BETTER SCREENSHOTS
+;; [[https://mbork.pl/2025-12-15_Improving_Emacs_screenshots][Source]]
+
+(defvar frameshot-format 'png
+  "Default frame shot format.")
+
+(defun frameshot (filename width)
+  "Save Emacs frame as frame shot."
+  (interactive (list (read-file-name
+                      "Frameshot file: "
+                      nil nil nil
+                      (concat (format-time-string
+                               "Screenshot-%Y-%m-%d-%T.")
+                              (symbol-name frameshot-format)))
+                     (read-string "Rescale to [px]: ")))
+  (with-temp-file filename
+    (insert (x-export-frames nil (or frameshot-format 'png))))
+  (when width
+      (shell-command (format "mogrify -resize %s %s" width filename)))
+  (message "Frameshot saved as `%s'" filename))

@@ -364,6 +364,20 @@ For more on chathistory, see:
 (use-package elfeed
   :ensure t
   :defer t
+  :bind (:map elfeed-show-mode-map
+         ("f" . rc/elfeed-add-to-favorites)
+         :map elfeed-search-mode-map
+         ("f" . rc/elfeed-add-to-favorites))
+  :config
+  ;; TODO Should toggle instead of just setting
+  (defun rc/elfeed-add-to-favorites ()
+      "Adds the currently selected entry to favorites"
+      (interactive)
+    (let ((entry (if (eq major-mode 'elfeed-show-mode)
+                     elfeed-show-entry
+                   (elfeed-search-selected :ignore-region))))
+      (elfeed-tag entry 'fav)
+      (elfeed-search-update-entry entry)))
   :custom
   (elfeed-db-directory "~/.elfeed/")
   (elfeed-feeds '(("https://planet.emacslife.com/atom.xml" emacs)
@@ -375,3 +389,19 @@ For more on chathistory, see:
                   ("https://www.localfirstnews.com/rss/" programming)
                   ("https://www.youtube.com/feeds/videos.xml?channel_id=UCiiTssXxklIDeDBWq0tPHUA" youtube music)
                   )))
+
+(use-package zoxide
+  :ensure t)
+
+(use-package nov
+  :ensure t
+  :mode ("\\.epub\\'" . nov-mode)
+  :init
+  (defun +nov-olivetti-mode ()
+    (setq olivetti-body-width 130)
+    (olivetti-mode))
+  :config
+  (add-hook 'nov-mode-hook '+nov-olivetti-mode))
+
+(use-package ultra-scroll
+  :ensure t)

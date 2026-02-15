@@ -29,9 +29,9 @@
   :config
   (setq auto-mode-alist (cons '("\\.pl$" . prolog-mode) auto-mode-alist))
   (setq load-path (cons "/usr/sbin/swipl" load-path))
+  (setq prolog-system 'swi)
   ;; (autoload 'run-prolog "prolog" "Start a Prolog sub-process." t)
   ;; (autoload 'prolog-mode "prolog" "Major mode for editing Prolog programs." t)
-  (setq prolog-system 'swi)
   ;; (add-hook 'prolog-mode-hook 'turn-on-font-lock)
   ;; (autoload 'prolog-menu-hook-function "prolog-menu" t)
   ;; (add-hook 'prolog-mode-hook 'prolog-menu-hook-function)
