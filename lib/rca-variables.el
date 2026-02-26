@@ -15,3 +15,7 @@
 
 (defcustom dotfiles-dirs (expand-file-name "~/dotfiles/")
   "Directory where user configuration files are stored")
+
+(defcustom wallpaper-files (concat sync-directory "pix/wallpaper")
+    "Folder where wallpaper files are stored."
+    :type 'directory)

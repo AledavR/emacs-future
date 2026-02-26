@@ -70,13 +70,6 @@
            (dedicated . t)
            (window-width . 0.25)))))
 
-(use-package emacs
-  :ensure nil
-  :init
-  (defcustom wallpaper-files (concat sync-directory "pix/wallpaper")
-    "Folder where wallpaper files are stored."
-    :type 'directory))
-
 (use-package diminish
   :ensure t
   :config
@@ -96,8 +89,8 @@
           (nazrin2 ef-light ef-owl)
           (youmu ef-elea-light ef-elea-dark)
           (tsukasa ef-eagle ef-dream)
-          (satori ef-trio-light ef-trio-dark)))
-  (setq theme-character 'yuuma)
+          (satori ef-tritanopia-light ef-trio-dark)))
+  (setq theme-character 'satori)
   :config
   (setq ef-themes-mixed-fonts t)
   (setq ef-themes-headings
@@ -141,15 +134,6 @@
    '( :mode-line-active spacious-padding-subtle-mode-line-active
       :mode-line-inactive spacious-padding-subtle-mode-line-inactive))
   :config
-  ;; (setq-default header-line-format
-  ;;               '("%e" mode-line-front-space
-  ;;                 (:propertize
-  ;;                  display (min-width (6.0)))
-  ;;                 "%b" mode-line-end-spaces))
-  
-  ;; (setq spacious-padding-subtle-mode-line
-  ;;       `( :mode-line-active 'default
-  ;;          :mode-line-inactive vertical-border))
   (spacious-padding-mode 1))
 
 (defun my-inhibit-startup-screen-file ()
@@ -229,19 +213,6 @@ names an existing file."
 (use-package breadcrumb
   :ensure t
   :config
-  
-  ;; (setq-default mode-line-format
-  ;;               '("%e" mode-line-front-space
-  ;;                 (:propertize
-  ;;                  ("" mode-line-mule-info mode-line-client mode-line-modified mode-line-remote
-  ;;                   mode-line-window-dedicated)
-  ;;                  display (min-width (6.0)))
-  ;;                 mode-line-frame-identification "   "
-  ;;                 mode-line-position (project-mode-line project-mode-line-format)
-  ;;                 (vc-mode vc-mode) "  " mode-line-modes mode-line-misc-info mode-line-end-spaces))
-  
-  ;; (set-face-attribute 'header-line-active nil :inherit 'mode-line-active)
-  
   (breadcrumb-mode))
 
 ;; https://www.rahuljuliato.com/posts/emacs-tab-bar-groups
