@@ -11,6 +11,7 @@
   (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend)
   :custom
   (frame-resize-pixelwise t)
+  (window-resize-pixelwise t)
   (modus-themes-italic-constructs t)
   (fill-column 80)
   (indent-tabs-mode nil)
@@ -21,7 +22,12 @@
                     tab-bar-separator
                     tab-bar-format-add-tab
                     tab-bar-format-align-right
-                    tab-bar-format-global)))
+                    tab-bar-format-global))
+  :config
+  (add-hook 'after-make-frame-functions
+            (lambda (frame)
+              (with-selected-frame frame
+                (set-frame-size frame (frame-width) (frame-height) t)))))
 
 (use-package emacs
   :ensure nil
@@ -90,7 +96,7 @@
           (youmu ef-elea-light ef-elea-dark)
           (tsukasa ef-eagle ef-dream)
           (satori ef-tritanopia-light ef-trio-dark)))
-  (setq theme-character 'satori)
+  (setq theme-character 'nazrin2)
   :config
   (setq ef-themes-mixed-fonts t)
   (setq ef-themes-headings

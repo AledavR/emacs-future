@@ -327,11 +327,11 @@ For more on chathistory, see:
          (concat "/quote CHATHISTORY LATEST " channel " * " (number-to-string lines))
          t)))))
 
-(use-package erc-hl-nicks
-  :ensure t
-  :after erc
-  :custom
-  (erc-hl-nicks-minimum-contrast-ratio 4.5))
+;;(use-package erc-hl-nicks
+;;  :ensure t
+;;  :after erc
+;;  :custom
+;;  (erc-hl-nicks-minimum-contrast-ratio 4.5))
 
 (use-package consult-erc
   :ensure (:host codeberg :repo "mekeor/consult-erc")

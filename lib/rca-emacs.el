@@ -81,6 +81,8 @@
     (kill-buffer (current-buffer))
     (delete-frame))
 
+  (defun risky-local-variable-p (sym &optional _ignored) nil)
+
   ;; Greentext mode
   (setq greentext-font-lock
         '(("^>.*" . 'success)))
