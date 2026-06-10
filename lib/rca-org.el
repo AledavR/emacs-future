@@ -6,6 +6,7 @@
   :bind (("C-z C-a" . org-agenda)
          :map org-mode-map
          ("C-c C-x 1" . rc/org-update-idea)
+         ("C-c C-v c" . rc/copy-org-src-block-content)
          ("C-M-<return>" . +org-insert-math-subtree))
   :hook ((org-capture-mode . org-align-tags)
          (org-mode . variable-pitch-mode)

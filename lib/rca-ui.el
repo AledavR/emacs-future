@@ -96,7 +96,7 @@
           (youmu ef-elea-light ef-elea-dark)
           (tsukasa ef-eagle ef-dream)
           (satori ef-tritanopia-light ef-trio-dark)))
-  (setq theme-character 'nazrin2)
+  (setq theme-character 'tsukasa)
   :config
   (setq ef-themes-mixed-fonts t)
   (setq ef-themes-headings

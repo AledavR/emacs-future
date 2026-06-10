@@ -87,6 +87,13 @@
   :ensure t
   :defer t)
 
+(use-package web-mode
+  :ensure t
+  :defer t
+  :mode
+  (("\\.html?\\'" . web-mode))
+  )
+
 (use-package mhtml-mode
   :ensure nil
   :defer t

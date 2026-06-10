@@ -162,6 +162,15 @@ If POSITION is nil appends to the beginning of each element."
   (insert ": ")
   (bookmark-set "org-last-updated-idea"))
 
+(defun rc/copy-org-src-block-content ()
+  "Copy the content of the current Org source block directly to the kill ring."
+  (interactive)
+  (if (org-in-src-block-p)
+      (let ((code (org-element-property :value (org-element-at-point))))
+        (kill-new code)
+        (message "Code block content copied"))
+    (user-error "Not inside an Org source block")))
+
 (defun +diary-schedule-class (start-month start-day end-month end-day year days-of-week)
   (and (diary-block start-month start-day year
                     end-month end-day year)
