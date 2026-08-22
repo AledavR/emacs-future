@@ -125,22 +125,46 @@
   :hook (Info-mode . olivetti-mode)
   :custom (olivetti-body-width 110))
 
-(use-package spacious-padding
-  :ensure t
-  :custom
-  (spacious-padding-widths
-   '( :internal-border-width 3
-      :header-line-width 3
-      :mode-line-width 3
-      :tab-width 3
-      :right-divider-width 10
-      :scroll-bar-width 2
-      :fringe-width 2))
-  (spacious-padding-subtle-mode-line
-   '( :mode-line-active spacious-padding-subtle-mode-line-active
-      :mode-line-inactive spacious-padding-subtle-mode-line-inactive))
-  :config
-  (spacious-padding-mode 1))
+;; (use-package spacious-padding
+;;   :ensure t
+;;   :custom
+;;   (spacious-padding-widths
+;;    '(:internal-border-width 3
+;;      :header-line-width 3
+;;      :mode-line-width 3
+;;      :tab-width 3
+;;      :right-divider-width 10
+;;      :scroll-bar-width 2
+;;      :fringe-width 2))
+;;   (spacious-padding-subtle-mode-line
+;;    '(:mode-line-active spacious-padding-subtle-mode-line-active
+;;      :mode-line-inactive spacious-padding-subtle-mode-line-inactive))
+;;   :preface
+;;   (defun my/spacious-padding-enable (&optional frame)
+;;     (with-selected-frame (or frame (selected-frame))
+;;       (when (display-graphic-p)
+;;         (unless spacious-padding-mode
+;;           (spacious-padding-mode 1)))))
+;;   :hook
+;;   (after-init . my/spacious-padding-enable)
+;;   (after-make-frame-functions . my/spacious-padding-enable))
+
+;; (use-package spacious-padding
+;;   :ensure t
+;;   :custom
+;;   (spacious-padding-widths
+;;    '( :internal-border-width 3
+;;       :header-line-width 3
+;;       :mode-line-width 3
+;;       :tab-width 3
+;;       :right-divider-width 10
+;;       :scroll-bar-width 2
+;;       :fringe-width 2))
+;;   (spacious-padding-subtle-mode-line
+;;    '( :mode-line-active spacious-padding-subtle-mode-line-active
+;;       :mode-line-inactive spacious-padding-subtle-mode-line-inactive))
+;;   :config
+;;   (spacious-padding-mode t))
 
 (defun my-inhibit-startup-screen-file ()
   "Startup screen inhibitor for `command-line-functions`.
@@ -151,7 +175,7 @@ names an existing file."
 	 (file-exists-p
 	  (expand-file-name argi command-line-default-directory)))))
 
-;; (add-hook 'command-line-functions #'my-inhibit-startup-screen-file)
+(add-hook 'command-line-functions #'my-inhibit-startup-screen-file)
 (setq command-line-functions #'my-inhibit-startup-screen-file)
 
 (use-package dashboard
@@ -170,11 +194,14 @@ names an existing file."
         (directory-files (locate-user-emacs-file "img") t ".*g$"))
   (setq banner-image-size (if (equal system-name "acer") 500 550))
   :hook
-  (elpaca-after-init . dashboard-insert-startupify-lists)
-  (elpaca-after-init . dashboard-initialize)
+  ;; (elpaca-after-init . dashboard-insert-startupify-lists)
+  ;; (elpaca-after-init . dashboard-initialize)
+  
   (dashboard-mode . protect-dashboard)
   (dashboard-after-initialize . dashboard-refresh-buffer)
   (server-after-make-frame . rc/refresh-buffer-maybe)
+  
+  ;; (dashboard-mode-hook . (lambda () (setq-local default-directory (getenv "HOME"))))
   ;; (server-after-make-frame . (lambda () (set-frame-font "Aporetic Sans Mono 13")))
   :custom
   (dashboard-center-content t)
@@ -209,6 +236,7 @@ names an existing file."
   (dashboard-setup-startup-hook)
   (setq initial-buffer-choice
         (lambda () (get-buffer-create "*dashboard*"))))
+
   ;; :config
   ;; (add-hook server-after-make-frame-hook 'revert-buffer))
 

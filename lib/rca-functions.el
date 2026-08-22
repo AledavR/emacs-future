@@ -176,3 +176,16 @@ If POSITION is nil appends to the beginning of each element."
                     end-month end-day year)
        (or (cl-some (lambda (p) (= p (calendar-day-of-week date)))
                     days-of-week))))
+
+
+(defun rc/alist-affixation-function (alist)
+  (lambda (candidates)
+    (mapcar
+     (lambda (candidate)
+       (list
+        candidate
+        ""
+        (propertize
+         (format "  %s" (alist-get (intern candidate) alist))
+         'face 'font-lock-comment-face)))
+     candidates)))

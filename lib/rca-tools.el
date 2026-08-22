@@ -17,6 +17,7 @@
   (denote-known-keywords '("matematica" "informatica"))
   (denote-directory (concat sync-directory "archive/notes"))
   (denote-dired-directories (mapcar (lambda (dir) (concat sync-directory "archive/" dir )) '("notes" "journal" "posts")))
+  (denote-templates '((food . "\n\n* Opinión\n\n* Observaciones\n\n")))
   :init
   (defvar-keymap denote-prefix-map
     :doc "Denote commands"
@@ -347,15 +348,55 @@ For more on chathistory, see:
   :bind (("M-s g" . rc/find-gptel-file))
   :config
   (defun rc/find-gptel-file ()
-    "Find config file interactively"
+    "Find gptel file interactively"
     (interactive)
     (find-file (locate-user-emacs-file
-                (completing-read "Select config file: "
+                (completing-read "Select gptel file: "
                                  (directory-files-recursively (concat sync-directory "archive/llm/") ".*" nil)))))
+  (defun rc/gptel-select-directive ()
+    (interactive)
+    (let ((completion-extra-properties
+           `(:affixation-function ,(rc/alist-affixation-function gptel-directives))))
+      (completing-read
+       "Select value: "
+       (mapcar (lambda (x) (symbol-name (car x)))
+               gptel-directives)
+       nil t)))
+  (defun rc/gptel-writing-aid (&optional directive)
+    "Submits the current region or a string input to gptel."
+    (interactive
+     (list (when current-prefix-arg
+             (rc/gptel-select-directive))))
+    (let ((input (if (use-region-p)
+                     (buffer-substring-no-properties
+                      (region-beginning)
+                      (region-end))
+                   (read-string "Entrada: "))))
+      (gptel-request
+          input
+        :system (or directive
+                    (alist-get (intern "sinonimos") gptel-directives))
+        :callback
+        (lambda (response info)
+          (when (stringp response)
+            (with-current-buffer (get-buffer-create "*gptel-writing-aid*")
+              (let ((inhibit-read-only t))
+                (erase-buffer)
+                (insert response))
+              (markdown-mode)
+              (local-set-key (kbd "q") (lambda () (interactive) (quit-window t)))
+              (display-buffer
+               (current-buffer)
+               `((display-buffer-in-side-window)
+                 (side . bottom)
+                 (window-height . ,#'fit-window-to-buffer)))))))))
   (dolist (directive
-           '((Asistente . "Eres un modelo de lenguaje asistente especializado en programación el cual esta contenido en el editor de texto Emacs. Debes explicar tu respuesta de manera concisa.")
-             (Generador . "Eres un modelo de lenguaje y un programador eficiente. Solo genera código y solo código como única salida sin ningún tipo de texto adicional.")
-             (Matematico . "Eres un modelo de lenguaje y un instructor de matemática. Define de manera concisa los pasos usados en la resolución de problemas. Usa notación Latex con los símbolos \( y \) cuando sea necesario.")))
+           '((asistente . "Eres un modelo de lenguaje asistente especializado en programación el cual esta contenido en el editor de texto Emacs. Debes explicar tu respuesta de manera concisa.")
+             (generador . "Eres un modelo de lenguaje y un programador eficiente. Solo genera código y solo código como única salida sin ningún tipo de texto adicional.")
+             (matematico . "Eres un modelo de lenguaje y un instructor de matemática. Define de manera concisa los pasos usados en la resolución de problemas. Usa notación Latex con los símbolos \\( y \\) cuando sea necesario.")
+             (sinonimos . "Proporciona hasta 10 sinónimos de la palabra o frase indicada. Escribe todos los sinónimos en un único párrafo, separados exclusivamente por comas. Utiliza únicamente palabras existentes y válidas en español.")
+             (antonimos . "Proporciona hasta 10 antónimos de la palabra o frase indicada. Escribe todos los antónimos en un único párrafo, separados exclusivamente por comas. Utiliza únicamente palabras existentes y válidas en español.")
+             (definicion . "Proporciona una definición completa, clara y precisa de la palabra o frase indicada. Incluye sus diferentes significados relevantes, categoría gramatical cuando corresponda, contexto de uso y ejemplos breves cuando sean necesarios para comprenderla.")))
     (add-to-list 'gptel-directives directive))
   (setq gptel-backend (gptel-make-deepseek "Deepseek"
                         :stream t
@@ -403,5 +444,5 @@ For more on chathistory, see:
   :config
   (add-hook 'nov-mode-hook '+nov-olivetti-mode))
 
-(use-package ultra-scroll
-  :ensure t)
+;; (use-package ultra-scroll
+;;   :ensure t)
