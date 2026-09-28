@@ -47,6 +47,7 @@
    '((python . t)
      (julia . t)
      (shell . t)
+     (R . t)
      (calc . t)
      (octave . t)))
   

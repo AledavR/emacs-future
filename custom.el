@@ -59,10 +59,10 @@
  '(org-pretty-entities-include-sub-superscripts nil)
  '(package-selected-packages
    '(ace-window auctex cape cdlatex circadian consult corfu dashboard diminish
-                ef-themes eglot-java gnuplot htmlize kind-icon lua-mode magit
-                marginalia markdown-mode meow olivetti orderless ox-pandoc
-                pdf-tools rainbow-mode smartparens use-package vertico vterm
-                vundo yasnippet))
+                edit-indirect ef-themes eglot-java gnuplot htmlize kind-icon
+                lua-mode magit marginalia markdown-mode meow olivetti orderless
+                ox-pandoc pdf-tools rainbow-mode smartparens use-package vertico
+                vterm vundo yasnippet))
  '(pdf-annot-default-annotation-properties
    '((t (label . "")) (text (color . "#ff0000") (icon . "Note"))
      (highlight (color . "yellow")) (underline (color . "blue"))

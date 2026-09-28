@@ -93,10 +93,11 @@
         '((parsee ef-reverie ef-elea-dark)
           (yuuma ef-tritanopia-light ef-rosa)
           (nazrin2 ef-light ef-owl)
+          (utsuho ef-arcadia ef-elea-dark)
           (youmu ef-elea-light ef-elea-dark)
           (tsukasa ef-eagle ef-dream)
           (satori ef-tritanopia-light ef-trio-dark)))
-  (setq theme-character 'tsukasa)
+  (setq theme-character 'utsuho)
   :config
   (setq ef-themes-mixed-fonts t)
   (setq ef-themes-headings

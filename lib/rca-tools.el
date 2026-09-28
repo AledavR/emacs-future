@@ -446,3 +446,19 @@ For more on chathistory, see:
 
 ;; (use-package ultra-scroll
 ;;   :ensure t)
+
+(use-package quarto-mode
+  :ensure t
+  :mode ("\\.Rmd" . poly-quarto-mode))
+
+(use-package ess
+  :ensure t)
+
+(use-package org-draw
+  :ensure t
+  :commands (org-draw org-draw-edit org-draw-setup))
+
+(use-package org-timegrid
+  :ensure (:host github :repo "Gleek/org-timegrid")
+  :commands (org-timegrid-week)
+  :bind ("C-c c" . org-timegrid-week))
